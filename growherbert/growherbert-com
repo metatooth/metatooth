@@ -1,0 +1,38 @@
+upstream growherbert_backend {
+  server thermos.metatooth.com:3030;
+}
+
+server {
+  listen 443 ssl;
+  server_name www.growherbert.com growherbert.com;
+
+  if ($scheme = http) {
+    return 301 https://$host$request_uri;
+  }
+   
+  location / {
+    proxy_pass http://growherbert_backend/;
+
+    proxy_headers_hash_max_size 512;
+    proxy_headers_hash_bucket_size 128;
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;  
+  }
+
+  ssl_certificate /root/.acme.sh/growherbert.com_ecc/fullchain.cer;
+  ssl_certificate_key /root/.acme.sh/growherbert.com_ecc/growherbert.com.key;
+}
+
+server {
+  if ($host = www.growherbert.com) {
+    return 301 https://growherbert.com$request_uri;
+  }
+
+  if ($host = growherbert.com) {
+    return 301 https://$host$request_uri;
+  }
+
+  listen 80;
+  server_name www.growherbert.com growherbert.com;
+  return 404;
+}

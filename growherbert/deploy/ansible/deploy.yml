@@ -1,0 +1,71 @@
+- hosts: servers
+
+  tasks:
+    - name: Ensures {{ build_dir }} dir exists
+      file:
+        path: "{{ build_dir }}"
+        state: directory
+
+    - name: Sync docker-compose.yml
+      synchronize:
+        src: "{{ src_dir }}/docker-compose.yml"
+        dest: "{{ build_dir }}"
+
+    - name: Sync nginx.conf
+      synchronize:
+        src: "{{ src_dir }}/nginx.conf"
+        dest: "{{ build_dir }}"
+
+    - name: Install .env file
+      become: yes
+      template:
+        src: ./templates/dotenv.j2
+        dest: "{{ build_dir }}/.env"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Run docker compose up
+      ansible.builtin.shell:
+        cmd: cd {{ build_dir }} && docker compose up -d
+
+    - name: Install growherbert.com service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/com.growherbert.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable and start growherbert.com service
+      become: yes
+      systemd:
+        name: com.growherbert
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
+- hosts: balancers
+
+  tasks:
+
+  - name: Install growherbert.com config
+    become: yes
+    synchronize:
+      src: "{{ src_dir }}/growherbert-com"
+      dest: /etc/nginx/sites-available/growherbert-com
+      
+  - name: Enable growherbert.com
+    become: yes
+    file:
+      src: /etc/nginx/sites-available/growherbert-com
+      dest: /etc/nginx/sites-enabled/growherbert-com
+      state: link
+
+  - name: Restart nginx
+    service:
+      name: nginx
+      state: restarted
+    become: yes
+

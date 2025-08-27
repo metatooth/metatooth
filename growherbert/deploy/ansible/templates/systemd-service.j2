@@ -1,0 +1,13 @@
+[Unit]
+Description=The growherbert.com website
+Requires=docker.service
+After=docker.service
+
+[Service]
+WorkingDirectory={{ build_dir }}
+ExecStart=/usr/bin/docker-compose up
+ExecStop=/usr/bin/docker-compose down 
+Restart=always
+
+[Install]
+WantedBy=default.target
