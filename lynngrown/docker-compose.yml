@@ -1,0 +1,28 @@
+services:
+  wordpress:
+    image: wordpress:6.5.5-php8.3-fpm-alpine
+    container_name: wordpress-lynngrown-1
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      WORDPRESS_DB_HOST: $MARIADB_HOST
+      WORDPRESS_DB_USER: $MARIADB_USER
+      WORDPRESS_DB_PASSWORD: $MARIADB_PASSWORD
+      WORDPRESS_DB_NAME: $MARIADB_NAME
+    volumes:
+      - wordpress-data:/var/www/html
+
+  nginx:
+    image: nginx:1.27.0-alpine
+    container_name: nginx-lynngrown-1
+    restart: unless-stopped
+    ports:
+      - "3300:80"
+    volumes:
+      - wordpress-data:/var/www/html
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - wordpress
+
+volumes:
+  wordpress-data:

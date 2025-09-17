@@ -1,0 +1,70 @@
+- hosts: servers
+
+  tasks:
+    - name: Ensures {{ build_dir }} dir exists
+      file:
+        path: "{{ build_dir }}"
+        state: directory
+
+    - name: Sync docker-compose.yml
+      synchronize:
+        src: "{{ src_dir }}/docker-compose.yml"
+        dest: "{{ build_dir }}"
+
+    - name: Sync nginx.conf
+      synchronize:
+        src: "{{ src_dir }}/nginx.conf"
+        dest: "{{ build_dir }}"
+
+    - name: Install .env file
+      become: yes
+      template:
+        src: ./templates/dotenv.j2
+        dest: "{{ build_dir }}/.env"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Run docker compose up
+      ansible.builtin.shell:
+        cmd: cd {{ build_dir }} && docker compose up -d
+
+    - name: Install lynngrown.com service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/com.lynngrown.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable and start lynngrown.com service
+      become: yes
+      systemd:
+        name: com.lynngrown
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
+- hosts: balancers
+
+  tasks:
+
+  - name: Install lynngrown.com config
+    become: yes
+    synchronize:
+      src: "{{ src_dir }}/lynngrown-com"
+      dest: /etc/nginx/sites-available/lynngrown-com
+
+  - name: Enable lynngrown.com
+    become: yes
+    file:
+      src: /etc/nginx/sites-available/lynngrown-com
+      dest: /etc/nginx/sites-enabled/lynngrown-com
+      state: link
+
+  - name: Restart nginx
+    service:
+      name: nginx
+      state: restarted
+    become: yes

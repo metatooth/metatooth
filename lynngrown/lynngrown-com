@@ -1,0 +1,38 @@
+upstream lynngrown_backend {
+  server thermos.metatooth.com:3300;
+}
+
+server {
+  listen 443 ssl;
+  server_name www.lynngrown.com lynngrown.com;
+
+  if ($scheme = http) {
+    return 301 https://$host$request_uri;
+  }
+
+  location / {
+    proxy_pass http://lynngrown_backend/;
+
+    proxy_headers_hash_max_size 512;
+    proxy_headers_hash_bucket_size 128;
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  ssl_certificate /root/.acme.sh/lynngrown.com_ecc/fullchain.cer;
+  ssl_certificate_key /root/.acme.sh/lynngrown.com_ecc/lynngrown.com.key;
+}
+
+server {
+  if ($host = www.lynngrown.com) {
+    return 301 https://lynngrown.com$request_uri;
+  }
+
+  if ($host = lynngrown.com) {
+    return 301 https://$host$request_uri;
+  }
+
+  listen 80;
+  server_name www.lynngrown.com lynngrown.com;
+  return 404;
+}
