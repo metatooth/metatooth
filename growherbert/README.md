@@ -1,4 +1,4 @@
-# (growherbert.com)[https://growherbert.com]
+# [growherbert.com](https://growherbert.com)
 
 A WordPress-powered website
 
