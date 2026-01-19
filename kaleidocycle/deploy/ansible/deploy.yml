@@ -1,0 +1,67 @@
+- hosts: servers
+
+  tasks:
+    - name: Make app directory
+      ansible.builtin.shell:
+        cmd: "mkdir -p {{ app_dir }}"
+
+    - name: Sync docker image
+      synchronize:
+        src: "{{ src_dir }}/kaleidocycle_app_latest.tar.gz"
+        dest: "{{ app_dir }}"
+
+    - name: Load docker image
+      ansible.builtin.shell:
+        cmd: docker load < kaleidocycle_app_latest.tar.gz
+        chdir: "{{ app_dir }}"
+
+    - name: Stop running conatiner
+      ansible.builtin.shell:
+        cmd: docker container remove --force {{ container_name }}
+
+    - name: Run docker image as container
+      ansible.builtin.shell:
+        cmd: >
+          docker run -d
+          -p 3000:3000
+          --name {{ container_name }}
+          kaleidocycle_app:latest
+
+    - name: Install kaleidocycle.metatooth.com service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/com.metatooth.kaleidocycle.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Enable and start kalediocycle.metatooth.com service
+      become: yes
+      systemd:
+        name: com.metatooth.kaleidocycle
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
+- hosts: balancers
+
+  tasks:
+    - name: Install kaleidocycle.metatooth.com config
+      become: yes
+      synchronize:
+        src: "{{ src_dir }}//config//kaleidocycle-metatooth-com"
+        dest: /etc/nginx/sites-available/kaleidocycle-metatooth-com
+
+    - name: Enable kaleidocycle.metatooth.com
+      become: yes
+      file:
+        src: /etc/nginx/sites-available/kaleidocycle-metatooth-com
+        dest: /etc/nginx/sites-enabled/kaleidocycle-metatooth.com
+        state: link
+
+    - name: Restart nginx
+      service:
+        name: nginx
+        state: restarted
+      become: yes
