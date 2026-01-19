@@ -9,7 +9,15 @@ class Assets < ROM::Relation[:sql]
     attribute :media, Types::String
     attribute :width, Types::Float
     attribute :height, Types::Float
+    attribute :path_to_img, Types::String
+    attribute :image_url, Types::String
+    attribute :thumbnail_url, Types::String
+    attribute :s3_filename, Types::String
     attribute :s3_original, Types::String
+    attribute :s3_500, Types::String
+    attribute :s3_thumbnail, Types::String
+    attribute :s3_150, Types::String
+    attribute :s3_300, Types::String
     attribute :s3_thumb, Types::String
     attribute :s3_w300, Types::String
     attribute :s3_w500, Types::String
