@@ -20,7 +20,7 @@
         group: root
         mode: '0600'
 
-    - name: Stop running conatiner
+    - name: Stop running container
       ansible.builtin.shell:
         cmd: docker container remove --force {{ container_name }}
 
