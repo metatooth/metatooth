@@ -14,7 +14,4 @@ gem 'rom'
 gem 'rom-sql'
 gem 'sass'
 gem 'sinatra'
-
-group :development do
-  gem 'rubocop', '~> 1.25.1'
-end
+gem 'sqlite3'
