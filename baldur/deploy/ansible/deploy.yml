@@ -21,10 +21,11 @@
           docker run -d
           -p 3333:4567
           --name {{ container_name }}
+          --add-host={{ db_host }}:66.175.215.212
           -e AWS_ACCESS_KEY_ID="{{ aws_access_key_id }}"
           -e AWS_SECRET_ACCESS_KEY="{{ aws_secret_access_key }}"
           -e S3_BUCKET_NAME="{{ s3_bucket_name }}"
-          -e DATABASE_URL="{{ db_url }}"
+          -e DATABASE_URL="postgresql://{{ db_user }}:{{ db_password }}@{{ db_host }}/{{ db_name }}"
           -e UPLOAD_PASSWORD="{{ upload_password }}"
           -e RACK_ENV=production
           baldur_app:latest
@@ -60,7 +61,7 @@
   - name: Install laramirandagoodman.com config
     become: yes
     synchronize:
-      src: "{{ src_dir }}//config//nginx.conf"
+      src: "{{ src_dir }}/nginx.conf"
       dest: /etc/nginx/sites-available/laramirandagoodman-com
 
   - name: Enable laramirandagoodman.com
