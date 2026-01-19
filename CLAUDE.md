@@ -4,15 +4,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Metatooth is a monorepo managing containerized WordPress deployments for two websites:
+Metatooth is a monorepo managing containerized WordPress deployments for three websites:
 - **growherbert** (growherbert.com) - exposed on port 3030
 - **lynngrown** (lynngrown.com) - exposed on port 3300
+- **metatooth/www** (metatooth.com) - exposed on port 3330
 
 The project uses Ansible for infrastructure automation with Docker Compose for containerization.
 
 ## Build & Deploy Commands
 
-Both sites follow identical patterns. Replace `{site}` with `growherbert` or `lynngrown`:
+All sites follow identical patterns. Replace `{site}` with `growherbert`, `lynngrown`, or `metatooth/www`:
 
 ```bash
 # Deploy to servers
@@ -27,7 +28,7 @@ make clean    # Remove setup stamp
 ```
 
 ### Environment Variables
-- `GROWHERBERT_BRANCH` / `LYNNGROWN_BRANCH` - Git branch/tag to deploy (default: "local")
+- `GROWHERBERT_BRANCH` / `LYNNGROWN_BRANCH` / `METATOOTH_BRANCH` - Git branch/tag to deploy (default: "local")
 - `ANSIBLE_INVENTORY` - Path to Ansible inventory file
 
 ### Maintenance Playbooks
