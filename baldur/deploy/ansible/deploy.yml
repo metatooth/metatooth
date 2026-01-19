@@ -11,6 +11,15 @@
         cmd: docker load < baldur_app_latest.tar.gz
         chdir: "{{ deploy_dir }}"
 
+    - name: Install .env file
+      become: yes
+      template:
+        src: ./templates/dotenv.j2
+        dest: "{{ deploy_dir }}/.env"
+        owner: root
+        group: root
+        mode: '0600'
+
     - name: Stop running conatiner
       ansible.builtin.shell:
         cmd: docker container remove --force {{ container_name }}
@@ -22,12 +31,7 @@
           -p 3333:4567
           --name {{ container_name }}
           --add-host={{ db_host }}:{{ db_host_ip }}
-          -e AWS_ACCESS_KEY_ID="{{ aws_access_key_id }}"
-          -e AWS_SECRET_ACCESS_KEY="{{ aws_secret_access_key }}"
-          -e S3_BUCKET_NAME="{{ s3_bucket_name }}"
-          -e DATABASE_URL="postgresql://{{ db_user }}:{{ db_password }}@{{ db_host }}/{{ db_name }}?sslmode=require"
-          -e UPLOAD_PASSWORD="{{ upload_password }}"
-          -e RACK_ENV=production
+          --env-file {{ deploy_dir }}/.env
           baldur_app:latest
 
     - name: Install laramirandagoodman.com service
