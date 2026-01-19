@@ -1,0 +1,16 @@
+*~
+/config/settings.yml
+/config/redis/development.conf
+/config/redis/test.conf
+/db/redis/development
+/db/redis/test
+/tmp
+/webrat.log
+/vendor/webrat/vendor
+/public/uploads
+vendor/
+.bundle/
+.sass-cache/
+.env
+_venv
+assets/

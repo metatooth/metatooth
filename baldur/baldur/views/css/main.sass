@@ -1,0 +1,261 @@
+html
+  height: 100%
+
+body
+  height: 100%
+  font-family: 'Segoe UI', sans-serif
+
+h4
+  font-weight: bold
+
+
+.bgimg
+  background-image: url("http://s3.amazonaws.com/laramirandagoodman-assets/dnuajsghifzeayek.jpg")
+  height: 100%
+  background-position: center
+  background-repeat: no-repeat
+  background-size: cover
+
+.billboard
+  position: absolute
+  left: 0px
+  top: 0px
+  padding: 75px
+
+.billboard .title
+  color: #fff
+  font-weight: bold
+  font-size: 100px
+
+.billboard .button
+  color: #000
+  background: #fff
+  padding: 10px
+  margin: 20px 0px 20px 0px
+  font-weight: bold
+  width: 100px
+  text-align: center
+
+.billboard .button a:link
+  color: #000
+  text-decoration: #000
+
+.billboard .button a:visited
+  color: #000
+  text-decoration: #000
+
+.billboard .button a:hover
+  color: #000
+  text-decoration: #000
+
+.billboard .button a:active
+  color: #000
+  text-decoration: #000
+
+.billboard .icon
+  color: #fff
+
+@media screen and (max-width: 600px)
+  .billboard .title
+    font-size: 40px
+
+.button
+  cursor: pointer
+
+.is-right
+  float: right
+
+.home-icon
+  color: white
+  font-size: 40px
+  text-decoration: none
+
+.home-icon:hover
+  color: white
+
+.contact-icon
+  color: black
+  font-size: 30px
+  text-decoration: none
+
+.contact-icon:hover
+  color: black
+
+.card
+  border: 0px
+
+.header
+  overflow: hidden
+  padding: 40px 20px
+
+.header a
+  float: left
+  color: #666666
+  text-align: center
+  padding: 3px 20px
+  text-decoration: none
+  font-size: 18px
+  line-height: 25px
+  border-radius: 4px
+
+.header a.logo
+  color: black
+  font-size: 25px
+  font-weight: bold
+
+.header a:hover
+  color: black
+
+.header a.active
+  color: black
+
+.header-right
+  float: right
+
+@media screen and (max-width: 500px)
+  .header a
+    float: none
+    display: block
+    text-align: left
+  .header-right
+    float: none
+
+.container
+  text-align: center
+  padding: 0px 30px
+
+.section
+  text-align: left
+  padding: 10px 0px
+
+.section p
+  font-family: Georgia, 'Times New Roman', serif
+
+.row
+  display: flex
+  flex-wrap: wrap
+  padding: 0px 4px
+
+.column
+  flex: 50%
+  max-width: 50%
+  padding: 0 4px
+
+.column img
+  margin-bottom: 56px
+  width: 90%
+  cursor: pointer
+
+@media screen and (max-width: 1000px)
+  .column
+    flex: 100%
+    max-width: 100%
+
+.modal
+  display: none
+  position: fixed
+  z-index: 1
+  padding-top: 20px
+  left: 0
+  top: 0
+  width: 100%
+  height: 100%
+  overflow: auto
+  background-color: rgba(0,0,0,0.99)
+  text-align: center
+
+.modal-content
+  position: relative
+  text-align: center
+  vertical-align: middle
+  height: 100%
+
+.close
+  color: white
+  position: absolute
+  z-index: 10
+  top: 10px
+  right: 25px
+  font-size: 35px
+  font-weight: bold
+
+.close:hover,
+.close:focus
+  color: white
+  cursor: pointer
+  text-decoration: none
+
+.asset
+  position: relative
+  padding-top: 30px
+
+.asset img:hover + div
+  display: block
+
+.asset img
+  max-width: 80%
+  max-height: 80vh
+  height:  auto
+  margin: auto
+
+.caption
+  position: absolute
+  bottom: 0px
+  padding: 20px
+  width: 100%
+  text-align: center
+  color: white
+  background-color: rgba(0,0,0,0.7)
+  font-weight: bold
+  display: none
+
+.caption:hover
+  display: block
+
+.caption .title
+  font-size: large
+
+.prev,
+.next
+  cursor: pointer
+  position: absolute
+  top: 50%
+  width: auto
+  padding: 16px
+  margin-top: -50px
+  color: white
+  font-weight: bold
+  font-size: 20px
+  transition: 0.6s ease
+  border-radius: 0 3px 3px 0
+  user-select: none
+  -webkit-user-select: none
+
+.prev
+  left: 0
+
+.next
+  right: 0
+  border-radius: 3px 0 0 3px
+
+.prev:hover,
+.next:hover
+  background-color: rgba(0, 0, 0, 0.8)
+
+img.demo
+  opacity: 0.6
+
+.active,
+.demo:hover
+  opacity: 1
+
+img.hover-shadow
+  transition: 0.3s
+
+.hover-shadow:hover
+  box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19)
+
+#footer
+  text-align: center
+  font-size: small
+  padding: 50px 50px 50px 50px

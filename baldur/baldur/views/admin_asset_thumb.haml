@@ -1,0 +1,17 @@
+%div{:class => "asset-thumbnail"}
+  %a{ :href => "/paintings/view/#{asset.id}" }
+    %img{ :width => "150", :src => asset.url_thumb, :alt => asset.alt_text }
+  %br
+  != asset.title_year_html
+  %br
+  != asset.media
+  %br
+  != asset.dim
+  %br
+  %label{:for=>"weight_#{asset.id}"} Weight:
+  %input(type="text" name="weight_#{asset.id}" value="#{@weights[asset.id]}")
+  %br
+  %label{:for=>"delete_#{asset.id}"} Delete?
+  %input(type="checkbox" name="delete_#{asset.id}")
+  %br
+  %br

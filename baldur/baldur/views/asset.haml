@@ -1,0 +1,9 @@
+%div{ :class => "asset" }
+  %img{ :src => asset.url,
+        :alt => asset.title }
+    %div{ :class => "caption"}
+      %p{ :class => "title" }= asset.title
+      %p
+        &nbsp;
+      %p= "#{asset.dim}. #{asset.media}."
+      %p= asset.year

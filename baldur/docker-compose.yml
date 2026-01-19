@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: baldur
+      POSTGRES_USER: postgres
+      POSTGRES_DB: baldur
+      PGDATA: /pgdata
+    volumes:
+      - pgdata:/pgdata
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      start_period: 10s
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  client:
+    image: baldur_app:latest
+    build:
+      context: .
+      target: client
+    environment:
+      DATABASE_URL: postgresql://postgres:baldur@db:5432/baldur?sslmode=disable
+    ports:
+      - "4567:4567"
+    depends_on:
+      db:
+        condition: service_healthy
+
+volumes:
+  pgdata:

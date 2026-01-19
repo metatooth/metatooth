@@ -1,0 +1,46 @@
+#wrap
+  #header
+    != partial :header
+  #nav
+  #sidebar
+    %ul{:class=>"menu"}
+      %li
+        %a{:href=>"/"} HOME
+      %li &nbsp;
+      %li
+        %a{:href=>"/admin"} ADMIN
+      %li &nbsp;
+      %li
+        %a{:href=>"/upload"} UPLOAD
+
+  #main
+    %h1
+      Select file, fill in details, click 'Upload!'
+      %form(method="post" enctype='multipart/form-data')
+        %input(type='file' name='myfile')
+        %br
+        Title:
+        %input(type='text' name='title')
+        %br
+        Year:
+        %input(type='text' name='year')
+        %br
+        Height (in):
+        %input(type='text' name='height')
+        %br
+        Width (in):
+        %input(type='text' name='width')
+        %br
+        Media:
+        %input(type='text' name='media')
+        %br
+        Series:
+        %input(type='text' name='series')
+        %br
+        Password:
+        %input(type='text' name='password')
+        %br
+        %input(type='submit' value='Upload!')
+
+  #footer
+    != partial :footer

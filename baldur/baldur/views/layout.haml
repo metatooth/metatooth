@@ -1,0 +1,20 @@
+!!! Strict
+%html{:lang => "en"}
+  %head
+    %meta{:charset => "utf-8"}
+    %meta{:name => "viewport", :content => "width=device-width, initial-scale=1"}
+    %title
+      LARA MIRANDA GOODMAN
+    %meta{:"http-equiv" => "Content-Type", :content => "text/html; charset=utf-8"}/
+    %link{:rel => "stylesheet", :href => "https://www.w3schools.com/w3css/4/w3.css"}
+    %link{:rel => "stylesheet", :href => "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css"}
+    %link{:rel => "stylesheet", :href => "/css/reset.css", :type => "text/css"}/
+    %link{:rel => "stylesheet", :href => "/css/main.css", :type => "text/css"}/
+    %link{:rel => "preconnect", :href => "//s3.amazonaws.com"}
+    - @assets.each do |a|
+      %link{:rel => "prefetch", :href => a.url}
+      %link{:rel => "prefetch", :href => a.url_500}
+      %link{:rel => "prefetch", :href => a.url_300}
+  %body{ :id => "body" }
+    != yield
+    != File.read(File.join('views', 'google_analytics.html'))

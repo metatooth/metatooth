@@ -4,12 +4,17 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Metatooth is a monorepo managing containerized WordPress deployments for three websites:
+Metatooth is a monorepo containing:
+
+**WordPress Deployments** (managed via Ansible):
 - **growherbert** (growherbert.com) - exposed on port 3030
 - **lynngrown** (lynngrown.com) - exposed on port 3300
 - **metatooth/www** (metatooth.com) - exposed on port 3330
 
-The project uses Ansible for infrastructure automation with Docker Compose for containerization.
+**Other Projects**:
+- **baldur** - Ruby-based image gallery web application for artist portfolio management (exposed on port 4567). See [baldur/CLAUDE.md](baldur/CLAUDE.md) for details.
+
+The project uses Ansible for WordPress infrastructure automation with Docker Compose for containerization across all services.
 
 ## Build & Deploy Commands
 

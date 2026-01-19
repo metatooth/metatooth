@@ -1,0 +1,28 @@
+!= partial :header, :contact => 'active'
+
+%div{ :class => "container" }
+  #main
+
+    %p
+      Swampscott, Massachusetts USA
+
+    %br
+
+    %p
+      %a{ :href => "mailto:artist@laramirandagoodman.com" }= "artist@laramirandagoodman.com"
+
+    %br
+
+    %p
+      +1-781-526-8828
+
+    %br
+
+    %p
+      %a{ :href => "https://www.facebook.com/laramirandagoodman", :class => "fa fa-facebook contact-icon", :target => "_blank"}
+      %span
+        &nbsp;
+      %a{ :href => "https://www.instagram.com/laramirandagoodman", :class => "fa fa-instagram contact-icon", :target => "_blank"}
+
+  #footer
+    != partial :footer
