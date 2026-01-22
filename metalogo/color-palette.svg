@@ -1,0 +1,10 @@
+<svg height="400" width="1000">
+  <!-- Copyright Metatooth LLC 2020. -->
+  <rect x="0" y="0" height="400" width="1000" style="fill:#000000;"/>
+  <rect x="50" y="50" height="300" width="300" style="fill:#ff33bb;stroke:#000000;stroke-width:20;"/>
+  <rect x="350" y="50" height="300" width="200" style="fill:#00bbee;stroke:#000000;stroke-width:20;"/>
+  <rect x="550" y="50" height="300" width="100" style="fill:#00dd77;stroke:#000000;stroke-width:20;"/>
+  <rect x="650" y="50" height="300" width="100" style="fill:#ff7700;stroke:#000000;stroke-width:20;"/>
+  <rect x="750" y="50" height="300" width="100" style="fill:#fdfdfd;stroke:#000000;stroke-width:20;"/>
+  <rect x="850" y="50" height="300" width="100" style="fill:#2d2d2d;stroke:#000000;stroke-width:20;"/>
+</svg>
