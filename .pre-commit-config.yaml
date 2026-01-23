@@ -11,3 +11,6 @@ repos:
       - id: check-yaml
       - id: check-json
       - id: check-added-large-files
+      - id: no-commit-to-branch
+        args: ["--branch", "main"]
+      - id: check-merge-conflict
