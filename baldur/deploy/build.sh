@@ -41,4 +41,4 @@ docker build -t baldur_app:latest .
 
 docker save baldur_app:latest | gzip > $DEPLOYMENT_DIR/baldur_app_latest.tar.gz
 
-cp -r config $DEPLOYMENT_DIR/
+cp nginx.conf $DEPLOYMENT_DIR/
