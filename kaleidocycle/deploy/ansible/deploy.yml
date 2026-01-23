@@ -15,7 +15,7 @@
         cmd: docker load < kaleidocycle_app_latest.tar.gz
         chdir: "{{ app_dir }}"
 
-    - name: Stop running conatiner
+    - name: Stop running container
       ansible.builtin.shell:
         cmd: docker container remove --force {{ container_name }}
 
@@ -36,7 +36,7 @@
         group: root
         mode: "0644"
 
-    - name: Enable and start kalediocycle.metatooth.com service
+    - name: Enable and start kaleidocycle.metatooth.com service
       become: yes
       systemd:
         name: com.metatooth.kaleidocycle
@@ -50,7 +50,7 @@
     - name: Install kaleidocycle.metatooth.com config
       become: yes
       synchronize:
-        src: "{{ src_dir }}//config//kaleidocycle-metatooth-com"
+        src: "{{ src_dir }}/config/kaleidocycle-metatooth-com"
         dest: /etc/nginx/sites-available/kaleidocycle-metatooth-com
 
     - name: Enable kaleidocycle.metatooth.com
