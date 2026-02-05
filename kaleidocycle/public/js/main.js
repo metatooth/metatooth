@@ -54,7 +54,6 @@ lights[2].position.set(100, 0, -100);
 scene.add(lights[0]);
 scene.add(lights[1]);
 scene.add(lights[2]);
-scene.add(lights[3]);
 
 const group = new THREE.Group();
 const build = new Builder();

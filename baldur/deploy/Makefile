@@ -18,8 +18,8 @@ endif
 check_inventory:
 ifeq ($(ANSIBLE_INVENTORY),)
 	@echo ""
-	@echo "Must set ANSIBLE_INVENTORY. Use \"ansible/inventory\" to use invetory"
-  @echo	"from current repository."
+	@echo "Must set ANSIBLE_INVENTORY. Use \"ansible/inventory\" to use inventory"
+	@echo "from current repository."
 	@echo ""
 	@exit 1
 endif
