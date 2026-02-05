@@ -27,11 +27,11 @@ $ cmake --build _builds
 
 ## Built With
 
-* [CMake](https://cmake.org/) - The CMake system makes it easier to build, test, and package a C++ project.
+- [CMake](https://cmake.org/) - The CMake system makes it easier to build, test, and package a C++ project.
 
 ## Authors
 
-* **Terry Lorber** - *Initial work* - <terry@metatooth.com>
+- **Terry Lorber** - _Initial work_ - <terry@metatooth.com>
 
 ## License
 
