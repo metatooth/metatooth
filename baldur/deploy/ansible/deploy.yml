@@ -3,7 +3,7 @@
   tasks:
     - name: Sync docker image
       synchronize:
-        src: "{{ src_dir }}//baldur_app_latest.tar.gz"
+        src: "{{ src_dir }}/baldur_app_latest.tar.gz"
         dest: "{{ deploy_dir }}"
 
     - name: Load docker image
