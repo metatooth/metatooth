@@ -8,6 +8,6 @@ rackup 'config.ru'
 port ENV['PORT'] || 4567
 environment ENV['RACK_ENV'] || 'development'
 
-on_worker_boot do
+before_worker_boot do
   # Worker specific setup
 end

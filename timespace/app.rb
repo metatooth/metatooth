@@ -7,6 +7,10 @@ class App < Sinatra::Base
     redirect to('/1')
   end
 
+  get '/favicon.ico' do
+    return ""
+  end
+
   get '/:id' do
     @events = Event.make
 
