@@ -11,7 +11,7 @@ fi
 HERE=$( cd $( dirname "${BASH_SOURCE[0]}" ) >/dev/null 2>&1 && pwd )
 TOPDIR=$( dirname ${HERE} )
 
-TMP_DIR=/tmp/baldur
+TMP_DIR=/tmp/metatooth.com
 rm -rf $TMP_DIR
 mkdir -p $TMP_DIR
 
@@ -22,7 +22,7 @@ cleanup() {
   rm -rfv $BUILD_DIR
 }
 
-trap "cleanup" exit
+#trap "cleanup" exit
 
 if [ "${BRANCH}" = "local" ]; then
   ln -sf ${TOPDIR} ${BUILD_DIR}
@@ -37,8 +37,8 @@ cd $BUILD_DIR
 rm -rf $DEPLOYMENT_DIR
 mkdir -p $DEPLOYMENT_DIR
 
-docker build -t baldur_app:latest .
+docker build -t timespace_app:latest .
 
-docker save baldur_app:latest | gzip > $DEPLOYMENT_DIR/baldur_app_latest.tar.gz
+docker save timespace_app:latest | gzip > $DEPLOYMENT_DIR/timespace_app_latest.tar.gz
 
 cp nginx.conf $DEPLOYMENT_DIR/

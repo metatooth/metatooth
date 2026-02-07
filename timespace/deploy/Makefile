@@ -1,4 +1,4 @@
-BALDUR_BRANCH ?= local
+TIMESPACE_BRANCH ?= local
 ANSIBLE_INVENTORY ?= ansible/inventory
 
 .PHONY: all
@@ -6,9 +6,9 @@ all: deploy-all
 
 .PHONY: check_branch
 check_branch:
-ifeq ($(BALDUR_BRANCH),)
+ifeq ($(TIMESPACE_BRANCH),)
 	@echo ""
-	@echo "Must set BALDUR_BRANCH. Use \"local\" to deploy current changes,"
+	@echo "Must set TIMESPACE_BRANCH. Use \"local\" to deploy current changes,"
 	@echo "or use a tag version to deploy a release."
 	@echo ""
 	@exit 1
@@ -25,17 +25,17 @@ ifeq ($(ANSIBLE_INVENTORY),)
 endif
 
 .PHONY: deploy-all
-deploy-all: deploy-baldur
+deploy-all: deploy-timespace
 
 .PHONY: build
 build: check_branch check_inventory
-	./build.sh ${BALDUR_BRANCH} ${ANSIBLE_INVENTORY}
+	./build.sh ${TIMESPACE_BRANCH} ${ANSIBLE_INVENTORY}
 
 .PHONY: deploy
 deploy:
 	ansible-playbook -i ${ANSIBLE_INVENTORY} ansible/deploy.yml
 
-.PHONY: deploy-baldur
-deploy-baldur:
+.PHONY: deploy-timespace
+deploy-timespace:
 	$(MAKE) build
 	$(MAKE) deploy

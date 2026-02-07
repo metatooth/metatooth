@@ -3,49 +3,39 @@
   tasks:
     - name: Sync docker image
       synchronize:
-        src: "{{ src_dir }}//baldur_app_latest.tar.gz"
+        src: "{{ src_dir }}/timespace_app_latest.tar.gz"
         dest: "{{ deploy_dir }}"
 
     - name: Load docker image
       ansible.builtin.shell:
-        cmd: docker load < baldur_app_latest.tar.gz
+        cmd: docker load < timespace_app_latest.tar.gz
         chdir: "{{ deploy_dir }}"
-
-    - name: Install .env file
-      template:
-        src: ./templates/dotenv.j2
-        dest: "{{ deploy_dir }}/.env"
-        owner: "{{ ansible_user }}"
-        group: "{{ ansible_user }}"
-        mode: '0600'
 
     - name: Stop running container
       ansible.builtin.shell:
-        cmd: docker container remove --force {{ container_name }}
+        cmd: docker container remove --force ruby-timespace-1
 
     - name: Run docker image as container
       ansible.builtin.shell:
         cmd: >
           docker run -d
-          -p 3333:4567
-          --name {{ container_name }}
-          --add-host={{ db_host }}:{{ db_host_ip }}
-          --env-file {{ deploy_dir }}/.env
-          baldur_app:latest
+          -p 4000:3000
+          --name ruby-timespace-1
+          timespace_app:latest
 
-    - name: Install laramirandagoodman.com service
+    - name: Install timespace.metatooth.com service
       become: yes
       template:
         src: ./templates/systemd-service.j2
-        dest: /etc/systemd/system/com.laramirandagoodman.service
+        dest: /etc/systemd/system/com.metatooth.timespace.service
         owner: root
         group: root
         mode: '0644'
 
-    - name: Enable and start laramirandagoodman.com service
+    - name: Enable and start timespace.metatooth.com service
       become: yes
       systemd:
-        name: com.laramirandagoodman
+        name: com.metatooth.timespace
         state: restarted
         daemon_reload: yes
         enabled: yes
@@ -61,16 +51,16 @@
 
   tasks:
 
-  - name: Install laramirandagoodman.com config
+  - name: Install timespace.metatooth.com config
     become: yes
     synchronize:
       src: "{{ src_dir }}/nginx.conf"
-      dest: /etc/nginx/sites-available/laramirandagoodman-com
+      dest: /etc/nginx/sites-available/timespace-metatooth-com
 
-  - name: Enable laramirandagoodman.com
+  - name: Enable timespace.metatooth.com
     become: yes
     file:
-      src: /etc/nginx/sites-available/laramirandagoodman-com
-      dest: /etc/nginx/sites-enabled/laramirandagoodman-com
+      src: /etc/nginx/sites-available/timespace-metatooth-com
+      dest: /etc/nginx/sites-enabled/timespace-metatooth-com
       state: link
     notify: Restart Nginx

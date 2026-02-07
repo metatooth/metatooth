@@ -1,11 +1,11 @@
 [Unit]
-Description=The laramirandagoodman.com website
+Description=The timespace.metatooth.com website
 Requires=docker.service
 After=docker.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c 'docker container inspect {{ container_name }} >/dev/null 2>&1 || docker run -d -p 3333:4567 --name {{ container_name }} baldur_app:latest'
+ExecStart=/bin/bash -c 'docker container inspect ruby-timespace-1 >/dev/null 2>&1 || docker run -d -p 4000:4567 --name ruby-timespace-1 timespace_app:latest'
 RemainAfterExit=yes
 
 [Install]
