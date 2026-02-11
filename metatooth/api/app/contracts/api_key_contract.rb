@@ -3,7 +3,7 @@
 # Validation of an api key
 class ApiKeyContract < Dry::Validation::Contract
   params do
-    required(:api_key).filled(:string)
+    required(:api_key).filled(:str?)
     required(:active).value(:bool)
   end
 end

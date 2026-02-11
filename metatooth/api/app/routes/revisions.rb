@@ -111,6 +111,6 @@ class App
       check = params
     end
     check['data']
-      &.slice('bucket', 'etag', 'location', 'mime_type', 's3key', 'service')
+      &.slice('bucket', 'etag', 'location', 'mime_type', 's3key', 'service', 'number', 'description', 'name')
   end
 end

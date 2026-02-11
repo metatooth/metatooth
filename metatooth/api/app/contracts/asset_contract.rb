@@ -3,6 +3,6 @@
 # Validation of an asset
 class AssetContract < Dry::Validation::Contract
   params do
-    required(:url).filled(:string)
+    required(:url).filled(:str?)
   end
 end

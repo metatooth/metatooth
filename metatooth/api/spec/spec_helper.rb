@@ -55,18 +55,21 @@ RSpec.configure do |config|
   end
 
   config.before(:suite) do
-    DatabaseCleaner.strategy = :truncation, {
-      pre_count: true,
-      reset_sequences: true
-    }
-    DatabaseCleaner.clean_with(:truncation,
-      pre_count: true,
-      reset_sequences: true)
+    # Clear all tables at the start of the test suite
+    connection = MAIN_CONTAINER.gateways[:default].connection
+    %w[access_tokens addresses api_keys assets order_items orders plans products revisions users].each do |table|
+      connection.run("TRUNCATE TABLE #{table} CASCADE;")
+      connection.run("ALTER SEQUENCE #{table}_id_seq RESTART WITH 1;")
+    end
   end
 
   config.around(:each) do |example|
-    DatabaseCleaner.cleaning do
-      example.run
+    example.run
+    # Clear all tables after each test
+    connection = MAIN_CONTAINER.gateways[:default].connection
+    %w[access_tokens addresses api_keys assets order_items orders plans products revisions users].each do |table|
+      connection.run("TRUNCATE TABLE #{table} CASCADE;")
+      connection.run("ALTER SEQUENCE #{table}_id_seq RESTART WITH 1;")
     end
   end
 end

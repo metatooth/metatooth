@@ -17,7 +17,7 @@ class App
   get '/assets' do
     now = DateTime.now
     from = params[:from] ? DateTime.parse(params[:from]) : now - 30
-    to = params[:to] ? DateTime.parse(params[:to]) - 1 : now
+    to = params[:to] ? DateTime.parse(params[:to]) + 1 : now + 1
 
     asset_repo = AssetRepo.new(MAIN_CONTAINER)
 

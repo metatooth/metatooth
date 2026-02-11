@@ -3,6 +3,6 @@
 # Validation of a plan
 class PlanContract < Dry::Validation::Contract
   params do
-    required(:name).filled(:string)
+    required(:name).filled(:str?)
   end
 end

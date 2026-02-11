@@ -8,8 +8,8 @@ class UserContract < Dry::Validation::Contract
   end
 
   params do
-    required(:email).filled(:string)
-    required(:password_digest).filled(:string)
+    required(:email).filled(:str?)
+    required(:password_digest).filled(:str?)
   end
 
   rule(:email).validate(:email)
