@@ -80,6 +80,7 @@ CREATE TABLE IF NOT EXISTS orders (
 -- Create products table
 CREATE TABLE IF NOT EXISTS products (
   id SERIAL PRIMARY KEY,
+  locator VARCHAR(255),
   name VARCHAR(255),
   description TEXT,
   price DECIMAL(10, 2),
@@ -111,7 +112,6 @@ CREATE TABLE IF NOT EXISTS assets (
   name VARCHAR(255),
   url VARCHAR(255),
   asset_type VARCHAR(255),
-  mime_type VARCHAR(255),
   created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
   deleted BOOLEAN DEFAULT FALSE,

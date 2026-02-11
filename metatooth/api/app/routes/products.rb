@@ -98,7 +98,11 @@ class App
   end
 
   def product_params
-    params[:data]&.slice(:name, :description)
+    return params[:data]&.slice(:name, :description) unless params.empty?
+
+    request.body.rewind
+    check = JSON.parse(request.body.read)
+    check['data']&.slice('name', 'description', 'price', 'sku')
   end
 
   def product_repo

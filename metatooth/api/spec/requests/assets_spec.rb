@@ -114,7 +114,7 @@ RSpec.describe 'Assets', type: :request do
 
       context 'with valid parameters' do
         let(:params) do
-          { mime_type: 'model/glft+json' }
+          { asset_type: 'model/glft+json' }
         end
 
         it 'gets HTTP status 200' do
@@ -122,13 +122,13 @@ RSpec.describe 'Assets', type: :request do
         end
 
         it 'receives the updated resource' do
-          expect(json_body['data']['mime_type']).to eq(
+          expect(json_body['data']['asset_type']).to eq(
             'model/glft+json'
           )
         end
 
         it 'updates the record in the database' do
-          expect(asset_repo.by_id(b.id).mime_type).to eq(
+          expect(asset_repo.by_id(b.id).asset_type).to eq(
             'model/glft+json'
           )
         end

@@ -98,10 +98,10 @@ class App
   end
 
   def asset_params
-    return params[:data]&.slice(:url, :mime_type) unless params.empty?
+    return params[:data]&.slice(:url, :asset_type) unless params.empty?
 
     request.body.rewind
     check = JSON.parse(request.body.read)
-    check['data']&.slice('url', 'mime_type', 'service', 'bucket', 's3key', 'etag')
+    check['data']&.slice('url', 'asset_type', 'service', 'bucket', 's3key', 'etag')
   end
 end

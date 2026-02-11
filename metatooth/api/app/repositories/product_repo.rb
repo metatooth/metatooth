@@ -8,6 +8,12 @@ class ProductRepo < ROM::Repository[:products]
     products.by_pk(id).one!
   end
 
+  def create(attributes)
+    attrs = attributes.dup
+    attrs[:locator] ||= SecureRandom.hex(8)
+    products.command(:create).call(attrs)
+  end
+
   def delete(id)
     update(id, deleted: true, deleted_at: DateTime.now)
   end

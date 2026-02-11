@@ -7,5 +7,4 @@ Factory.define(:asset) do |f|
     "https://metatooth-cabinet.s3.amazonaws.com/junk-drawer/logo#{n}.png"
   end
   f.asset_type { 'image/png' }
-  f.mime_type { 'image/png' }
 end
