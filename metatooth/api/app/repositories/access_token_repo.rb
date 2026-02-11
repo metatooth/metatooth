@@ -17,16 +17,16 @@ class AccessTokenRepo < ROM::Repository[:access_tokens]
   end
 
   def generate(id)
-    token = SecureRandom.hex
-    update(id, token_digest: BCrypt::Password.create(token))
+    token = SecureRandom.hex(32)
+    update(id, token: token)
     token
   end
 
   def query(conditions)
     access_tokens
-      .map_to(AccessToken)
       .where(deleted: false)
       .where(conditions)
+      .map { |token| AccessToken.new(token) }
       .to_a
   end
 end

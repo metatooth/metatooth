@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ruby '3.0.2'
+ruby '3.3.8'
 
 source 'https://rubygems.org'
 
@@ -10,13 +10,14 @@ gem 'foreman'
 gem 'json'
 gem 'pg'
 gem 'pony'
-gem 'puma'
+gem 'puma', '~> 6.0'
 gem 'rack-accept'
 gem 'rack-cors', require: 'rack/cors'
 gem 'rake'
 gem 'rom'
 gem 'rom-sql'
 gem 'sinatra'
+gem 'swagger-ui_rails', '~> 2.0'
 
 group :development, :test do
   gem 'database_cleaner'

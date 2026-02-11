@@ -21,7 +21,7 @@ class App
     from = params[:from] ? Time.parse(params[:from]) : now - (30 * 24 * 60 * 60)
     to = params[:to] ? Time.parse(params[:to]) : now + (1 * 24 * 60 * 60)
 
-    all_orders = orders.to_a
+    all_orders = order_repo.query(user_id: current_user[:id])
     all_orders.select! { |v| v[:created_at] > from && v[:created_at] < to }
 
     status 200

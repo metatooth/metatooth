@@ -3,5 +3,5 @@
 Factory.define(:plan) do |f|
   f.locator { SecureRandom.hex(2) }
   f.sequence(:name) { |n| "name #{n}" }
-  f.timestamps
+  f.price { 99.99 }
 end

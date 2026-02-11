@@ -2,5 +2,5 @@
 
 Factory.define(:order) do |f|
   f.association(:user)
-  f.timestamps
+  f.status { 'pending' }
 end

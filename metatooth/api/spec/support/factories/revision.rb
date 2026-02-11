@@ -2,8 +2,6 @@
 
 Factory.define(:revision) do |f|
   f.locator { SecureRandom.hex(2) }
-  f.sequence(:number) { |n| n }
-  f.location { 'example.org' }
-  f.timestamps
+  f.sequence(:version) { |n| n }
   f.association(:plan)
 end

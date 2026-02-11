@@ -2,5 +2,5 @@
 
 Factory.define(:product) do |f|
   f.sequence(:name) { |n| "name #{n}" }
-  f.timestamps
+  f.price { 99.99 }
 end

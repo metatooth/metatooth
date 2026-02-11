@@ -5,7 +5,6 @@ Factory.define(:user) do |f|
   f.sequence(:name) { |n| "name #{n}" }
   f.type 'User'
   f.password_digest { BCrypt::Password.create('password') }
-  f.timestamps
 
   f.trait :confirmation_redirect_url do |t|
     t.confirmation_token '123'
