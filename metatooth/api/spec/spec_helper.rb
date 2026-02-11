@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 ENV['RACK_ENV'] = 'test'
+ENV['DATABASE_URL'] ||= 'postgresql://metatooth:metatooth@localhost:5432/metatooth_development'
 
 require 'database_cleaner'
 require 'dry-validation-matchers'
