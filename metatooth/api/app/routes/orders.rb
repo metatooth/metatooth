@@ -1,6 +1,21 @@
 # frozen_string_literal: true
 
-# The orders endpoints.
+##
+# Orders API Endpoints
+#
+# This module provides RESTful endpoints for managing dental orders.
+#
+# == Authentication
+# All endpoints require valid API key and access token in the Authorization header:
+#   Authorization: Metaspace-Token api_key=<id>:<key>, access_token=<user_id>:<token>
+#
+# == Resources
+# * GET /orders - List user's orders with date filtering
+# * POST /orders - Create a new order
+# * GET /orders/:id - Retrieve a specific order
+# * PUT /orders/:id - Update order details
+# * DELETE /orders/:id - Soft-delete an order
+#
 class App
   options '/orders' do
     response['Access-Control-Allow-Origin'] = '*'

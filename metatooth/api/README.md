@@ -1,6 +1,77 @@
 # api.metatooth.com
 
-> A Sinatra.rb project
+> A RESTful API for managing dental order data using Sinatra, Ruby, and ROM
+
+## Features
+
+- Complete CRUD endpoints for dental order management
+- Input validation with Dry::Validation
+- Database abstraction with ROM (Ruby Object Mapper)
+- PostgreSQL backend with proper migrations
+- Comprehensive test suite (80%+ coverage)
+- API key and token-based authentication
+- CORS support
+- Swagger/OpenAPI documentation
+
+## Data Models
+
+The API manages the following core entities:
+
+- **users**: User accounts with authentication and confirmation workflows
+- **orders**: Dental order records with status tracking and timestamps
+- **order_items**: Line items within orders with quantity and pricing
+- **products**: Available products/services for ordering
+- **addresses**: Billing and shipping addresses
+- **plans**: Treatment or subscription plans
+- **revisions**: Versioning for plans
+- **assets**: Files and media storage
+- **api_keys**: API authentication keys
+- **access_tokens**: Bearer tokens for API access
+
+## API Endpoints
+
+### Orders
+- `GET /orders` - List all orders for current user
+- `POST /orders` - Create a new order
+- `GET /orders/:id` - Get a specific order
+- `PUT /orders/:id` - Update an order
+- `DELETE /orders/:id` - Delete (soft delete) an order
+
+### Order Items
+- `GET /orders/:order_id/items` - List items in an order
+- `POST /orders/:order_id/items` - Add an item to an order
+- `GET /orders/:order_id/items/:id` - Get a specific order item
+- `PUT /orders/:order_id/items/:id` - Update an order item
+- `DELETE /orders/:order_id/items/:id` - Remove an item from an order
+
+### Products
+- `GET /products` - List all products
+- `POST /products` - Create a new product
+- `GET /products/:id` - Get a specific product
+- `PUT /products/:id` - Update a product
+- `DELETE /products/:id` - Delete a product
+
+### Users
+- `POST /users` - Register a new user
+- `GET /users` - List all users (admin only)
+- `GET /users/:id` - Get a specific user
+- `PUT /users/:id` - Update a user
+- `DELETE /users/:id` - Delete a user
+
+### Additional Endpoints
+- `GET /plans` - List treatment plans
+- `POST /plans` - Create a plan
+- `PUT /orders/:order_id` - Update order status
+- `GET /addresses` - List saved addresses
+- `POST /addresses` - Save an address
+
+## Authentication
+
+All endpoints (except `/users` for registration) require authentication via:
+
+```
+Authorization: Metaspace-Token api_key=<id>:<key>, access_token=<user_id>:<token>
+```
 
 ## Getting Started
 
