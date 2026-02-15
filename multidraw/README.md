@@ -4,7 +4,7 @@ Multidraw implements an application framework in C++. Not just any framework, th
 
 Multidraw depends on [FLTK](https://www.fltk.org/) for multi-platform user interface support.
 
-Git repository at [metatooth/libmultidraw](https://github.com/metatooth/libmultidraw)
+Git repository at [metatooth/metatooth](https://github.com/metatooth/metatooth)
 
 Original source from [vectaport/ivtools](https://github.com/vectaport/ivtools)
 
@@ -14,7 +14,7 @@ Original source from [vectaport/ivtools](https://github.com/vectaport/ivtools)
 
 ### Install dependencies
 
-```$ sudo apt install conan cmake build-essentials clang clang-tidy```
+```$ sudo apt install conan cmake build-essentials clang clang-tidy libgl-dev libgl1-mesa-dev libx11-dev```
 
 ### Get and build
 
@@ -29,7 +29,7 @@ $ make
 
 ## License
 
-Copyright (c) 2023 Metatooth LLC. See the [License](LICENSE).
+Copyright (c) 2026 Metatooth LLC. See the [License](../LICENSE).
 
 In addition, some elements of the codebase are:
 

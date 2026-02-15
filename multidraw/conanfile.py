@@ -1,12 +1,10 @@
-from conans import ConanFile, tools, CMake
-from conan.tools.cmake import CMakeToolchain, cmake_layout, CMakeDeps
+from conan import ConanFile
+from conan.tools.cmake import CMakeToolchain, cmake_layout, CMakeDeps, CMake
 
 class MultidrawConan(ConanFile):
     name = "libmultidraw"
     version = "0.1"
 
-    generators = "cmake", "cmake_find_package"
-    
     # Optional metadata
     license = "MIT"
     author = "Terry Lorber terry@metatooth.com"
@@ -33,6 +31,7 @@ class MultidrawConan(ConanFile):
     def requirements(self):
         self.requires("fltk/1.3.8")
         self.requires("doxygen/1.9.4")
+        self.requires("freetype/2.13.2")
         self.requires("libxft/2.3.6")
 
     def generate(self):

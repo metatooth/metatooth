@@ -17,11 +17,11 @@ add_library(
 	commands/SaveCmd.cpp
 	components/Component.cpp
         state_vars/ComponentNameVar.cpp
-	state_vars/ModifiedStatusVar.cpp	
+	state_vars/ModifiedStatusVar.cpp
 	state_vars/NameVar.cpp
 )
 
-target_link_libraries(multidraw ${CONAN_LIBS})
+target_link_libraries(multidraw fltk::fltk libxft::libxft Freetype::Freetype)
 
 add_dependencies(multidraw VersionHeader)
 
@@ -40,4 +40,3 @@ set_target_properties(
 )
 
 install(TARGETS multidraw)
-
