@@ -1,0 +1,91 @@
+- hosts: servers
+
+  tasks:
+    - name: Ensures {{ build_dir }} dir exists
+      file:
+        path: "{{ build_dir }}"
+        state: directory
+
+    - name: Sync docker-compose.yml
+      synchronize:
+        src: "{{ src_dir }}/docker-compose.yml"
+        dest: "{{ build_dir }}"
+
+    - name: Sync Gemfile
+      synchronize:
+        src: "{{ src_dir }}/Gemfile"
+        dest: "{{ build_dir }}"
+
+    - name: Sync Gemfile.lock
+      synchronize:
+        src: "{{ src_dir }}/Gemfile.lock"
+        dest: "{{ build_dir }}"
+
+    - name: Sync config.ru
+      synchronize:
+        src: "{{ src_dir }}/config.ru"
+        dest: "{{ build_dir }}"
+
+    - name: Sync init.rb
+      synchronize:
+        src: "{{ src_dir }}/init.rb"
+        dest: "{{ build_dir }}"
+
+    - name: Sync Procfile
+      synchronize:
+        src: "{{ src_dir }}/Procfile"
+        dest: "{{ build_dir }}"
+
+    - name: Sync app directory
+      synchronize:
+        src: "{{ src_dir }}/app/"
+        dest: "{{ build_dir }}/app"
+
+    - name: Sync config directory
+      synchronize:
+        src: "{{ src_dir }}/config/"
+        dest: "{{ build_dir }}/config"
+
+    - name: Sync db directory
+      synchronize:
+        src: "{{ src_dir }}/db/"
+        dest: "{{ build_dir }}/db"
+
+    - name: Install .env file
+      become: yes
+      template:
+        src: ./templates/dotenv.j2
+        dest: "{{ build_dir }}/.env"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Run docker compose up
+      ansible.builtin.shell:
+        cmd: cd {{ build_dir }} && docker compose up -d
+
+    - name: Install metatooth-api service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/com.metatooth.api.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable and start metatooth-api service
+      become: yes
+      systemd:
+        name: com.metatooth.api
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
+- hosts: balancers
+
+  tasks:
+
+  - name: Install metatooth-api config (if needed)
+    become: yes
+    debug:
+      msg: "Balancer configuration for metatooth-api can be added here if needed"

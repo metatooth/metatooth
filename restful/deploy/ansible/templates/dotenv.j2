@@ -1,0 +1,5 @@
+DATABASE_URL={{ database_url }}
+RACK_ENV={{ rack_env | default('production') }}
+PORT={{ api_port | default('3000') }}
+WEB_CONCURRENCY={{ web_concurrency | default('2') }}
+RAILS_MAX_THREADS={{ rails_max_threads | default('5') }}
