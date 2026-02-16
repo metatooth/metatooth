@@ -14,7 +14,7 @@ Original source from [vectaport/ivtools](https://github.com/vectaport/ivtools)
 
 ### Install dependencies
 
-```$ sudo apt install conan cmake build-essentials clang clang-tidy libgl-dev libgl1-mesa-dev libx11-dev```
+`$ sudo apt install conan cmake build-essentials clang clang-tidy libgl-dev libgl1-mesa-dev libx11-dev`
 
 ### Get and build
 
