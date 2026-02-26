@@ -1,0 +1,63 @@
+[all:vars]
+ansible_connection=ssh
+ansible_user=<add_ssh_user>
+ansible_ssh_pass=<add_ssh_password>
+ansible_python_interpreter=/usr/bin/python3
+buildDir="/home/{{ ansible_user }}"
+appDir="{{ buildDir }}/herbert"
+srcDir=/tmp/herbert/deployment
+distDir="{{ srcDir }}/dist"
+
+[databases]
+<add_db_hosts>
+
+[databases:vars]
+dbname=<add_db_name>
+dbpass=<add_db_password>
+dbuser=<add_db_user>
+db_allowed_cidr=<add_allowed_cidr>
+
+[servers]
+<add_server_hosts>
+
+[servers:vars]
+dbuser="{{ hostvars[groups['databases'][0]].dbuser }}"
+dbpass="{{ hostvars[groups['databases'][0]].dbpass }}"
+dbname="{{ hostvars[groups['databases'][0]].dbname }}"
+dbhost="{{ groups['databases'][0] }}"
+dburl="postgresql://{{ dbuser }}:{{ dbpass }}@{{ dbhost }}:5432/{{ dbname }}"
+wss_host="{{ groups['socket_servers'][0] }}"
+wss_port="{{ hostvars[groups['socket_servers'][0]].wss_port }}"
+wss_url="ws://{{ wss_host }}:{{ wss_port }}"
+api_port=5000
+
+[socket_servers]
+<add_socket_servers>
+
+[socket_servers:vars]
+server_api_host="{{ groups['servers'][0] }}"
+server_api_port="{{ hostvars[groups['servers'][0]].api_port }}"
+api_url="http://{{ server_api_host }}:{{ server_api_port }}"
+wss_port=2929
+
+[clients]
+<add_client_hosts>
+
+[clients:vars]
+client_port=8080
+
+[workers]
+<add_worker_hosts>
+
+[workers:vars]
+wss_host="{{ groups['socket_servers'][0] }}"
+wss_port="{{ hostvars[groups['socket_servers'][0]].wss_port }}"
+wss_url="ws://{{ wss_host }}:{{ wss_port }}"
+
+[kiosks]
+<add_kiosk_hosts>
+
+[kiosks:vars]
+client_host="{{ groups['clients'][0] }}"
+client_port="{{ hostvars[groups['clients'][0]].client_port }}"
+client_url="http://{{ client_host }}:{{ client_port }}"

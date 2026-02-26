@@ -1,0 +1,167 @@
+- hosts: workers
+
+  vars:
+    nodejs_version: "20.x"
+    service_description: "Herbert in-room worker service"
+    service_user: root
+    service_file: dist/worker/main.js
+
+  tasks:
+    - name: Enable I2C
+      become: yes
+      shell: "raspi-config nonint do_i2c 0"
+
+    - name: Install System Dependencies
+      become: yes
+      apt:
+        update_cache: yes
+        state: latest
+        name:
+          [
+            "motion",
+            "bluetooth",
+            "bluez",
+            "git",
+            "gcc",
+            "g++",
+            "libbluetooth-dev",
+            "libudev-dev",
+            "lirc",
+            "make",
+          ]
+
+    - name: Clone 8relind-rpi
+      git:
+        repo: "https://github.com/SequentMicrosystems/8relind-rpi.git"
+        dest: /home/{{ ansible_user }}/8relind-rpi
+
+    - name: Build and install 8relind-rpi
+      become: yes
+      make:
+        chdir: /home/{{ ansible_user }}/8relind-rpi
+        target: install
+
+    - name: Insert/update the bootloader file
+      become: yes
+      blockinfile:
+        path: /boot/config.txt
+        block: |
+          dtoverlay=gpio-ir,gpio_pin=18
+          dtoverlay=gpio-ir-tx,gpio_pin=17
+
+    - name: Create LIRC module configuration
+      become: yes
+      copy:
+        dest: /etc/lirc/hardware.conf
+        content: |
+          LIRCD_ARGS="--uinput --listen"
+          LOAD_MODULES=true
+          DRIVER="default"
+          DEVICE="/dev/lirc0"
+          MODULES="lirc_rpi"
+
+    - name: Create LIRC module option
+      become: yes
+      copy:
+        dest: /etc/lirc/lirc_options.conf
+        content: |
+          [lircd]
+          nodaemon        = False
+          driver          = default
+          device          = /dev/lirc0
+          output          = /var/run/lirc/lircd
+          pidfile         = /var/run/lirc/lircd.pid
+          plugindir       = /usr/lib/arm-linux-gnueabihf/lirc/plugins
+          permission      = 666
+          allow-simulate  = No
+          repeat-max      = 600
+
+    - name: Create the LG controller file
+      become: yes
+      copy:
+        src: "{{ src_dir }}/scripts/AKB73016012.licrd.conf"
+        dest: /etc/lirc/lircd.conf.d/lg.lircd.conf
+
+    - name: Create the B+D controller file
+      become: yes
+      copy:
+        src: "{{ src_dir }}/scripts/810900812A.licrd.conf"
+        dest: /etc/lirc/lircd.conf.d/b+d.lircd.conf
+    - name: Create {{ app_dir }}
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+    - name: Create {{ app_dir }}/dist
+      file:
+        path: "{{ app_dir }}/dist"
+        state: directory
+
+    - name: Sync herbert dist
+      synchronize:
+        src: "{{ dist_dir }}/worker"
+        dest: "{{ app_dir }}/dist"
+        recursive: yes
+        delete: yes
+
+    - name: Sync herbert shared
+      synchronize:
+        src: "{{ dist_dir }}/shared"
+        dest: "{{ app_dir }}/dist"
+        recursive: yes
+        delete: yes
+
+    - name: Sync herbert config
+      synchronize:
+        src: "{{ src_dir }}/config"
+        dest: "{{ app_dir }}"
+        recursive: yes
+        delete: yes
+
+    - name: Sync herbert package.json
+      synchronize:
+        src: "{{ src_dir }}/package.json"
+        dest: "{{ app_dir }}"
+
+    - name: Sync herbert package-lock.json
+      synchronize:
+        src: "{{ src_dir }}/package-lock.json"
+        dest: "{{ app_dir }}"
+
+    - name: Install nodejs {{nodejs_version}}
+      include_role:
+        name: geerlingguy.nodejs
+        apply:
+          become: yes
+
+    - name: Install production node_modules
+      command: npm install
+      args:
+        chdir: "{{ app_dir }}"
+      environment:
+        NODE_ENV: production
+
+    - name: Install worker service
+      become: yes
+      template:
+        src: ./templates/worker-systemd-service.j2
+        dest: /etc/systemd/system/herbert-worker.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Enable and start herbert-worker service
+      become: yes
+      systemd:
+        name: herbert-worker
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
+    - name: Create .bash_aliases
+      copy:
+        dest: /home/{{ ansible_user }}/.bash_aliases
+        content: |
+          alias reload='sudo systemctl daemon-reload'
+          alias restart='sudo systemctl restart herbert-worker'
+          alias status='sudo systemctl status herbert-worker'
+          alias tail-worker='sudo journalctl -u herbert-worker -f'

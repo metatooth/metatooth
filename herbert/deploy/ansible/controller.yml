@@ -1,0 +1,47 @@
+- hosts: controllers
+
+  vars:
+    service_description: "Controller service for the Herbert system"
+    container_name: "controller-1"
+
+  tasks:
+    - name: Sync docker image
+      synchronize:
+        src: "{{ src_dir }}/herbert_controller_latest.tar.gz"
+        dest: "{{ deploy_dir }}"
+
+    - name: Load docker image
+      ansible.builtin.shell:
+        cmd: docker load < herbert_controller_latest.tar.gz
+        chdir: "{{ deploy_dir }}"
+
+    - name: Stop running conatiner
+      ansible.builtin.shell:
+        cmd: docker container remove --force {{ container_name }}
+
+    - name: Run docker image as container
+      ansible.builtin.shell:
+        cmd: >
+          docker run -d
+          -e API_URL=http://api-1:{{ api_port }}
+          -e WSS_URL=ws://socket-1:{{ wss_port }}
+          --network=herbert-net
+          --name={{ container_name}}
+          herbert_controller:latest
+
+    - name: Install controller service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/herbert-controller.service
+        owner: root
+        group: root
+        mode: "0644"
+
+    - name: Enable and start herbert-controller service
+      become: yes
+      systemd:
+        name: herbert-controller
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

@@ -1,0 +1,12 @@
+{
+  "devices": [
+    {
+      "id": "aaaaaabbbbbb",
+      "manufacturer": "mockmeter"
+    },
+    {
+      "id": "bbbbbbcccccc",
+      "manufacturer": "mockplug"
+    }
+  ]
+}

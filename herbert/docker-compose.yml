@@ -1,0 +1,94 @@
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: bar
+      POSTGRES_USER: postgres
+      POSTGRES_DB: herbert
+      PGDATA: /pgdata
+    volumes:
+      - ./scripts/db:/docker-entrypoint-initdb.d
+      - pgdata:/pgdata
+    ports:
+      - "5432:5432"
+
+  api:
+    image: herbert_api:latest
+    build:
+      context: .
+      target: api
+    environment:
+      DATABASE_URL: postgresql://postgres:bar@db:5432/herbert?sslmode=disable
+      WSS_URL: ws://socket_server:2929
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+    ports:
+      - "5000:5000"
+    depends_on:
+      - db
+
+  socket:
+    image: herbert_socket:latest
+    build:
+      context: .
+      target: socket
+    environment:
+      API_URL: http://api:5000
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+    ports:
+      - "2929:2929"
+    depends_on:
+      - api
+
+  controller:
+    image: herbert_controller:latest
+    build:
+      context: .
+      target: controller
+    environment:
+      API_URL: http://api:5000
+      WSS_URL: ws://api:2929
+    depends_on:
+      - api
+      - socket
+
+  client:
+    image: herbert_client:latest
+    build:
+      context: .
+      target: runner
+    env_file: .env
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+    depends_on:
+      - api
+      - socket
+    ports:
+      - "8080:8080"
+
+  worker:
+    image: herbert_worker:latest
+    privileged: true
+    build:
+      context: .
+      target: worker
+    environment:
+      NODE_ENV: docker
+      WSS_URL: ws://socket_server:2929
+    volumes:
+      - ./src:/app/src
+      - ./config:/app/config
+      - /var/run/dbus/system_bus_socket:/var/run/dbus/system_bus_socket
+      - /dev:/dev
+    devices:
+      - /dev/vhci:/dev/vhci
+    depends_on:
+      - api
+      - socket
+
+volumes:
+  pgdata:

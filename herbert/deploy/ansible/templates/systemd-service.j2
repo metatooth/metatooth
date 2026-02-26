@@ -1,0 +1,14 @@
+[Unit]
+Description={{ service_description }}
+Requires=docker.service
+After=docker.service
+
+[Service]
+TimeoutStartSec=0
+Restart=always
+ExecStartPre=/usr/bin/docker stop {{ container_name }}
+ExecStart=/usr/bin/docker start --attach {{ container_name }}
+ExecStop=/usr/bin/docker stop --time 2 {{ container_name }}
+
+[Install]
+WantedBy=multi-user.target

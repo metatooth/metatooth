@@ -1,0 +1,110 @@
+<script lang="ts">
+import "chartjs-adapter-date-fns";
+import { mapGetters } from "vuex";
+
+import ChartBase from "@client/components/ChartBase.vue";
+import { Device } from "@client/store/devices/types";
+
+export default {
+  components: {
+    ChartBase,
+  },
+
+  props: {
+    id: String,
+    data: { type: Array<Device>, default: [] },
+  },
+
+  data() {
+    return {
+      display: [],
+      stepSize: 0.5,
+      minmax: [100, 0],
+    };
+  },
+
+  computed: {
+    label() {
+      if (this.settings.units === "C") {
+        return "Celsius (°C)";
+      } else if (this.settings.units === "F") {
+        return "Fahrenheit (°F)";
+      }
+
+      return "Kelvin (°K)";
+    },
+
+    suggestedMin() {
+      if (this.minmax[0] === 100) {
+        this.calcminmax();
+      }
+      return this.minmax[0];
+    },
+
+    suggestedMax() {
+      if (this.minmax[1] === 0) {
+        this.calcminmax();
+      }
+      return this.minmax[1];
+    },
+
+    ...mapGetters("settings", ["settings"]),
+  },
+
+  watch: {
+    data() {
+      this.display = [];
+      let x, y;
+      this.data.forEach((d) => {
+        x = d.x;
+        if (this.settings.units === "C") {
+          y = d.y;
+        } else if (this.settings.units === "F") {
+          y = (d.y * 9) / 5 + 32;
+        } else {
+          y = d.y + 273.15;
+        }
+
+        if (y < this.minmax[0]) {
+          this.minmax[0] = y;
+        }
+
+        if (y > this.minmax[1]) {
+          this.minmax[1] = y;
+        }
+
+        this.display.push({ x: x, y: y });
+      });
+    },
+  },
+
+  methods: {
+    calcminmax() {
+      this.data.forEach((d) => {
+        if (d.y < this.minmax[0]) {
+          this.minmax[0] = d.y;
+        }
+
+        if (d.y > this.minmax[1]) {
+          this.minmax[1] = d.y;
+        }
+      });
+    },
+  },
+};
+</script>
+
+<template>
+  <div>
+    <chart-base
+      :id="id"
+      :data="display"
+      title="Temperature"
+      :label="label"
+      :suggested-min="suggestedMin"
+      :suggested-max="suggestedMax"
+      :step-size="stepSize"
+      :units="settings.units"
+    />
+  </div>
+</template>
