@@ -1,0 +1,42 @@
+version: "3"
+services:
+  db:
+    image: postgres
+    environment:
+      POSTGRES_DB: autodex
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: autodex
+      PGDATA: /pgdata
+    volumes:
+      - ./scripts/db:/docker-entrypoint-initdb.d
+      - pgdata:/pgdata
+    ports:
+      - "5432:5432"
+
+  server:
+    image: autodex_server:latest
+    build:
+      context: .
+      target: server
+    environment:
+      DATABASE_URL: postgresql://postgres:autodex@db:5432/autodex?sslmode=disable
+    ports:
+      - "8888:8888"
+    depends_on:
+      - "db"
+
+
+  client:
+    image: autodex_client:latest
+    build:
+      context: .
+      target: client
+    environment:
+      API_URL: http://server:8888
+    depends_on:
+      - server
+    ports:
+      - "3000:3000"
+
+volumes:
+  pgdata:
