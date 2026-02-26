@@ -5,9 +5,11 @@ After=docker.service
 
 [Service]
 WorkingDirectory={{ build_dir }}
-ExecStart=/usr/bin/docker-compose up
-ExecStop=/usr/bin/docker-compose down
+ExecStart=/usr/bin/docker compose up
+ExecStop=/usr/bin/docker compose down
 Restart=always
+Environment="PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin"
+EnvironmentFile={{ build_dir }}/.env
 
 [Install]
-WantedBy=default.target
+WantedBy=multi-user.target

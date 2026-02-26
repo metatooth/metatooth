@@ -10,7 +10,7 @@ fi
 HERE=$( cd $( dirname "${BASH_SOURCE[0]}" ) >/dev/null 2>&1 && pwd )
 TOPDIR=$( dirname ${HERE} )
 
-TMP_DIR=/tmp/metatooth.com
+TMP_DIR=/tmp/metatooth-restful
 rm -rf $TMP_DIR
 mkdir -p $TMP_DIR
 

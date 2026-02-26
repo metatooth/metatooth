@@ -6,50 +6,12 @@
         path: "{{ build_dir }}"
         state: directory
 
-    - name: Sync docker-compose.yml
+    - name: Sync deployment directory
       synchronize:
-        src: "{{ src_dir }}/docker-compose.yml"
+        src: "{{ src_dir }}/"
         dest: "{{ build_dir }}"
-
-    - name: Sync Gemfile
-      synchronize:
-        src: "{{ src_dir }}/Gemfile"
-        dest: "{{ build_dir }}"
-
-    - name: Sync Gemfile.lock
-      synchronize:
-        src: "{{ src_dir }}/Gemfile.lock"
-        dest: "{{ build_dir }}"
-
-    - name: Sync config.ru
-      synchronize:
-        src: "{{ src_dir }}/config.ru"
-        dest: "{{ build_dir }}"
-
-    - name: Sync init.rb
-      synchronize:
-        src: "{{ src_dir }}/init.rb"
-        dest: "{{ build_dir }}"
-
-    - name: Sync Procfile
-      synchronize:
-        src: "{{ src_dir }}/Procfile"
-        dest: "{{ build_dir }}"
-
-    - name: Sync app directory
-      synchronize:
-        src: "{{ src_dir }}/app/"
-        dest: "{{ build_dir }}/app"
-
-    - name: Sync config directory
-      synchronize:
-        src: "{{ src_dir }}/config/"
-        dest: "{{ build_dir }}/config"
-
-    - name: Sync db directory
-      synchronize:
-        src: "{{ src_dir }}/db/"
-        dest: "{{ build_dir }}/db"
+        recursive: yes
+        delete: yes
 
     - name: Install .env file
       become: yes
@@ -64,19 +26,19 @@
       ansible.builtin.shell:
         cmd: cd {{ build_dir }} && docker compose up -d
 
-    - name: Install metatooth-api service
+    - name: Install metatooth-restful service
       become: yes
       template:
         src: ./templates/systemd-service.j2
-        dest: /etc/systemd/system/com.metatooth.api.service
+        dest: /etc/systemd/system/com.metatooth.restful.service
         owner: root
         group: root
         mode: '0644'
 
-    - name: Enable and start metatooth-api service
+    - name: Enable and start metatooth-restful service
       become: yes
       systemd:
-        name: com.metatooth.api
+        name: com.metatooth.restful
         state: restarted
         daemon_reload: yes
         enabled: yes
@@ -85,7 +47,24 @@
 
   tasks:
 
-  - name: Install metatooth-api config (if needed)
+  - name: Install metatooth-restful nginx config
     become: yes
-    debug:
-      msg: "Balancer configuration for metatooth-api can be added here if needed"
+    template:
+      src: ./templates/nginx.conf.j2
+      dest: /etc/nginx/sites-available/{{ server_name }}
+      owner: root
+      group: root
+      mode: '0644'
+
+  - name: Enable metatooth-restful nginx site
+    become: yes
+    file:
+      src: /etc/nginx/sites-available/{{ server_name }}
+      dest: /etc/nginx/sites-enabled/{{ server_name }}
+      state: link
+
+  - name: Reload nginx
+    become: yes
+    systemd:
+      name: nginx
+      state: reloaded
