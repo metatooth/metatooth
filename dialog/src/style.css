@@ -1,0 +1,13 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: Arial, Helvetica, Roboto, sans-serif;
+}
+
+.menu {
+  background-color: #323232;
+  text-align: center;
+  color: white;
+}
