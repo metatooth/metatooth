@@ -1,0 +1,74 @@
+- hosts: servers
+
+  vars:
+    app_dir: "/home/{{ ansible_user }}/herbert"
+
+  tasks:
+    - name: Install Node.js and bluetooth tools
+      become: yes
+      ansible.builtin.apt:
+        name:
+          - nodejs
+          - npm
+          - bluez
+          - bluetooth
+        state: present
+        update_cache: yes
+
+    - name: Ensures {{ app_dir }} dir exists
+      file:
+        path: "{{ app_dir }}"
+        state: directory
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Sync src/
+      synchronize:
+        src: "{{ src_dir }}/src/"
+        dest: "{{ app_dir }}/src/"
+
+    - name: Sync package.json
+      synchronize:
+        src: "{{ src_dir }}/package.json"
+        dest: "{{ app_dir }}/package.json"
+
+    - name: Sync package-lock.json
+      synchronize:
+        src: "{{ src_dir }}/package-lock.json"
+        dest: "{{ app_dir }}/package-lock.json"
+
+    - name: Install .env file
+      template:
+        src: ./templates/dotenv.j2
+        dest: "{{ app_dir }}/.env"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0600'
+
+    - name: Run npm install
+      ansible.builtin.shell:
+        cmd: npm install --omit=dev
+        chdir: "{{ app_dir }}"
+
+    - name: Grant cap_net_raw to node binary for BLE scanning
+      become: yes
+      ansible.builtin.shell:
+        cmd: setcap cap_net_raw+eip $(which node)
+
+    - name: Install herbert service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/herbert.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable and start herbert service
+      become: yes
+      systemd:
+        name: herbert
+        state: restarted
+        daemon_reload: yes
+        enabled: yes

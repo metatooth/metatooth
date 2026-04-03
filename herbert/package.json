@@ -1,0 +1,35 @@
+{
+  "name": "herbert",
+  "version": "1.0.0",
+  "description": "Thermostat controller for SwitchBot Meter and Meross smart plug",
+  "type": "module",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "main": "src/index.js",
+  "bin": {
+    "herbert": "./src/index.js"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "scan": "node src/index.js scan",
+    "status": "node src/index.js status"
+  },
+  "dependencies": {
+    "@stoprocent/noble": "^2.3.17",
+    "commander": "^12.0.0",
+    "dotenv": "^16.4.0",
+    "meross-local": "^1.0.0",
+    "node-switchbot": "^3.6.8",
+    "pino": "^9.0.0",
+    "pino-pretty": "^11.0.0"
+  },
+  "keywords": [
+    "thermostat",
+    "switchbot",
+    "meross",
+    "iot",
+    "ble"
+  ],
+  "license": "MIT"
+}

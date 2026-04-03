@@ -1,0 +1,20 @@
+[Unit]
+Description=Herbert smart thermostat controller
+After=network.target
+Conflicts=bluetooth.service
+
+[Service]
+Type=simple
+User={{ ansible_user }}
+WorkingDirectory=/home/{{ ansible_user }}/herbert
+EnvironmentFile=/home/{{ ansible_user }}/herbert/.env
+ExecStartPre=+/bin/systemctl stop bluetooth
+ExecStartPre=/bin/sleep 2
+ExecStartPre=+/usr/bin/hciconfig hci0 up
+ExecStart=/usr/bin/node src/index.js run
+ExecStopPost=+/bin/systemctl start bluetooth
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=multi-user.target
