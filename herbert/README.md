@@ -80,4 +80,14 @@ The thermostat uses hysteresis to prevent rapid on/off cycling:
 
 ## Getting the Meross Key
 
-Use https://github.com/jixunmoe/meross-login to retrieve your Meross device key.
+Clone the meross-login tool into the `meross-login/` directory and use it to authenticate:
+
+```bash
+git clone https://github.com/jixunmoe/meross-login.git meross-login
+cd meross-login
+npm ci --prod
+node meross generate-config   # creates config.json
+node meross login             # prompts for credentials, writes user.json
+```
+
+Your `MEROSS_KEY` is the `key` field in the resulting `user.json`.
