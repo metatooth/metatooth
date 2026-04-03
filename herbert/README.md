@@ -14,11 +14,13 @@ Control your heater using a SwitchBot Meter and Meross smart plug.
 ## Setup
 
 1. Install dependencies:
+
    ```bash
    npm install
    ```
 
 2. Copy `.env` and configure:
+
    ```bash
    # Required
    MEROSS_PLUG_ADDRESS=192.168.1.100  # Your Meross plug IP
@@ -36,6 +38,7 @@ Control your heater using a SwitchBot Meter and Meross smart plug.
 ## Usage
 
 ### Run Thermostat (default)
+
 ```bash
 npm start
 # or with options
@@ -43,16 +46,19 @@ node src/index.js run --low 65 --high 70 --interval 60000
 ```
 
 ### Scan for Devices
+
 ```bash
 npm run scan
 ```
 
 ### Check Status
+
 ```bash
 npm run status
 ```
 
 ### Control Plug Directly
+
 ```bash
 node src/index.js plug on
 node src/index.js plug off
@@ -60,6 +66,7 @@ node src/index.js plug status
 ```
 
 ### One-shot Temperature Reading
+
 ```bash
 node src/index.js temp
 ```
