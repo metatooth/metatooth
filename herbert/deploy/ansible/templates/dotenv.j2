@@ -1,0 +1,10 @@
+MEROSS_PLUG_ADDRESS={{ meross_plug_address }}
+MEROSS_KEY={{ meross_key }}
+THERMOSTAT_LOW_THRESHOLD={{ thermostat_low_threshold | default(68) }}
+THERMOSTAT_HIGH_THRESHOLD={{ thermostat_high_threshold | default(72) }}
+SCAN_INTERVAL_MS={{ scan_interval_ms | default(30000) }}
+LOG_LEVEL={{ log_level | default('info') }}
+{% if switchbot_device_id is defined %}
+SWITCHBOT_DEVICE_ID={{ switchbot_device_id }}
+{% endif %}
+NOBLE_REPORT_ALL_HCI_EVENTS=1
