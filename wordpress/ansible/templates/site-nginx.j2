@@ -1,0 +1,39 @@
+upstream {{ site_slug }}_backend {
+  server {{ backend_host }}:{{ wordpress_port }};
+}
+
+server {
+  listen 443 ssl;
+  server_name www.{{ site_domain }} {{ site_domain }};
+
+  if ($scheme = http) {
+    return 301 https://$host$request_uri;
+  }
+
+  location / {
+    proxy_pass http://{{ site_slug }}_backend/;
+
+    proxy_headers_hash_max_size 512;
+    proxy_headers_hash_bucket_size 128;
+    proxy_set_header Host $host;
+    proxy_set_header X-Forwarded-Host $host;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+
+  ssl_certificate /root/.acme.sh/{{ site_domain }}_ecc/fullchain.cer;
+  ssl_certificate_key /root/.acme.sh/{{ site_domain }}_ecc/{{ site_domain }}.key;
+}
+
+server {
+  if ($host = www.{{ site_domain }}) {
+    return 301 https://{{ site_domain }}$request_uri;
+  }
+
+  if ($host = {{ site_domain }}) {
+    return 301 https://$host$request_uri;
+  }
+
+  listen 80;
+  server_name www.{{ site_domain }} {{ site_domain }};
+  return 404;
+}

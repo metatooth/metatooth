@@ -1,0 +1,78 @@
+- hosts: servers
+
+  tasks:
+    - name: Ensures {{ build_dir }} dir exists
+      file:
+        path: "{{ build_dir }}"
+        state: directory
+
+    - name: Install docker-compose.yml
+      become: yes
+      template:
+        src: ./templates/docker-compose.yml.j2
+        dest: "{{ build_dir }}/docker-compose.yml"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Install nginx.conf
+      become: yes
+      template:
+        src: ./templates/nginx.conf.j2
+        dest: "{{ build_dir }}/nginx.conf"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Install .env file
+      become: yes
+      template:
+        src: ./templates/dotenv.j2
+        dest: "{{ build_dir }}/.env"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Run docker compose up
+      ansible.builtin.shell:
+        cmd: cd {{ build_dir }} && docker compose up -d --remove-orphans
+
+    - name: Install {{ site_domain }} service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/com.{{ site_slug }}.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable and start {{ site_domain }} service
+      become: yes
+      systemd:
+        name: com.{{ site_slug }}
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
+- hosts: balancers
+
+  tasks:
+
+  - name: Install {{ site_domain }} config
+    become: yes
+    template:
+      src: ./templates/site-nginx.j2
+      dest: /etc/nginx/sites-available/{{ site_slug }}-com
+
+  - name: Enable {{ site_domain }}
+    become: yes
+    file:
+      src: /etc/nginx/sites-available/{{ site_slug }}-com
+      dest: /etc/nginx/sites-enabled/{{ site_slug }}-com
+      state: link
+
+  - name: Restart nginx
+    service:
+      name: nginx
+      state: restarted
+    become: yes
