@@ -5,14 +5,14 @@ rad=`echo "60*($pi/180)" | bc -l`
 
 if [ $# -ne 5 ]
 then
-    echo "usage: metalogo.sh <radius> <ratio> <theta> <primary> <secondary>"
+    echo "usage: lynngrown.sh <radius> <ratio> <theta> <primary> <secondary>"
     echo
     echo "  Outputs a SVG of width & height twice <radius>. Draw a circle "
     echo "  of <radius>. Inset a triangle inscribed within a"
     echo "  circle of <radius>*<ratio>. Then rotate the triangle by <theta>."
     echo "  Use <primary> and <secondary> colors."
     echo
-    echo "  for example, metalogo.sh 256 0.95 45 000000 ffffff"
+    echo "  for example, lynngrown.sh 256 0.95 45 000000 ffffff"
     exit
 fi
 
