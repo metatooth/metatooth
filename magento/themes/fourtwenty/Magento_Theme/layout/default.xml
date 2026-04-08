@@ -1,0 +1,100 @@
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+  <body>
+    <referenceBlock name="logo">
+      <arguments>
+        <argument name="logo_file" xsi:type="string">images/logo.png</argument>
+        <argument name="logo_img_width" xsi:type="number">150</argument>
+        <argument name="logo_img_height" xsi:type="number">22</argument>
+      </arguments>
+    </referenceBlock>
+
+    <referenceBlock name="top.links" remove="true"/>
+
+    <referenceBlock name="catalog.topnav" remove="true"/>
+
+    <referenceBlock name="store.menu">
+      <block class="Magento\Theme\Block\Html\Topmenu" name="store.topnav" template="Magento_Theme::html/topmenu.phtml" ttl="3600" before="-"/>
+    </referenceBlock>
+
+    <referenceContainer name="header-wrapper">
+      <container htmlTag="div" htmlClass="block block-menu" before="top.search">
+	<container htmlTag="ul" htmlClass="menu links">
+	  <block class="Magento\Framework\View\Element\Html\Link">
+	    <arguments>
+	      <argument name="label" xsi:type="string">Shop</argument>
+	      <argument name="path" xsi:type="string">hard-nightguard.html</argument>
+	    </arguments>
+	  </block>
+	  <block class="Magento\Framework\View\Element\Html\Link">
+	    <arguments>
+	      <argument name="label" xsi:type="string">How To</argument>
+	      <argument name="path" xsi:type="string">impressions</argument>
+	    </arguments>
+	  </block>
+	  <block class="Magento\Framework\View\Element\Html\Link">
+	    <arguments>
+	      <argument name="label" xsi:type="string">FAQ</argument>
+	      <argument name="path" xsi:type="string">faq</argument>
+	    </arguments>
+	  </block>
+	  <block class="Magento\Framework\View\Element\Html\Link">
+	    <arguments>
+	      <argument name="label" xsi:type="string">About</argument>
+	      <argument name="path" xsi:type="string">about</argument>
+	    </arguments>
+	  </block>
+	  <block class="Magento\Framework\View\Element\Html\Link">
+	    <arguments>
+	      <argument name="label" xsi:type="string">Contact</argument>
+	      <argument name="path" xsi:type="string">contact</argument>
+	    </arguments>
+	  </block>
+	</container>
+      </container>
+    </referenceContainer>
+
+    <move element="authorization-link" destination="header-wrapper" before="top.search" />
+
+    <referenceBlock name="report.bugs" remove="true"/>
+
+    <referenceBlock name="contact-us-link">
+        <arguments>
+          <argument name="label" translate="true" xsi:type="string">Contact</argument>
+          <argument name="path" xsi:type="string">contact</argument>
+        </arguments>
+    </referenceBlock>
+
+    <referenceBlock name="footer_links">
+      <block class="Magento\Framework\View\Element\Html\Link\Current" name="blog-link" after="contact-us-link">
+        <arguments>
+          <argument name="label" xsi:type="string">Blog</argument>
+          <argument name="path" xsi:type="string">blog</argument>
+        </arguments>
+      </block>
+
+      <block class="Magento\Framework\View\Element\Html\Link\Current" name="material-safety-link" after="blog-link">
+        <arguments>
+          <argument name="label" xsi:type="string">Material Safety</argument>
+          <argument name="path" xsi:type="string">material-safety-nightguard</argument>
+        </arguments>
+      </block>
+
+      <block class="Magento\Framework\View\Element\Html\Link\Current" name="nightguard-care-link" after="material-safety-link">
+        <arguments>
+          <argument name="label" xsi:type="string">Mouthguard Care</argument>
+          <argument name="path" xsi:type="string">cleaning-custom-night-guard</argument>
+        </arguments>
+      </block>
+
+      <block class="Magento\Framework\View\Element\Html\Link\Current" name="impression-kit-link" after="nightguard-care-link">
+        <arguments>
+          <argument name="label" xsi:type="string">Impression Kit</argument>
+          <argument name="path" xsi:type="string">impressions</argument>
+        </arguments>
+      </block>
+
+    </referenceBlock>
+
+    <move element="copyright" destination="before.body.end"/>
+  </body>
+</page>
