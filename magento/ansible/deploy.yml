@@ -8,7 +8,7 @@
 
     - name: Sync Magento source
       synchronize:
-        src: "{{ playbook_dir }}/../../src/"
+        src: "{{ playbook_dir }}/../src/"
         dest: "{{ build_dir }}/public_html/"
         rsync_opts:
           - "--exclude=.gitignore"
@@ -16,7 +16,7 @@
 
     - name: Sync active theme
       synchronize:
-        src: "{{ playbook_dir }}/../../themes/magento2-theme/"
+        src: "{{ playbook_dir }}/../themes/magento2-theme/"
         dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/threetwenty/"
         rsync_opts:
           - "--exclude=.gitignore"
