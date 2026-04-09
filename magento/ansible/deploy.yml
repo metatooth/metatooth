@@ -24,7 +24,7 @@
 
     - name: Copy database dump
       synchronize:
-        src: "{{ inventory_dir }}/magento-final.sql"
+        src: "{{ db_dump_path }}"
         dest: "{{ build_dir }}/magento-final.sql"
       tags: sync
 
