@@ -1,0 +1,25 @@
+services:
+  {{ site_slug }}_php:
+    image: markoshust/magento-php:7.4-fpm-2
+    container_name: php-{{ site_slug }}-1
+    restart: unless-stopped
+    volumes:
+      - {{ build_dir }}/public_html:/var/www/html
+      - {{ build_dir }}/php-fpm.conf:/usr/local/etc/php-fpm.conf
+      - {{ site_slug }}_sock:/sock
+
+  {{ site_slug }}_nginx:
+    image: nginx:1.18-alpine
+    container_name: nginx-{{ site_slug }}-1
+    restart: unless-stopped
+    ports:
+      - "{{ magento_port }}:80"
+    volumes:
+      - {{ build_dir }}/public_html:/var/www/html
+      - {{ build_dir }}/nginx.conf:/etc/nginx/conf.d/default.conf
+      - {{ site_slug }}_sock:/sock
+    depends_on:
+      - {{ site_slug }}_php
+
+volumes:
+  {{ site_slug }}_sock:
