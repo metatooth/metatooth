@@ -1,0 +1,78 @@
+<script type="text/javascript">
+    require([
+        'jquery',
+        'Magento_Ui/js/modal/alert',
+        'Magento_Ui/js/lib/spinner'
+    ], function($, alert, loader){
+        "use strict";
+
+        $('.page-wrapper').append(
+            '<div data-role="spinner" style="position: fixed;" data-component="revoke_oauth_button_spinner" class="admin__data-grid-loading-mask">' +
+            '<div class="spinner">' +
+            '<span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span>' +
+            '</div>' +
+            '</div>'
+        );
+
+        var $loader = loader.get('revoke_oauth_button_spinner');
+        $loader.hide();
+
+        $(document).ready(function(){
+            $('body').on('click', '#squareup_omni_general_application_revoke_oauth', function(){
+                var squareAppKey = $('#squareup_omni_general_application_id');
+                var squareAppSecret = $('#squareup_omni_general_application_secret');
+                if (squareAppKey.val().length === 0 || squareAppSecret.val().length === 0){
+                    alert({
+                        content: 'Please fill in the Square Application Id and Square Application Secret'
+                    });
+                    return false;
+                }
+
+                <?php $configHelper = $this->helper("\Squareup\Omni\Helper\Config"); ?>
+                <?php if($configHelper->getApplicationMode() === \Squareup\Omni\Model\System\Config\Source\Options\Mode::PRODUCTION_ENV){ ?>
+
+                $.ajax({
+                    url: '<?php echo $block->getRevokeUrl(); ?>',
+                    method: 'post',
+                    dataType: 'json',
+                    data: {
+                        form_key: window.FORM_KEY
+                    },
+                    beforeSend: function(){
+                        $loader.show();
+                    },
+                    success: function (data, textStatus, jqXHR) {
+                        if(data.success){
+                            alert({
+                                title: "Success",
+                                content: "OAuth Token was revoked successfully."
+                            });
+                            window.location.reload();
+                        }else{
+                            $loader.hide();
+                            alert({
+                                title: "Failed",
+                                content: data.message
+                            });
+                        }
+                    },
+                    error: function(jqXHR, textStatus, error){
+                        $loader.hide();
+                        alert({
+                            title: "Failed",
+                            content: error
+                        });
+                    }
+                });
+
+                <?php }else{ ?>
+                    alert({
+                        title: "Application mode is Sandbox",
+                        content: "Please switch to production mode."
+                    });
+                <?php } ?>
+            });
+        });
+    });
+</script>
+<?php echo $this->getButtonHtml(); ?>

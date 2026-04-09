@@ -1,0 +1,56 @@
+<?php
+$helper = $this->helper('Squareup\Omni\Helper\Config');
+$sandbox = $helper->isSandbox();
+$applicationId = $helper->getApplicationId($sandbox);
+$locationId = $helper->getLocationId();
+
+$sessionQuote = $this->helper('Squareup\Omni\Helper\SessionQuote')->getData();
+?>
+<div class="admin__fieldset payment-method" id="payment_form_squareup_payment" style="display: none;">
+    <div id="sq-ccbox">
+        <form id="nonce-form" novalidate method="post">
+            <div id="square_form_fields" class="form-fields">
+                <table>
+                    <tbody>
+                    <tr>
+                        <td class="label-name">Card Number:</td>
+                        <td class="input-wrap"><div id="sq-card-number"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="label-name">CVV:</td>
+                        <td class="input-wrap"><div id="sq-cvv"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="label-name">Expiration Date:</td>
+                        <td class="input-wrap"><div id="sq-expiration-date"></div></td>
+                    </tr>
+                    <tr>
+                        <td class="label-name">Postal Code:</td>
+                        <td class="input-wrap"><div id="sq-postal-code"></div></td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <a id="sq-creditcard" class="button-credit-card">Submit card information</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+                <input type="hidden" id="card-nonce" name="payment[nonce]">
+                <input type="hidden" id="display-form" name="payment[display_form]" value="true">
+                <input type="hidden" id="verification-token" name="payment[buyerVerificationToken]" value="false">
+                <input type="hidden" id="save_square_cards_empty" name="payment[save_square_card]"/>
+                <input type="hidden" id="digital-wallet" name="payment[digital_wallet]">
+                <input type="hidden" id="card-brand" name="payment[cc_type]" value="">
+                <input type="hidden" id="card-last-4" name="payment[cc_number]" value="">
+                <input type="hidden" id="card-exp-month" name="payment[cc_exp_month]" value="">
+                <input type="hidden" id="card-exp-year" name="payment[cc_exp_year]" value="">
+            </div>
+        </form>
+    </div>
+    <script>
+        window.SquareupApplicationId = "<?php echo $applicationId; ?>";
+        window.SquareupLocationId = "<?php echo $locationId; ?>";
+        window.SquareupSessionQuote = <?php echo $sessionQuote; ?>;
+        Squareup.initPayment();
+    </script>
+</div>

@@ -1,0 +1,321 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Config:etc/system_file.xsd">
+    <system>
+        <tab id="square_up" translate="label" sortOrder="200">
+            <label>Square</label>
+        </tab>
+
+        <!-- ======================= Squareup System Config ======================= -->
+        <section id="squareup_omni" translate="label" sortOrder="200" showInDefault="1" showInWebsite="1" showInStore="1">
+            <label>Square Configuration</label>
+            <tab>square_up</tab>
+            <resource>Squareup_Omni::squareup_config</resource>
+
+            <!-- ======================= General Configuration ======================= -->
+            <group id="general" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>General Configuration</label>
+                <field id="application_mode" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Application Mode</label>
+                    <source_model>Squareup\Omni\Model\System\Config\Source\Options\Mode</source_model>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="application_id" translate="label comment" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Square Application Id</label>
+                    <comment><![CDATA[
+                                1. Get Started: <a href="https://docs.connect.squareup.com/get-started">https://docs.connect.squareup.com/get-started</a>
+                                <br />
+                                2. Create App: <a href="https://connect.squareup.com/apps">https://connect.squareup.com/apps</a>
+                    ]]></comment>
+                    <depends>
+                        <field id="application_mode">prod</field>
+                    </depends>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="application_secret" translate="label comment" type="password" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Square Application Secret</label>
+                    <comment><![CDATA[
+                            The square application secret found in your Square account.
+                            <br /><span style="color: red; font-weight:bold;">
+                            Important: Do not share your Application Secret with anyone. Do not store this value
+                            anywhere - you will not need to re-enter it again.</span>
+                    ]]></comment>
+                    <depends>
+                        <field id="application_mode">prod</field>
+                    </depends>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="sandbox_application_id" translate="label comment" type="text" sortOrder="70" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sandbox Application Id</label>
+                    <comment><![CDATA[ The Sandbox Application Id found in your Square account ]]></comment>
+                    <depends>
+                        <field id="application_mode">sandbox</field>
+                    </depends>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="sandbox_application_secret" translate="label comment" type="text" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sandbox Access Token</label>
+                    <comment><![CDATA[ The Sandbox Access Token found in your Square account ]]></comment>
+                    <depends>
+                        <field id="application_mode">sandbox</field>
+                    </depends>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="sandbox_application_location" translate="label comment" type="select" sortOrder="90" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sandbox Square Location for Online Payments</label>
+                    <comment><![CDATA[ The square location found in your Square account ]]></comment>
+                    <source_model>Squareup\Omni\Model\System\Config\Source\Options\Location</source_model>
+                    <depends>
+                        <field id="application_mode">sandbox</field>
+                    </depends>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="location_id" translate="label comment" type="select" sortOrder="100" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Square Location for Online Payments</label>
+                    <comment><![CDATA[ The square location found in your Square account ]]></comment>
+                    <source_model>Squareup\Omni\Model\System\Config\Source\Options\Location</source_model>
+                    <depends>
+                        <field id="application_mode">prod</field>
+                    </depends>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="sandbox_documentation" translate="label comment" type="label" sortOrder="110" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sandbox Documentation</label>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Message</frontend_model>
+                    <depends>
+                        <field id="application_mode">sandbox</field>
+                    </depends>
+                </field>
+            </group>
+
+            <!-- ======================= OAuth Configuration ======================= -->
+            <group id="oauth_settings" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Oauth Configuration</label>
+                <field id="oauth_message" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Important Message!</label>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Message</frontend_model>
+                </field>
+                <field id="redirect_url" translate="label comment" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Redirect Url</label>
+                    <comment><![CDATA[ Redirect Url for oauth configuration in square ]]></comment>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Redirect</frontend_model>
+                </field>
+                <field id="application_oauth" translate="label comment" type="button" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Get OAuth Token</label>
+                    <comment>Retrieve OAuth Token</comment>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Oauth</frontend_model>
+                </field>
+                <field id="revoke_application_oauth" translate="label comment" type="button" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Revoke OAuth Token</label>
+                    <comment>Revoke all OAuth tokens for the current merchant. After the token is revoked you need to refresh the cache to enact the change.</comment>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\RevokeOauth</frontend_model>
+                    <depends>
+                        <field id="application_mode">prod</field>
+                    </depends>
+                </field>
+                <field id="oauth_token" translate="label comment" type="label" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>OAuth Access Token</label>
+                    <comment><![CDATA[ The OAuth Access Token is retrieved from Square after authorization ]]></comment>
+                </field>
+            </group>
+
+            <!-- ======================= Webhooks Configuration ======================= -->
+            <group id="webhooks_settings" translate="label" type="text" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Webhooks Configuration</label>
+                <field id="webhook_url" translate="label" type="label" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Webhook url</label>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Webhook</frontend_model>
+                    <comment><![CDATA[ Webhook Url in order to use the square webhooks ]]></comment>
+                </field>
+                <field id="webhook_signature" translate="label comment" type="password" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Square Signature</label>
+                    <comment><![CDATA[ The square signiture ]]></comment>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="webhook_button" translate="label comment" type="button" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Register webhooks</label>
+                    <comment>Register the inventory and payment webhooks</comment>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Webhooks</frontend_model>
+                </field>
+            </group>
+
+            <!-- ======================= Customer Synchronization ======================= -->
+            <group id="customer" translate="label" type="text" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Customer Synchronization</label>
+                <field id="customer_sync" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Customer Synchronization</label>
+                    <comment><![CDATA[ Enable the customer synchronization between Magento and Square ]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+
+                <!-- TODO add button functionality -->
+                <field id="run_customer_sync" translate="label comment" type="button" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Manual Customer Sync</label>
+                    <comment>Manually trigger customer sync</comment>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Customer</frontend_model>
+                    <depends>
+                        <field id="customer_sync">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <!-- ======================= Catalog and Inventory Synchronization ======================= -->
+            <group id="catalog" translate="label" type="text" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Catalog and Inventory Synchronization</label>
+                <field id="sor" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>System of records</label>
+                    <comment>
+                        <![CDATA[
+                            Select the system of records in order to know the way the records are synchronized
+                        ]]>
+                    </comment>
+                    <source_model>Squareup\Omni\Model\System\Config\Source\Options\Records</source_model>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="enable_catalog" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Catalog Synchronization</label>
+                    <comment><![CDATA[
+                        Enable the synchronization of products between system of records and
+                        the client <br /><span style="font-weight: bold;">Please enable Catalog Sync in order to enable Inventory Sync.</span>
+                        ]]>
+                    </comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+
+                <!-- TODO add button functionality -->
+                <field id="run_catalog_sync" translate="label comment" type="button" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Manual Catalog Sync</label>
+                    <comment>Manually trigger catalog sync</comment>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Catalog</frontend_model>
+                    <depends>
+                        <field id="enable_catalog">1</field>
+                    </depends>
+                </field>
+                <field id="enable_inventory" translate="label comment" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Inventory Synchronization</label>
+                    <comment><![CDATA[ Enable the synchronization of inventory between system of records and the client ]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enable_catalog">1</field>
+                    </depends>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="run_inventory_sync" translate="label comment" type="button" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Manual Inventory Sync</label>
+                    <comment>Manually trigger inventory sync</comment>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Inventory</frontend_model>
+                    <depends>
+                        <field id="enable_catalog">1</field>
+                        <field id="enable_inventory">1</field>
+                    </depends>
+                </field>
+                <field id="enable_images" translate="label comment" type="select" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Catalog Images Synchronization</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="enable_catalog">1</field>
+                    </depends>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="images_size" translate="label comment" type="label" sortOrder="70" showInStore="1" showInDefault="1" showInWebsite="1">
+                    <label>Images to upload</label>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Message</frontend_model>
+                    <depends>
+                        <field id="enable_catalog">1</field>
+                    </depends>
+                </field>
+                <field id="run_images_sync" translate="label comment" type="button" sortOrder="80" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Manual Catalog Image Sync</label>
+                    <comment>Manually trigger catalog image sync</comment>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Images</frontend_model>
+                    <depends>
+                        <field id="enable_catalog">1</field>
+                    </depends>
+                </field>
+            </group>
+
+            <!-- ======================= Order and Transactions Synchronization ======================= -->
+            <group id="orders" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                <label>Order and Transactions Synchronization</label>
+                <field id="create_order" translate="label comment" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Create Square order</label>
+                    <comment><![CDATA[ Create Square Order when transaction is completed through Magento E-Commerce store ]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="import_trans" translate="label comment" type="select" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Import transaction and refunds</label>
+                    <comment><![CDATA[ Import transaction and refunds from physical location  ]]></comment>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="convert_transactions" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Convert transactions into orders</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <depends>
+                        <field id="import_trans">1</field>
+                    </depends>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="run_import_trans" translate="label comment" type="button" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Manual Transactions and Refunds Sync</label>
+                    <comment>Run the Transactions and Refunds sync before the cron job does it</comment>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Transactions</frontend_model>
+                    <depends>
+                        <field id="import_trans">1</field>
+                    </depends>
+                </field>
+                <field id="enable_gift" translate="label" type="select" sortOrder="50" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Enable Gift Card</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                    <comment>Please note that using the Gift Card functionality is limited to accounts that have this option enabled on their Square account. Please contact a Square representative and request the Gift Card functionality to be enabled for your account before enabling this option.</comment>
+                </field>
+            </group>
+        </section>
+
+        <!-- ======================= Squareup Payment ======================= -->
+        <section id="payment">
+            <group id="squareup_payment" translate="label" type="text" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="1">
+                <attribute type="displayIn">account</attribute>
+                <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Fieldset\Expanded</frontend_model>
+                <label>Square Payment Solution</label>
+                <field id="active" translate="label" type="select" sortOrder="10" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Enabled</label>
+                    <source_model>Magento\Config\Model\Config\Source\Yesno</source_model>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="title" translate="label" type="text" sortOrder="20" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Title</label>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="payment_action" translate="label comment" type="select" sortOrder="30" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Payment Action</label>
+                    <comment>If you select Authorize Only please make sure you are creating the invoice not
+                        longer than 6 days, otherwise you will not be able to capture the amount.
+                    </comment>
+                    <source_model>Squareup\Omni\Model\System\Config\Source\Options\Action</source_model>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="enable_save_card_on_file" translate="label" type="select" sortOrder="40" showInDefault="1" showInWebsite="1" showInStore="0">
+                    <label>Card on File</label>
+                    <source_model>\Squareup\Omni\Model\System\Config\Source\Options\CardOnFile</source_model>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+                <field id="payment_message" translate="label" type="label" sortOrder="50" showInStore="1" showInDefault="1" showInWebsite="1">
+                    <label>Important Message!</label>
+                    <frontend_model>Squareup\Omni\Block\Adminhtml\System\Config\Button\Message</frontend_model>
+                    <depends>
+                        <field id="application_mode">prod</field>
+                    </depends>
+                </field>
+                <field id="sort_order" translate="label" type="text" sortOrder="60" showInDefault="1" showInWebsite="1" showInStore="1">
+                    <label>Sort Order</label>
+                    <frontend_class>validate-number</frontend_class>
+                    <backend_model>Squareup\Omni\Model\Config\Config</backend_model>
+                </field>
+            </group>
+        </section>
+    </system>
+</config>

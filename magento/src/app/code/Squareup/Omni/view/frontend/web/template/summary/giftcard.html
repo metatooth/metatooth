@@ -1,0 +1,24 @@
+<!-- ko foreach: getRegion('before_details') -->
+<!-- ko template: getTemplate() --><!-- /ko -->
+<!-- /ko -->
+
+<tr class="squareup-giftcards">
+    <th class="mark" scope="row">
+        <!-- ko if: (checkGiftCards())-->
+        <span class="giftcard-label">Square Gift Card</span>
+        <!-- /ko -->
+        <table>
+            <tbody data-bind="foreach: giftCards">
+                <tr>
+                    <td data-bind="text: card_code"></td>
+                    <td data-bind="text: amount"></td>
+                </tr>
+            </tbody>
+        </table>
+    </th>
+</tr>
+
+
+<!-- ko foreach: getRegion('after_details') -->
+<!-- ko template: getTemplate() --><!-- /ko -->
+<!-- /ko -->
