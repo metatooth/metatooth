@@ -1,0 +1,152 @@
+- hosts: servers
+
+  tasks:
+    - name: Ensure {{ build_dir }} dir exists
+      file:
+        path: "{{ build_dir }}"
+        state: directory
+
+    - name: Sync Magento files
+      synchronize:
+        src: "{{ magento_src }}/opt/magento/public_html/"
+        dest: "{{ build_dir }}/public_html/"
+        rsync_opts:
+          - "--exclude=app/etc/env.php"
+          - "--exclude=var/cache/*"
+          - "--exclude=var/log/*"
+          - "--exclude=var/session/*"
+          - "--exclude=generated/*"
+      tags: sync
+
+    - name: Copy database dump
+      synchronize:
+        src: "{{ magento_src }}/magento-final.sql"
+        dest: "{{ build_dir }}/magento-final.sql"
+      tags: sync
+
+    - name: Import database dump
+      ansible.builtin.shell:
+        cmd: >
+          grep -v "^CREATE DATABASE\|^USE " {{ build_dir }}/magento-final.sql |
+          sed "s/ DEFINER=\`[^\`]*\`@\`[^\`]*\`//" |
+          mysql -h {{ db_host }} -P {{ db_port | default('3306') }}
+          -u {{ db_user }} -p{{ db_password }} {{ db_name }}
+      tags: import
+
+    - name: Install env.php
+      become: yes
+      template:
+        src: ./templates/env.php.j2
+        dest: "{{ build_dir }}/public_html/app/etc/env.php"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Set writable directory permissions
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          chown -R {{ ansible_user }}:{{ ansible_user }} {{ build_dir }}/public_html/{{ item }} &&
+          chmod -R 777 {{ build_dir }}/public_html/{{ item }}
+      loop:
+        - var
+        - pub/static
+        - pub/media
+        - generated
+
+    - name: Install refresh script
+      template:
+        src: ./templates/refresh.j2
+        dest: "{{ build_dir }}/refresh"
+        owner: "{{ ansible_user }}"
+        group: "{{ ansible_user }}"
+        mode: '0755'
+
+    - name: Install php-fpm.conf
+      become: yes
+      template:
+        src: ./templates/php-fpm.conf.j2
+        dest: "{{ build_dir }}/php-fpm.conf"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Install docker-compose.yml
+      become: yes
+      template:
+        src: ./templates/docker-compose.yml.j2
+        dest: "{{ build_dir }}/docker-compose.yml"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Install nginx.conf
+      become: yes
+      template:
+        src: ./templates/nginx.conf.j2
+        dest: "{{ build_dir }}/nginx.conf"
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Install .env file
+      become: yes
+      template:
+        src: ./templates/dotenv.j2
+        dest: "{{ build_dir }}/.env"
+        owner: root
+        group: root
+        mode: '0600'
+
+    - name: Run docker compose up
+      become: yes
+      ansible.builtin.shell:
+        cmd: cd {{ build_dir }} && docker compose up -d --remove-orphans
+
+    - name: Update Magento base URLs in database
+      ansible.builtin.shell:
+        cmd: >
+          mysql -h {{ db_host }} -P {{ db_port | default('3306') }}
+          -u {{ db_user }} -p{{ db_password }} {{ db_name }} -e
+          "UPDATE core_config_data SET value='https://{{ site_domain }}/' WHERE path IN ('web/secure/base_url','web/unsecure/base_url');"
+      tags: urls
+
+    - name: Install {{ site_domain }} service
+      become: yes
+      template:
+        src: ./templates/systemd-service.j2
+        dest: /etc/systemd/system/com.{{ site_slug }}.service
+        owner: root
+        group: root
+        mode: '0644'
+
+    - name: Enable and start {{ site_domain }} service
+      become: yes
+      systemd:
+        name: com.{{ site_slug }}
+        state: restarted
+        daemon_reload: yes
+        enabled: yes
+
+- hosts: balancers
+
+  tasks:
+
+  - name: Install {{ site_domain }} config
+    become: yes
+    template:
+      src: ./templates/site-nginx.j2
+      dest: /etc/nginx/sites-available/{{ site_slug }}-com
+
+  - name: Enable {{ site_domain }}
+    become: yes
+    file:
+      src: /etc/nginx/sites-available/{{ site_slug }}-com
+      dest: /etc/nginx/sites-enabled/{{ site_slug }}-com
+      state: link
+
+  - name: Restart nginx
+    service:
+      name: nginx
+      state: restarted
+    become: yes
