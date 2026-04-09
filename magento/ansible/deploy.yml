@@ -126,7 +126,8 @@
         cmd: >
           mysql -h {{ db_host }} -P {{ db_port | default('3306') }}
           -u {{ db_user }} -p{{ db_password }} {{ db_name }} -e
-          "UPDATE core_config_data SET value='https://{{ site_domain }}/' WHERE path IN ('web/secure/base_url','web/unsecure/base_url');"
+          "UPDATE core_config_data SET value='https://{{ site_domain }}/'
+          WHERE path LIKE 'web/%/base%url' AND value IS NOT NULL;"
       tags: urls
 
     - name: Install {{ site_domain }} service
