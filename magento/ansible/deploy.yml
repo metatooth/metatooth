@@ -16,8 +16,8 @@
 
     - name: Sync active theme
       synchronize:
-        src: "{{ playbook_dir }}/../themes/magento2-theme/"
-        dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/threetwenty/"
+        src: "{{ playbook_dir }}/../themes/metatooth/default/"
+        dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/default/"
         rsync_opts:
           - "--exclude=.gitignore"
       tags: sync
@@ -28,6 +28,13 @@
         dest: "{{ build_dir }}/magento-final.sql"
       tags: sync
 
+    - name: Ensure /root/.composer dir exists
+      become: yes
+      file:
+        path: /root/.composer
+        state: directory
+        mode: '0700'
+
     - name: Deploy composer auth
       become: yes
       copy:
@@ -35,12 +42,6 @@
         dest: /root/.composer/auth.json
         mode: '0600'
 
-    - name: Run composer install
-      become: yes
-      ansible.builtin.shell:
-        cmd: cd {{ build_dir }}/public_html && composer install --no-dev
-      environment:
-        COMPOSER_HOME: /root/.composer
 
     - name: Import database dump
       ansible.builtin.shell:
@@ -71,6 +72,8 @@
         - pub/static
         - pub/media
         - generated
+        - vendor
+        - app/etc
 
     - name: Install refresh script
       template:
@@ -120,6 +123,72 @@
       become: yes
       ansible.builtin.shell:
         cmd: cd {{ build_dir }} && docker compose up -d --remove-orphans
+
+    - name: Copy auth.json into phpfpm container
+      become: yes
+      ansible.builtin.shell:
+        cmd: |
+          docker exec php-{{ site_slug }}-1 mkdir -p /root/.composer
+          docker cp /root/.composer/auth.json php-{{ site_slug }}-1:/root/.composer/auth.json
+
+    - name: Patch zend-code for PHP 7.4 compatibility
+      ansible.builtin.shell:
+        cmd: >
+          sed -i 's/return (string) \$type;/return $type->getName();/'
+          {{ build_dir }}/public_html/vendor/zendframework/zend-code/src/Reflection/ParameterReflection.php
+
+    - name: Patch Magento ErrorHandler to ignore E_DEPRECATED (PHP 7.4)
+      ansible.builtin.lineinfile:
+        path: "{{ build_dir }}/public_html/vendor/magento/framework/App/ErrorHandler.php"
+        regexp: '^\s*\$errorNo = \$errorNo & error_reporting\(\);'
+        line: "        $errorNo = $errorNo & error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED;"
+
+    - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          composer dump-autoload -d /var/www/html
+
+    - name: Compile DI
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          php -d error_reporting=24567
+          /var/www/html/bin/magento setup:di:compile
+
+    - name: Regenerate autoloader (optimized — now that proxies exist)
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          composer dump-autoload --optimize -d /var/www/html
+
+    - name: Run setup:upgrade
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          php -d error_reporting=24567
+          /var/www/html/bin/magento setup:upgrade --keep-generated
+
+    - name: Deploy static content
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          php -d error_reporting=24567
+          /var/www/html/bin/magento setup:static-content:deploy -f en_US
+        chdir: "{{ build_dir }}"
+      tags: static
+
+    - name: Flush Magento cache
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          php /var/www/html/bin/magento cache:flush
 
     - name: Update Magento base URLs in database
       ansible.builtin.shell:

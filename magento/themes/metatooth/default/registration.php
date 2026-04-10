@@ -6,6 +6,6 @@
 
 \Magento\Framework\Component\ComponentRegistrar::register(
     \Magento\Framework\Component\ComponentRegistrar::THEME,
-    'frontend/Metatooth/fourtwenty',
+    'frontend/Metatooth/default',
     __DIR__
 );

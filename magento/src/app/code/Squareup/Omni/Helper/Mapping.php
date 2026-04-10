@@ -217,9 +217,9 @@ class Mapping extends AbstractHelper
         foreach ($productVariations as $productVar) {
             $version = (empty($productVar->getSquareVariationId()))?
                 null :
-                (array_key_exists($productVar->getSquareVariationId(), $versions))?
+                ((array_key_exists($productVar->getSquareVariationId(), $versions))?
                     $versions[$productVar->getSquareVariationId()] :
-                    null;
+                    null);
             $id = (empty($productVar->getSquareVariationId()))?
                 '#' . $productVar->getId() . '::' :
                 $productVar->getSquareVariationId();
