@@ -35,7 +35,6 @@
         state: directory
         mode: '0700'
 
-
     - name: Deploy composer auth
       become: yes
       copy:
