@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<!--
+/**
+ * Copyright © Magento, Inc. All rights reserved.
+ * See COPYING.txt for license details.
+ */
+-->
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Backend:etc/menu.xsd">
+    <menu>
+        <!-- Add Square menu item under Sales (in admin section) -->
+        <add id="Squareup_Omni::square" title="Square" translate="title" module="Squareup_Omni" sortOrder="40" parent="Magento_Sales::sales" resource="Squareup_Omni::square"/>
+
+        <!-- Add Transactions menu item under Sales->Square (in admin section) -->
+        <add id="Squareup_Omni::transactions" title="Transactions" translate="title" module="Squareup_Omni" sortOrder="10" parent="Squareup_Omni::square" resource="Squareup_Omni::transactions" action="square/transactions/index"/>
+        <!-- Add Refunds menu item under Sales->Square (in admin section) -->
+        <add id="Squareup_Omni::refunds" title="Refunds" translate="title" module="Squareup_Omni" sortOrder="20" parent="Squareup_Omni::square" resource="Squareup_Omni::refunds" action="square/refunds/index"/>
+    </menu>
+</config>

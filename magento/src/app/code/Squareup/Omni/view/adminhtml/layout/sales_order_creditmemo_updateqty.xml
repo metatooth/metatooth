@@ -1,0 +1,11 @@
+<?xml version="1.0"?>
+<page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
+    <body>
+        <referenceBlock name="creditmemo_totals">
+            <block class="Squareup\Omni\Block\Adminhtml\Sales\Order\Creditmemo\Totals" name="squareup_totals" template="Squareup_Omni::order/creditmemo/create/totals/giftcards.phtml"/>
+        </referenceBlock>
+        <referenceContainer name="submit_after">
+            <block class="Squareup\Omni\Block\Adminhtml\Sales\Order\Creditmemo\RefundGiftcards" name="squareup_refund_giftcards" template="Squareup_Omni::order/creditmemo/refund/giftcards.phtml" />
+        </referenceContainer>
+    </body>
+</page>

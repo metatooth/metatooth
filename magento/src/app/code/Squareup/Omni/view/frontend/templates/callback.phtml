@@ -1,0 +1,34 @@
+
+<body>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-md-12">
+            <h1>Your token was successfully saved</h1>
+            <form method="post"
+                  action="<?php echo $this->getUrl('squareupomni/index/saveLocation'); ?>"
+                  enctype="multipart/form-data">
+                <input name="form_key"
+                       type="hidden"
+                       value="<?php echo $this->getFormKey(); ?>" />
+                <div class="form-group">
+                    <?php $locations = $this->getLocations(); ?>
+                    <label for="location">
+                        <?php echo __('Please select a default location'); ?>
+                    </label>
+                    <select name="location" id="location" class="form-control">
+                        <?php foreach ($locations as $location): ?>
+                            <option value="<?php echo $location->getSquareId(); ?>">
+                                <?php echo $location->getName(); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <input type="submit"
+                           class="btn btn-info"
+                           value="<?php echo __('Save'); ?>" />
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

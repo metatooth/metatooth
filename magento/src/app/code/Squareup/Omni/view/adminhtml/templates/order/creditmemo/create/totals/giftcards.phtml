@@ -1,0 +1,19 @@
+<?php $giftCards = $this->getGiftCards(); ?>
+<?php $source = $this->getSource(); ?>
+
+<?php foreach ($giftCards as $giftCard): ?>
+<tr>
+    <?php $giftCardColumn = 'getSquareGiftcard' . $giftCard->getEntityId(); ?>
+    <td class="label">Square Gift Card Refund <?php echo $giftCard->getCardCode(); ?></td>
+    <td>
+        <?php if ($giftCard->getAmount() > 0): ?>
+            <span>Max: <?php echo $giftCard->getAmount(); ?></span>
+            <input type="text"
+                   name="creditmemo[square_giftcard_<?php echo $giftCard->getEntityId(); ?>]"
+                   value="<?php echo $source->{$giftCardColumn}(); ?>"
+                   class="input-text admin__control-text not-negative-amount square-giftcard"
+                   giftcard-id="<?php echo $giftCard->getEntityId(); ?>" />
+        <?php endif; ?>
+    </td>
+</tr>
+<?php endforeach; ?>

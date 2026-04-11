@@ -13,10 +13,29 @@ Metatooth is a monorepo containing:
 
 **Other Projects**:
 - **baldur** - Ruby-based image gallery web application for artist portfolio management (exposed on port 4567). See [baldur/CLAUDE.md](baldur/CLAUDE.md) for details.
+- **magento** (shop.metatooth.com) - Magento 2.3.4 e-commerce shop running PHP-FPM + Nginx in Docker, exposed on port 3360. Source in `magento/src/`; themes in `magento/themes/`. No build step — source files rsync'd from `~/metaspace/magento/` at deploy time.
 
 The project uses Ansible for WordPress infrastructure automation with Docker Compose for containerization across all services.
 
 ## Build & Deploy Commands
+
+### Magento (shop.metatooth.com)
+
+```bash
+cd magento
+ANSIBLE_INVENTORY=/path/to/inventory make deploy
+
+# Selective deploy tags
+ansible-playbook -i ... --tags sync ansible/deploy.yml   # sync src + theme + DB dump only
+ansible-playbook -i ... --tags import ansible/deploy.yml # DB import only
+ansible-playbook -i ... --tags urls ansible/deploy.yml   # update base URLs only
+```
+
+Inventory, `auth.json`, and `magento-final.sql` live in the configs repo at
+`configs/com/metatooth/shop/`. Source is deployed from `magento/src/` via
+`composer install` on the server; active theme from `magento/themes/magento2-theme/`.
+
+### WordPress sites
 
 All sites follow identical patterns. Replace `{site}` with `growherbert`, `lynngrown`, or `metatooth/www`:
 

@@ -1,0 +1,5 @@
+.setup.stamp
+opt/
+*.sql
+*.tar.gz
+*.gz

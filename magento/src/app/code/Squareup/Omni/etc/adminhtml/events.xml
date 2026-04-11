@@ -1,0 +1,28 @@
+<?xml version="1.0"?>
+<config xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:framework:Event/etc/events.xsd">
+    <event name="catalog_product_save_after">
+        <observer name="squareup_omni_product_save" instance="Squareup\Omni\Observer\Product\SaveAfter" />
+    </event>
+    <event name="catalog_product_delete_before">
+        <observer name="squareup_omni_product_delete_before" instance="Squareup\Omni\Observer\Product\ResetChildren" />
+        <observer name="squareup_omni_product_delete" instance="Squareup\Omni\Observer\Product\DeleteBefore" />
+    </event>
+    <event name="controller_action_predispatch_adminhtml_system_config_save">
+        <observer name="squareup_omni_predispatch_config_save" instance="Squareup\Omni\Observer\System\BeforeConfigSave" />
+    </event>
+    <event name="admin_system_config_changed_section_squareup_omni">
+        <observer name="squareup_omni_config_save" instance="Squareup\Omni\Observer\System\SquareupConfigSave" />
+    </event>
+    <event name="controller_action_postdispatch_adminhtml_system_config_save">
+        <observer name="squareup_omni_clear_cache_types" instance="Squareup\Omni\Observer\System\AfterConfigSave" />
+    </event>
+    <event name="sales_order_invoice_save_after">
+        <observer name="squareup_omni_invoice_save_after" instance="Squareup\Omni\Observer\AdminGrid\SynchronizeItems" />
+    </event>
+    <event name="controller_action_postdispatch_catalog_product_action_attribute_save">
+        <observer name="squareup_omni_mass_product_attribute_save_after" instance="Squareup\Omni\Observer\Product\MassAction" />
+    </event>
+    <event name="adminhtml_sales_order_creditmemo_register_before">
+        <observer name="squareup_omni_creditmemo_register_before" instance="Squareup\Omni\Observer\Creditmemo\RegisterBefore" />
+    </event>
+</config>

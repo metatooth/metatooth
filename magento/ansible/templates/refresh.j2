@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd {{ build_dir }}/public_html/app/design/frontend/Metatooth/default
+git pull
+cd {{ build_dir }}
+rm -rf public_html/pub/static/*
+rm -rf public_html/var/*
+php public_html/bin/magento cache:flush
