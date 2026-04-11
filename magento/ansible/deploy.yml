@@ -17,7 +17,7 @@
     - name: Sync active theme
       synchronize:
         src: "{{ playbook_dir }}/../themes/metatooth/default/"
-        dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/default/"
+        dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/threetwenty/"
         rsync_opts:
           - "--exclude=.gitignore"
       tags: sync
