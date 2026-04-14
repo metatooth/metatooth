@@ -17,7 +17,7 @@
     - name: Sync active theme
       synchronize:
         src: "{{ playbook_dir }}/../themes/metatooth/default/"
-        dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/default/"
+        dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/threetwenty/"
         rsync_opts:
           - "--exclude=.gitignore"
       tags: sync
@@ -142,6 +142,12 @@
         path: "{{ build_dir }}/public_html/vendor/magento/framework/App/ErrorHandler.php"
         regexp: '^\s*\$errorNo = \$errorNo & error_reporting\(\);'
         line: "        $errorNo = $errorNo & error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED;"
+
+    - name: Patch AreaList to guard null areas (PHP 7.4 null array access notice)
+      ansible.builtin.replace:
+        path: "{{ build_dir }}/public_html/vendor/magento/framework/App/AreaList.php"
+        regexp: "if \\(\\$areaInfo\\['frontName'\\] == \\$frontName\\)"
+        replace: "if (is_array($areaInfo) && (($areaInfo['frontName'] ?? null) == $frontName))"
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
