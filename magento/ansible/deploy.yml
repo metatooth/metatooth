@@ -137,6 +137,12 @@
           sed -i 's/return (string) \$type;/return $type->getName();/'
           {{ build_dir }}/public_html/vendor/zendframework/zend-code/src/Reflection/ParameterReflection.php
 
+    - name: Patch UnionExpression implode() argument order for PHP 7.4 (issue #16)
+      ansible.builtin.shell:
+        cmd: >
+          sed -i 's/implode(\$parts, \$this->type)/implode($this->type, $parts)/'
+          {{ build_dir }}/public_html/vendor/magento/framework/DB/Sql/UnionExpression.php
+
     - name: Patch Magento ErrorHandler to ignore E_DEPRECATED (PHP 7.4)
       ansible.builtin.lineinfile:
         path: "{{ build_dir }}/public_html/vendor/magento/framework/App/ErrorHandler.php"
