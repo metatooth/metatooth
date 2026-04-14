@@ -51,4 +51,4 @@ class MultidrawConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["libmultidraw"]
+        self.cpp_info.libs = ["multidraw"]
