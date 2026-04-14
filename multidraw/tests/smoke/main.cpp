@@ -19,7 +19,7 @@ int main() {
   ExampleEditor* editor = new ExampleEditor("./metatooth.stl");
 
   multidraw->open(editor);
-  std::cout << "libmultidraw-" <<  __version__ << std::endl;
+  std::cout << "libmultidraw-" <<  multidraw_version << std::endl;
   
   multidraw->run();
 

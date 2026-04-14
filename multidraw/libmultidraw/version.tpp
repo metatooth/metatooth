@@ -1,8 +1,8 @@
-#ifndef _VERSION_H
-#define _VERSION_H
+#ifndef LIBMULTIDRAW_VERSION_HPP
+#define LIBMULTIDRAW_VERSION_HPP
 
 #include <string>
 
-const std::string __version__("@MULTIDRAW_VERSION@");
+const std::string multidraw_version("@MULTIDRAW_VERSION@");
 
-#endif // _VERSION_H
+#endif // LIBMULTIDRAW_VERSION_HPP
