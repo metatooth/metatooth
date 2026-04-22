@@ -1,14 +1,18 @@
-#ifndef _HISTORY_H
-#define _HISTORY_H
+#ifndef LIBMULTIDRAW_HISTORY_HPP
+#define LIBMULTIDRAW_HISTORY_HPP
 
 #include <vector>
 
-class Command;
+namespace multidraw {
 
-class History {
- public:
-  std::vector<Command*> past;
-  std::vector<Command*> future;
-};
+  class Command;
 
-#endif // _HISTORY_H
+  class History {
+   public:
+    std::vector<Command*> past;
+    std::vector<Command*> future;
+  };
+
+}
+
+#endif // LIBMULTIDRAW_HISTORY_HPP
