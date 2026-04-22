@@ -69,6 +69,7 @@ Catalog::name(Component* comp) const
   while (iter != _compMap.cend()) {
     if (iter->second == comp) {
       result = iter->first;
+      break;
     }
     iter++;
   }
@@ -84,6 +85,7 @@ Catalog::name(Command* cmd) const
   while (iter != _cmdMap.cend()) {
     if (iter->second == cmd) {
       result = iter->first;
+      break;
     }
     iter++;
   }
