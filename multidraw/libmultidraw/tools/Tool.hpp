@@ -25,6 +25,9 @@
 
 namespace multidraw {
 
+  class Command;
+  class Component;
+
   /**
    * A participant in the TOOLED COMPOSITE design pattern.
    */
@@ -41,6 +44,8 @@ namespace multidraw {
   private:
   
   };
+
+  inline Tool::~Tool() {}
 
 }
 

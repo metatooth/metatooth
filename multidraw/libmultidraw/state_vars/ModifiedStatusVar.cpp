@@ -38,8 +38,20 @@ ModifiedStatusVar::component() const
   return _component;
 }
 
+void
+ModifiedStatusVar::component(Component* component)
+{
+  _component = component;
+}
+
 bool
 ModifiedStatusVar::modified() const
 {
   return _modified;
+}
+
+void
+ModifiedStatusVar::modified(bool modified)
+{
+  _modified = modified;
 }
