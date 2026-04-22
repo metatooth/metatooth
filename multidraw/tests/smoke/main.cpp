@@ -15,12 +15,12 @@ int main() {
   multidraw->catalog(
     new ExampleCatalog("MultidrawSmokeTest", new ExampleCreator())
   );
-                     
+
   ExampleEditor* editor = new ExampleEditor("./metatooth.stl");
 
   multidraw->open(editor);
   std::cout << "libmultidraw-" <<  multidraw_version << std::endl;
-  
+
   multidraw->run();
 
   delete multidraw;

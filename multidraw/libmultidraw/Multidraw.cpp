@@ -55,8 +55,15 @@ Multidraw::~Multidraw()
 {
   delete _catalog;
   _catalog = nullptr;
-  
+
+  for (auto& [comp, history] : _histories) {
+    delete history;
+  }
   _histories.clear();
+
+  for (auto* editor : _editors) {
+    delete editor;
+  }
   _editors.clear();
 
   alive(false);
