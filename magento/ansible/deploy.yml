@@ -124,6 +124,19 @@
       ansible.builtin.shell:
         cmd: cd {{ build_dir }} && docker compose up -d --remove-orphans
 
+    - name: Fix writable directory ownership inside container
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec -u root php-{{ site_slug }}-1
+          chown -R app:app
+          /var/www/html/var
+          /var/www/html/pub/static
+          /var/www/html/pub/media
+          /var/www/html/generated
+          /var/www/html/vendor
+          /var/www/html/app/etc
+
     - name: Copy auth.json into phpfpm container
       become: yes
       ansible.builtin.shell:
@@ -142,6 +155,13 @@
         path: "{{ build_dir }}/public_html/vendor/magento/framework/App/ErrorHandler.php"
         regexp: '^\s*\$errorNo = \$errorNo & error_reporting\(\);'
         line: "        $errorNo = $errorNo & error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED;"
+
+    - name: Patch AuthObserver DateInterval comparison (PHP 8 incompatibility)
+      ansible.builtin.shell:
+        cmd: >
+          sed -i
+          's/\$now->diff(\$firstFailureDate) > \$lockThreshInterval/(clone $firstFailureDate)->add($lockThreshInterval) < $now/'
+          {{ build_dir }}/public_html/vendor/magento/module-user/Observer/Backend/AuthObserver.php
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
@@ -183,6 +203,19 @@
         chdir: "{{ build_dir }}"
       tags: static
 
+    - name: Configure Mageplaza SMTP (Brevo)
+      become: yes
+      ansible.builtin.shell:
+        cmd: |
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/general/enabled 1
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/host smtp-relay.brevo.com
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/port 587
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/protocol tls
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/authentication login
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/username {{ smtp_username }}
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/password {{ smtp_password }}
+      tags: smtp
+
     - name: Flush Magento cache
       become: yes
       ansible.builtin.shell:
@@ -196,7 +229,7 @@
           mysql -h {{ db_host }} -P {{ db_port | default('3306') }}
           -u {{ db_user }} -p{{ db_password }} {{ db_name }} -e
           "UPDATE core_config_data SET value='https://{{ site_domain }}/'
-          WHERE path LIKE 'web/%/base%url' AND value IS NOT NULL;"
+          WHERE path IN ('web/unsecure/base_url','web/secure/base_url') AND value IS NOT NULL;"
       tags: urls
 
     - name: Install {{ site_domain }} service
