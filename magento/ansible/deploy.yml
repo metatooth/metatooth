@@ -190,6 +190,13 @@
           docker exec php-{{ site_slug }}-1
           php /var/www/html/bin/magento cache:flush
 
+    - name: Enable SMTP
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          php /var/www/html/bin/magento config:set system/smtp/disable 0
+
     - name: Update Magento base URLs in database
       ansible.builtin.shell:
         cmd: >
