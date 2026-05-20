@@ -2,7 +2,7 @@
 
 <page xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" layout="1column" xsi:noNamespaceSchemaLocation="urn:magento:framework:View/Layout/etc/page_configuration.xsd">
     <head>
-        <script src="https://js.squareup.com/v2/paymentform.js" src_type="url"/>
+        <script src="https://web.squarecdn.com/v1/square.js" src_type="url"/>
         <css src="Squareup_Omni/css/view/payment/sqpaymentform.css"/>
     </head>
     <body>

@@ -185,57 +185,44 @@ define([
         },
 
         build: function (elementId, placeholder) {
-            var self = this;
-
-            self.giftCardForm = new SqPaymentForm({
-                applicationId: window.checkoutConfig.payment.squareup.squareupApplicationId,
-                locationId: window.checkoutConfig.payment.squareup.squareupLocationId,
-                inputClass: "sq-input",
-                giftCard: {
-                    elementId: elementId,
-                    placeholder: placeholder
-                },
-                callbacks: {
-                    cardNonceResponseReceived: function (errors, nonce, cardData) {
-                        console.log(nonce);
-                        if (errors) {
-                            errors.forEach(function (error) {
-                                if (error.type == "VALIDATION_ERROR") {
-                                    alert(error.message);
-                                }
-                            });
-
-                            return;
-                        }
-
-                        if (nonce) {
-                            document.getElementById('gift-card-nonce').value = nonce;
-                        }
-
-                        if (cardData) {
-                            document.getElementById('gift-card-code').value = cardData.last_4;
-                        }
-                    }
-                }
-            });
-
-            self.giftCardForm.build();
+            // Gift card form is attached via window.Squareup.giftCard in initPayment
         },
 
         requestCardNonce: function (action) {
             var self = this;
 
-            self.giftCardForm.requestCardNonce();
-            setTimeout(function () {
-                var giftCardNonce = document.getElementById('gift-card-nonce').value;
-                var giftCardCode = document.getElementById('gift-card-code').value;
+            if (!window.Squareup || !window.Squareup.giftCard) {
+                console.error('Gift card form not initialized');
+                return;
+            }
 
-                if (action == "check-balance") {
-                    return self.checkGiftCardBalanceAction(giftCardNonce);
-                } else if (action == "apply-giftcard") {
-                    self.applyGiftCardAction(giftCardNonce, giftCardCode);
-                }
-            }, 1000);
+            window.Squareup.giftCard.tokenize()
+                .then(function (result) {
+                    if (result.status !== 'OK') {
+                        (result.errors || []).forEach(function (error) {
+                            if (error.type === 'VALIDATION_ERROR') {
+                                alert(error.message);
+                            }
+                        });
+                        return;
+                    }
+
+                    var nonce = result.token;
+                    var last4 = (result.details && result.details.giftCard && result.details.giftCard.last4)
+                        ? result.details.giftCard.last4 : '';
+
+                    document.getElementById('gift-card-nonce').value = nonce;
+                    document.getElementById('gift-card-code').value = last4;
+
+                    if (action === 'check-balance') {
+                        self.checkGiftCardBalanceAction(nonce);
+                    } else if (action === 'apply-giftcard') {
+                        self.applyGiftCardAction(nonce, last4);
+                    }
+                })
+                .catch(function (err) {
+                    console.error('Gift card tokenize error:', err);
+                });
         },
 
         checkGiftCardBalance: function () {

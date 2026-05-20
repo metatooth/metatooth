@@ -131,6 +131,14 @@
           docker exec php-{{ site_slug }}-1 mkdir -p /root/.composer
           docker cp /root/.composer/auth.json php-{{ site_slug }}-1:/root/.composer/auth.json
 
+    - name: Fix var/ ownership inside container (host chown mismatches container uid)
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec --user root php-{{ site_slug }}-1
+          chown -R app:app /var/www/html/var/session /var/www/html/var/cache
+          /var/www/html/var/page_cache /var/www/html/var/tmp
+
     - name: Patch zend-code for PHP 7.4 compatibility
       ansible.builtin.shell:
         cmd: >

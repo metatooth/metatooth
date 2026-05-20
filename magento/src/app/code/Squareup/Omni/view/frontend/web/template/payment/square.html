@@ -60,24 +60,9 @@
                     </if>
 
                     <div id="square_form_fields" class="form-fields" data-bind="visible: !(getHaveSavedCards() && getIsSaveOnFileEnabled())">
+                        <div id="card-container"></div>
                         <table>
                             <tbody>
-                            <tr>
-                                <td class="label-name" data-bind="i18n: 'Card Number:'"></td>
-                                <td class="input-wrap"><div id="sq-card-number"></div></td>
-                            </tr>
-                            <tr>
-                                <td class="label-name" data-bind="i18n: 'CVV:'"></td>
-                                <td class="input-wrap"><div id="sq-cvv"></div></td>
-                            </tr>
-                            <tr>
-                                <td class="label-name" data-bind="i18n: 'Expiration Date:'"></td>
-                                <td class="input-wrap"><div id="sq-expiration-date"></div></td>
-                            </tr>
-                            <tr>
-                                <td class="label-name" data-bind="i18n: 'Postal Code:'"></td>
-                                <td class="input-wrap"><div id="sq-postal-code"></div></td>
-                            </tr>
                             <tr data-bind="visible: (getCanSaveCards() && displaySaveCcCheckbox())">
                                 <td class="label-name" data-bind="i18n: 'Save this credit card for future payments'"></td>
                                 <td class="input-wrap">

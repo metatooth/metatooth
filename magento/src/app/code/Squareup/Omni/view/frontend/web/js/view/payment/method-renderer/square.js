@@ -96,8 +96,6 @@ define(
 
             getCardInputTitle: function (data) {
                  return data.cardholder_name + " | " + data.card_brand + " | " + data.exp_month + "/" + data.exp_year + " | **** " + data.last_4;
-                // return window.checkoutConfig.payment.squareup.cardInputTitles[data];
-                // return 'Temporary title';
             },
 
             getCanSaveCards: function () {
@@ -127,7 +125,6 @@ define(
                             function (response) {
                                 alert(response.responseJSON.message);
                                 squareGiftCard.resetGiftCards();
-                                window.Squareup.paymentForm.recalculateSize();
                                 if (self.displayForm()) {
                                     if (false === window.squareupCardOnFileUsed) {
                                         document.getElementById('card-nonce').value = "";
@@ -154,278 +151,12 @@ define(
             },
 
             initialize: function () {
-
                 this._super();
-                var _self = this;
-
                 window.Squareup = {};
-                window.Squareup.options = {};
-                window.Squareup.paymentForm = {};
-                window.Squareup.createPaymentRequest = function() {
-                    var shippingAddressData = quote.shippingAddress();
-                    var email = (!quote.guestEmail)? window.checkoutConfig.customerData.email : quote.guestEmail;
-                    var quoteTotals = quote.totals();
-                    var itemsInfo = window.Squareup.getOrderItems(quoteTotals);
-                    return {
-                        requestShippingAddress: _self.requestShippingAddress,
-                        requestBillingInfo: _self.requestBillingInfo,
-                        currencyCode: _self.currencyCode,
-                        countryCode: shippingAddressData.countryId,
-                        shippingContact: {
-                            familyName: shippingAddressData.firstname,
-                            givenName: shippingAddressData.lastname,
-                            email: email,
-                            country: shippingAddressData.countryId,
-                            region: shippingAddressData.regionCode,
-                            city: shippingAddressData.city,
-                            addressLines: shippingAddressData.street,
-                            postalCode: shippingAddressData.postcode
-                        },
-                        total: {
-                            label: _self.squareupMerchantName,
-                            amount: quoteTotals.grand_total.toString(),
-                            pending: false
-                        },
-                        lineItems: itemsInfo
-                    };
-                };
 
-                window.Squareup.getOrderItems = function(totals) {
-                    return [
-                        {
-                            label: "Subtotal",
-                            amount: totals.subtotal.toString(),
-                            pending: false
-                        },
-                        {
-                            label: "Shipping",
-                            amount: totals.shipping_amount.toString(),
-                            pending: true
-                        },
-                        {
-                            label: "Tax",
-                            amount: totals.tax_amount.toString(),
-                            pending: false
-                        }
-                    ];
-                };
-
-                window.Squareup.callbacks = {
-                    /*
-                     * callback function: methodsSupported
-                     * Triggered when: the page is loaded.
-                     */
-                    methodsSupported: function (methods) {
-
-                        var applePayBtn = document.getElementById('sq-apple-pay');
-                        var applePayLabel = document.getElementById('sq-apple-pay-label');
-                        var masterpassBtn = document.getElementById('sq-masterpass');
-                        var masterpassLabel = document.getElementById('sq-masterpass-label');
-
-                        // Only show the button if Apple Pay for Web is enabled
-                        // Otherwise, display the wallet not enabled message.
-                        if (methods.applePay === true) {
-                            applePayBtn.style.display = 'inline-block';
-                        }
-
-                        // Only show the button if Masterpass is enabled
-                        // Otherwise, display the wallet not enabled message.
-                        if (methods.masterpass === true) {
-                            masterpassBtn.style.display = 'inline-block';
-                        }
-                    },
-
-                    /*
-                     * callback function: createPaymentRequest
-                     * Triggered when: a digital wallet payment button is clicked.
-                     */
-                    createPaymentRequest: function () {
-                        return window.Squareup.createPaymentRequest();
-                    },
-
-                    /*
-                     * callback function: validateShippingContact
-                     * Triggered when: a shipping address is selected/changed in a digital
-                     *                 wallet UI that supports address selection.
-                     */
-                    // validateShippingContact: function (contact) {
-
-                    //     let validationErrorObj ;
-                    //     /* ADD CODE TO SET validationErrorObj IF ERRORS ARE FOUND */
-                    //     return validationErrorObj ;
-                    // },
-
-                    /*
-                     * callback function: cardNonceResponseReceived
-                     * Triggered when: SqPaymentForm completes a card nonce request
-                     */
-                    cardNonceResponseReceived: function (errors, nonce, cardData) {
-                        var shippingAddressData = quote.shippingAddress();
-                        var email = (!quote.guestEmail)? window.checkoutConfig.customerData.email : quote.guestEmail;
-                        _self.messageContainer.clear();
-                        if (errors) {
-                            // Log errors from nonce generation to the Javascript console
-                            console.log("Encountered errors:");
-                            errors.forEach(
-                                function (error) {
-                                    _self.messageContainer.addErrorMessage({
-                                        message: error.message,
-                                        parameters: {}
-                                    });
-                                    console.log('  ' + error.message);
-                                }
-                            );
-
-                            return;
-                        }
-
-                        // Assign the nonce value to the hidden form field
-                        document.getElementById('card-nonce').value = nonce;
-                        document.getElementById('digital-wallet').value = cardData.digital_wallet_type;
-                        document.getElementById('card-brand').value = cardData.card_brand;
-                        document.getElementById('card-last-4').value = cardData.last_4;
-                        document.getElementById('card-exp-month').value = cardData.exp_month;
-                        document.getElementById('card-exp-year').value = cardData.exp_year;
-
-                        window.Squareup.paymentForm.verifyBuyer(
-                            nonce,
-                            {
-                                amount: quote.totals().grand_total.toString(),
-                                intent: "CHARGE",
-                                currencyCode: "USD",
-                                billingContact: {
-                                    familyName: shippingAddressData.firstname,
-                                    givenName: shippingAddressData.lastname,
-                                    email: email,
-                                    country: shippingAddressData.countryId,
-                                    city: shippingAddressData.city,
-                                    addressLines: shippingAddressData.street,
-                                    postalCode: shippingAddressData.postcode,
-                                    phone: shippingAddressData.telephone
-                                }
-                            },
-                            function (err, verification) {
-
-                                if (err == null) {
-                                    document.getElementById('buyerVerification-token').value = verification.token;
-                                    console.log(_self.verificationToken);
-
-                                    _self.verificationToken = verification.token;
-                                    console.log(_self.verificationToken);
-                                    _self.placeOrder();
-                                }
-                            }
-                        );
-
-                        console.log('Nonce received');
-                    },
-
-                    /*
-                     * callback function: unsupportedBrowserDetected
-                     * Triggered when: the page loads and an unsupported browser is detected
-                     */
-                    unsupportedBrowserDetected: function () {
-                        /* PROVIDE FEEDBACK TO SITE VISITORS */
-                    },
-
-                    /*
-                     * callback function: inputEventReceived
-                     * Triggered when: visitors interact with SqPaymentForm iframe elements.
-                     */
-                    inputEventReceived: function (inputEvent) {
-                        switch (inputEvent.eventType) {
-                            case 'focusClassAdded':
-                                /* HANDLE AS DESIRED */
-                                break;
-                            case 'focusClassRemoved':
-                                /* HANDLE AS DESIRED */
-                                break;
-                            case 'errorClassAdded':
-                                /* HANDLE AS DESIRED */
-                                break;
-                            case 'errorClassRemoved':
-                                /* HANDLE AS DESIRED */
-                                break;
-                            case 'cardBrandChanged':
-                                /* HANDLE AS DESIRED */
-                                break;
-                            case 'postalCodeChanged':
-                                /* HANDLE AS DESIRED */
-                                break;
-                        }
-                    },
-
-                    /*
-                     * callback function: paymentFormLoaded
-                     * Triggered when: SqPaymentForm is fully loaded
-                     */
-                    paymentFormLoaded: function () {
-                        /* HANDLE AS DESIRED */
-                        Squareup.paymentForm.setPostalCode(quote.shippingAddress().postcode);
-                        jQuery('#sq-creditcard').prop('disabled',false);
-                    }
-                };
-
-                /* Initialize options function */
-                var init = function () {
-                    _self.initOptions();
-                };
-
-                /* Initialize options event trigger */
-                /* wait for document to be loaded to initialize the events */
-                /*document.observe(
-                    "dom:loaded", function () {
-                        init();
-                    }
-                );*/
                 $(document).ready(function () {
-                    init();
+                    // options initialized on ready for afterRender timing
                 });
-            },
-
-            initOptions: function () {
-                var _self = this;
-                window.Squareup.options = {
-                    applicationId: _self.SquareupApplicationId,
-                    locationId: _self.SquareupLocationId,
-                    inputClass: 'sq-input',
-
-                    // Customize the CSS for SqPaymentForm iframe elements
-                    inputStyles: [{
-                        fontSize: '.9em'
-                    }],
-
-                    // Initialize Apple Pay placeholder ID
-                    applePay: {
-                        elementId: 'sq-apple-pay'
-                    },
-
-                    // Initialize Masterpass placeholder ID
-                    masterpass: false,
-                    /*masterpass: {
-                        elementId: 'sq-masterpass'
-                    },*/
-
-                    // Initialize the credit card placeholders
-                    cardNumber: {
-                        elementId: 'sq-card-number',
-                        placeholder: '•••• •••• •••• ••••'
-                    },
-                    cvv: {
-                        elementId: 'sq-cvv',
-                        placeholder: 'CVV'
-                    },
-                    expirationDate: {
-                        elementId: 'sq-expiration-date',
-                        placeholder: 'MM/YY'
-                    },
-                    postalCode: {
-                        elementId: 'sq-postal-code'
-                    },
-
-                    // SqPaymentForm callback functions
-                    callbacks: Squareup.callbacks
-                };
             },
 
             initPayment: function () {
@@ -436,19 +167,38 @@ define(
                 }
                 window.squareupCardOnFileUsed = false;
                 console.log('Initing payment');
-                window.Squareup.paymentForm = new SqPaymentForm(window.Squareup.options);
-                window.Squareup.paymentForm.build();
 
-                if(this.isGiftCardEnabled()) {
-                    /** Build gift card form*/
-                    squareGiftCard.build("sq-gift-card", "GIFT CARD NUMBER");
-                }
+                Square.payments(_self.SquareupApplicationId, _self.SquareupLocationId)
+                    .then(function (payments) {
+                        window.Squareup.payments = payments;
+
+                        var initPromises = [
+                            payments.card().then(function (card) {
+                                window.Squareup.card = card;
+                                return card.attach('#card-container');
+                            })
+                        ];
+
+                        if (_self.isGiftCardEnabled()) {
+                            initPromises.push(
+                                payments.giftCard().then(function (giftCard) {
+                                    window.Squareup.giftCard = giftCard;
+                                    return giftCard.attach('#sq-gift-card');
+                                })
+                            );
+                        }
+
+                        return Promise.all(initPromises);
+                    })
+                    .catch(function (err) {
+                        console.error('Failed to initialize Square payment form:', err);
+                    });
 
                 $(document).ready(function () {
-                    if(_self.onlyCardOnFileEnabled() == true && window.checkoutConfig.payment.squareup.getHaveSavedCards) {
+                    if (_self.onlyCardOnFileEnabled() == true && window.checkoutConfig.payment.squareup.getHaveSavedCards) {
                         jQuery('#save_square_cards_empty').val('0');
                         jQuery('#save-square-card').val('0');
-                    } else if(_self.onlyCardOnFileEnabled() == true) {
+                    } else if (_self.onlyCardOnFileEnabled() == true) {
                         jQuery('#save_square_cards_empty').val('1');
                         jQuery('#save-square-card').val('1');
                     }
@@ -465,40 +215,95 @@ define(
                             document.getElementById("square_form_fields").style.display = "block";
                             jQuery('input[name="payment[nonce]"]').val('');
                             window.squareupCardOnFileUsed = false;
-                            // $('#payment_form_squareup_payment + .actions-toolbar .primary').addClass('hide');
                         } else {
-                            var element =  document.getElementById('save_card_on_file_input');
+                            var element = document.getElementById('save_card_on_file_input');
                             if (typeof(element) != 'undefined' && element != null) {
-                                // jQuery('input[name="payment[save_square_card]"]').remove();
                                 jQuery('input[name="payment[save_square_card]"]').val('');
                             }
                             document.getElementById("square_form_fields").style.display = "none";
                             jQuery('input[name="payment[nonce]"]').val(this.value);
                             window.squareupCardOnFileUsed = true;
-                            // $('#payment_form_squareup_payment + .actions-toolbar .primary').removeClass('hide');
                         }
                     });
                 });
 
-                if(this.isGiftCardEnabled()) {
-                  squareGiftCard.resetTotals();
+                if (this.isGiftCardEnabled()) {
+                    squareGiftCard.resetTotals();
                 }
             },
 
             requestCardNonce: function (item, event) {
                 event.preventDefault();
-                var existingNonce = document.getElementById('card-nonce');
                 var _self = this;
+                var existingNonce = document.getElementById('card-nonce');
 
                 if (!_self.displayForm()) {
                     _self.placeOrder();
-                } else {
-                    if (existingNonce.value.length === 0) {
-                        Squareup.paymentForm.requestCardNonce();
-                    } else {
-                        _self.placeOrder();
-                    }
+                    return;
                 }
+
+                if (existingNonce.value.length > 0) {
+                    _self.placeOrder();
+                    return;
+                }
+
+                var shippingAddressData = quote.shippingAddress();
+                var email = (!quote.guestEmail) ? window.checkoutConfig.customerData.email : quote.guestEmail;
+
+                window.Squareup.card.tokenize()
+                    .then(function (result) {
+                        _self.messageContainer.clear();
+                        if (result.status !== 'OK') {
+                            (result.errors || []).forEach(function (error) {
+                                _self.messageContainer.addErrorMessage({
+                                    message: error.message,
+                                    parameters: {}
+                                });
+                                console.log('  ' + error.message);
+                            });
+                            return null;
+                        }
+
+                        var nonce = result.token;
+                        var cardDetails = (result.details && result.details.card) ? result.details.card : {};
+
+                        document.getElementById('card-nonce').value = nonce;
+                        document.getElementById('digital-wallet').value = '';
+                        document.getElementById('card-brand').value = cardDetails.brand || '';
+                        document.getElementById('card-last-4').value = cardDetails.last4 || '';
+                        document.getElementById('card-exp-month').value = cardDetails.expMonth || '';
+                        document.getElementById('card-exp-year').value = cardDetails.expYear || '';
+
+                        return window.Squareup.payments.verifyBuyer(nonce, {
+                            amount: quote.totals().grand_total.toString(),
+                            intent: "CHARGE",
+                            currencyCode: "USD",
+                            billingContact: {
+                                familyName: shippingAddressData.firstname,
+                                givenName: shippingAddressData.lastname,
+                                email: email,
+                                country: shippingAddressData.countryId,
+                                city: shippingAddressData.city,
+                                addressLines: shippingAddressData.street,
+                                postalCode: shippingAddressData.postcode,
+                                phone: shippingAddressData.telephone
+                            }
+                        });
+                    })
+                    .then(function (verificationResult) {
+                        if (verificationResult) {
+                            _self.verificationToken = verificationResult.token;
+                            document.getElementById('buyerVerification-token').value = verificationResult.token;
+                            _self.placeOrder();
+                        }
+                    })
+                    .catch(function (err) {
+                        console.error('Payment error:', err);
+                        _self.messageContainer.addErrorMessage({
+                            message: 'An error occurred during payment processing. Please try again.',
+                            parameters: {}
+                        });
+                    });
             },
 
             getData: function () {
@@ -519,8 +324,6 @@ define(
                     data.additional_data.cc_exp_month = ccExpMonth;
                     data.additional_data.cc_exp_year = ccExpYear;
                 }
-
-                var buyerVerification = $('#buyerVerification-token').val();
 
                 data.additional_data.buyerVerificationToken = self.verificationToken;
                 data.additional_data.display_form = self.displayForm();
