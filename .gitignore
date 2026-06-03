@@ -1,3 +1,6 @@
 .env
 *~
 _venv
+node_modules/
+.metatooth.setup.stamp
+.claude

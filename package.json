@@ -1,0 +1,23 @@
+{
+  "name": "metatooth",
+  "version": "1.0.0",
+  "description": "This is the mono repository for Metatooth LLC. It's supposedly a good idea.",
+  "homepage": "https://github.com/metatooth/metatooth#readme",
+  "bugs": {
+    "url": "https://github.com/metatooth/metatooth/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/metatooth/metatooth.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "@fission-ai/openspec": "^1.3.1"
+  }
+}
