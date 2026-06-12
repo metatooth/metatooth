@@ -3,12 +3,13 @@
   "version": "0.0.0",
   "description": "A ring of tetrahedra",
   "engines": {
-    "node": "18.16.0",
-    "npm": "9.5.1"
+    "node": "20.18.1",
+    "npm": "11.14.1"
   },
   "main": "index.js",
   "scripts": {
     "start": "nodemon ./index.js",
+    "dev": "concurrently \"nodemon ./index.js\" \"browser-sync start --proxy 'localhost:5000' --files 'public/**/*' --port 3000 --no-open\"",
     "test": "node test.js",
     "lint": "node_modules/eslint/bin/eslint.js **/*.js --ignore-pattern node_modules/"
   },
@@ -16,10 +17,11 @@
     "express": "^4.15.2"
   },
   "devDependencies": {
-    "eslint": "^6.7.2",
-    "eslint-config-airbnb-base": "^14.0.0",
+    "browser-sync": "^3.0.4",
+    "concurrently": "^9.2.1",
+    "eslint": "^8.2.0",
+    "eslint-config-airbnb-base": "^15.0.0",
     "eslint-plugin-import": "^2.19.1",
-    "eslint-plugin-vue": "^6.0.1",
     "nodemon": "^3.1.7",
     "prettier": "3.3.3"
   },
