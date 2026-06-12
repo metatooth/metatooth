@@ -5,6 +5,13 @@
       ansible.builtin.shell:
         cmd: "mkdir -p {{ app_dir }}"
 
+    - name: Stop kaleidocycle.metatooth.com service
+      become: yes
+      systemd:
+        name: com.metatooth.kaleidocycle
+        state: stopped
+      ignore_errors: yes
+
     - name: Sync docker image
       synchronize:
         src: "{{ src_dir }}/kaleidocycle_app_latest.tar.gz"
