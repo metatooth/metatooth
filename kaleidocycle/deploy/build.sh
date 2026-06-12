@@ -25,20 +25,19 @@ cleanup() {
 trap "cleanup" exit
 
 if [ "${BRANCH}" = "local" ]; then
-  ln -sf ${TOPDIR} ${BUILD_DIR}
+  DOCKER_CONTEXT=${TOPDIR}
 else
   git clone https://github.com/metatooth/kaleidocycle.git $BUILD_DIR
   cd $BUILD_DIR
   git checkout $BRANCH
+  DOCKER_CONTEXT=${BUILD_DIR}
 fi
-
-cd $BUILD_DIR
 
 rm -rf $DEPLOYMENT_DIR
 mkdir -p $DEPLOYMENT_DIR
 
-cp -r $BUILD_DIR/config $DEPLOYMENT_DIR/config
+cp -r $DOCKER_CONTEXT/config $DEPLOYMENT_DIR/config
 
-docker build -t kaleidocycle_app:latest .
+docker build -t kaleidocycle_app:latest $DOCKER_CONTEXT
 
 docker save kaleidocycle_app:latest | gzip > $DEPLOYMENT_DIR/kaleidocycle_app_latest.tar.gz
