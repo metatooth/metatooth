@@ -1,8 +1,6 @@
 #!/bin/sh
 
-cd {{ build_dir }}/public_html/app/design/frontend/Metatooth/default
-git pull
 cd {{ build_dir }}
 rm -rf public_html/pub/static/*
-rm -rf public_html/var/*
-php public_html/bin/magento cache:flush
+rm -rf public_html/var/cache public_html/var/page_cache public_html/var/view_preprocessed
+docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento cache:flush
