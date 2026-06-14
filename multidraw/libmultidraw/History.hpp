@@ -9,9 +9,15 @@ namespace multidraw {
 
   class History {
    public:
+    ~History();
     std::vector<Command*> past;
     std::vector<Command*> future;
   };
+
+  inline History::~History() {
+    for (Command* cmd : past) { delete cmd; }
+    for (Command* cmd : future) { delete cmd; }
+  }
 
 }
 

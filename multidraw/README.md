@@ -8,7 +8,7 @@ Git repository at [metatooth/metatooth](https://github.com/metatooth/metatooth)
 
 Original source from [vectaport/ivtools](https://github.com/vectaport/ivtools)
 
-![Unidraw](./doc/Unidraw.png)
+![Unidraw](./docs/Unidraw.png)
 
 ## Getting Started
 
@@ -29,7 +29,7 @@ $ make
 
 ## License
 
-Copyright (c) 2026 Metatooth LLC. See the [License](../LICENSE).
+Copyright (c) 2023-2026 Metatooth LLC. See the [License](../LICENSE).
 
 In addition, some elements of the codebase are:
 

@@ -47,6 +47,8 @@ Editor::Editor(const std::string& inpath, const std::string& outpath) :
   _component(nullptr),
   _tool(nullptr),
   _command(nullptr),
+  _name(nullptr),
+  _modified(nullptr),
   _window(nullptr),
   _viewer(nullptr)
 {
@@ -56,18 +58,18 @@ Editor::Editor(const std::string& inpath, const std::string& outpath) :
   // this Editor's state variables.
 
   // initialize component tree from the input path
-  
+
   Component* comp = nullptr;
   if (catalog->retrieve(inpath, comp)) {
     init(comp);
   }
 
   // state variables
-  
+
   _outpath = new NameVar(outpath);
 
   // try to parse commands from the input file, then execute
-  
+
   _command = dynamic_cast<Command*> (new MacroCmd(this));
   catalog->retrieve(inpath, _command);
 
@@ -76,8 +78,10 @@ Editor::Editor(const std::string& inpath, const std::string& outpath) :
 
 Editor::~Editor()
 {
+  delete _name;
   delete _modified;
   delete _outpath;
+  delete _command;
 }// destructor
 
 void
@@ -113,7 +117,7 @@ Editor::state(const std::string& name) const
   for (auto& character: ALLCAPS) { character = (char)std::toupper(character); }
 
   StateVar* var = nullptr;
-  
+
   if (ALLCAPS == "COMPONENTNAME") {
     var = _name;
   } else if (ALLCAPS == "MODIFIED") {
@@ -121,7 +125,7 @@ Editor::state(const std::string& name) const
   } else if (ALLCAPS == "OUTPATH") {
     var = _outpath;
   }
-  
+
   return var;
 }// state
 
@@ -135,6 +139,6 @@ void
 Editor::init(Component* comp)
 {
   _component = comp;
-  
+
   _modified = new ModifiedStatusVar(_component);
 }// init
