@@ -86,38 +86,27 @@ function tetraVertices(t, pairIndex, reflected) {
   });
 }
 
+const _faceScratch = new Float32Array(36);
+const _edgeScratch = new Float32Array(36);
+
 function facePositions([V0, V1, V2, V3]) {
-  return new Float32Array([
-    ...V0,
-    ...V1,
-    ...V2,
-    ...V0,
-    ...V2,
-    ...V3,
-    ...V0,
-    ...V3,
-    ...V1,
-    ...V1,
-    ...V3,
-    ...V2,
-  ]);
+  let i = 0;
+  for (const v of [V0, V1, V2, V0, V2, V3, V0, V3, V1, V1, V3, V2]) {
+    _faceScratch[i++] = v[0];
+    _faceScratch[i++] = v[1];
+    _faceScratch[i++] = v[2];
+  }
+  return _faceScratch;
 }
 
 function edgePositions([V0, V1, V2, V3]) {
-  return new Float32Array([
-    ...V0,
-    ...V1,
-    ...V0,
-    ...V2,
-    ...V0,
-    ...V3,
-    ...V1,
-    ...V2,
-    ...V1,
-    ...V3,
-    ...V2,
-    ...V3,
-  ]);
+  let i = 0;
+  for (const v of [V0, V1, V0, V2, V0, V3, V1, V2, V1, V3, V2, V3]) {
+    _edgeScratch[i++] = v[0];
+    _edgeScratch[i++] = v[1];
+    _edgeScratch[i++] = v[2];
+  }
+  return _edgeScratch;
 }
 
 const meshMaterial = new THREE.MeshPhongMaterial({
