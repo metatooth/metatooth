@@ -56,7 +56,7 @@ function baseVertices(t) {
 
   const w1 = [c, 0, s];
   const w2 = [-s / d, -s / d, c / d];
-  const w3 = [-s * s / d, 1 / d, s * c / d];
+  const w3 = [(-s * s) / d, 1 / d, (s * c) / d];
 
   const P = [w3[1] - w3[0], 0, -w3[2] / 2];
   const Q = [w3[1], w3[1], w3[2] / 2];
@@ -71,7 +71,8 @@ function baseVertices(t) {
 }
 
 function rotZ(v, alpha) {
-  const ca = Math.cos(alpha), sa = Math.sin(alpha);
+  const ca = Math.cos(alpha),
+    sa = Math.sin(alpha);
   return [v[0] * ca - v[1] * sa, v[0] * sa + v[1] * ca, v[2]];
 }
 
@@ -87,21 +88,35 @@ function tetraVertices(t, pairIndex, reflected) {
 
 function facePositions([V0, V1, V2, V3]) {
   return new Float32Array([
-    ...V0, ...V1, ...V2,
-    ...V0, ...V2, ...V3,
-    ...V0, ...V3, ...V1,
-    ...V1, ...V3, ...V2,
+    ...V0,
+    ...V1,
+    ...V2,
+    ...V0,
+    ...V2,
+    ...V3,
+    ...V0,
+    ...V3,
+    ...V1,
+    ...V1,
+    ...V3,
+    ...V2,
   ]);
 }
 
 function edgePositions([V0, V1, V2, V3]) {
   return new Float32Array([
-    ...V0, ...V1,
-    ...V0, ...V2,
-    ...V0, ...V3,
-    ...V1, ...V2,
-    ...V1, ...V3,
-    ...V2, ...V3,
+    ...V0,
+    ...V1,
+    ...V0,
+    ...V2,
+    ...V0,
+    ...V3,
+    ...V1,
+    ...V2,
+    ...V1,
+    ...V3,
+    ...V2,
+    ...V3,
   ]);
 }
 
@@ -125,11 +140,17 @@ for (let r = 0; r < 4; r++) {
     const verts = tetraVertices(0, r, reflected);
 
     const meshGeo = new THREE.BufferGeometry();
-    meshGeo.setAttribute("position", new THREE.BufferAttribute(facePositions(verts), 3));
+    meshGeo.setAttribute(
+      "position",
+      new THREE.BufferAttribute(facePositions(verts), 3),
+    );
     meshGeo.computeVertexNormals();
 
     const wireGeo = new THREE.BufferGeometry();
-    wireGeo.setAttribute("position", new THREE.BufferAttribute(edgePositions(verts), 3));
+    wireGeo.setAttribute(
+      "position",
+      new THREE.BufferAttribute(edgePositions(verts), 3),
+    );
 
     scene.add(new THREE.Mesh(meshGeo, meshMaterial));
     scene.add(new THREE.LineSegments(wireGeo, wireMaterial));
