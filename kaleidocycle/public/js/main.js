@@ -156,9 +156,9 @@ let twist = 0.01;
 let stop = false;
 
 document.addEventListener("keydown", (e) => {
-  if (e.keyCode === 83) {
+  if (e.key === "s") {
     stop = !stop;
-  } else if (e.keyCode === 84) {
+  } else if (e.key === "t") {
     twist *= -1;
   }
 });
