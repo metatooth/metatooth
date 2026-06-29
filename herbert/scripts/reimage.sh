@@ -2,9 +2,9 @@
 
 set -eo pipefail
 
-IMAGE_BASE_URL=https://downloads.raspberrypi.org
-IMAGE_URL_PATH=raspios_lite_armhf/images/raspios_lite_armhf-2024-11-19
-IMAGE_NAME_BASE=2024-11-19-raspios-bookworm-armhf-lite.img
+IMAGE_BASE_URL=https://downloads.raspberrypi.com
+IMAGE_URL_PATH=raspios_lite_armhf/images/raspios_lite_armhf-2026-06-19
+IMAGE_NAME_BASE=2026-06-18-raspios-trixie-armhf-lite.img
 
 IMAGE_ARCHIVE=${IMAGE_NAME_BASE}.xz
 IMAGE_URL="${IMAGE_BASE_URL}/${IMAGE_URL_PATH}/${IMAGE_ARCHIVE}"
@@ -22,13 +22,14 @@ log() {
 }
 
 download_image() {
+  if [ -f ${IMAGE_LOCATION} ]; then
+    log "Using existing image: ${IMAGE}"
+    return
+  fi
   if [ ! -f ${IMAGE_ARCHIVE_LOCATION} ]; then
     log "Downloading ${IMAGE_ARCHIVE}"
-    curl -L -o ${IMAGE_ARCHIVE_LOCATION} ${IMAGE_URL}
+    curl -L --fail -o ${IMAGE_ARCHIVE_LOCATION} ${IMAGE_URL}
   fi
-}
-
-extract_image() {
   log "Extracting ${IMAGE_ARCHIVE_LOCATION}"
   xz -d ${IMAGE_ARCHIVE_LOCATION}
 }
@@ -36,7 +37,7 @@ extract_image() {
 clean_up() {
   sudo umount ${FILESYSTEM_MOUNT} >/dev/null 2>&1 || true
   sudo umount ${BOOT_MOUNT} >/dev/null 2>&1 || true
-  rm -f ${IMAGE_LOCATION}
+  #rm -f ${IMAGE_LOCATION}
   rm -rf ${FILESYSTEM_MOUNT}
   rm -rf ${BOOT_MOUNT}
 }
@@ -48,22 +49,58 @@ enable_ssh() {
 
 add_wifi_settings() {
   log "Updating Wifi Settings: ${WIFI_SSID}"
-  cat <<-EOF | sudo tee -a \
-    ${FILESYSTEM_MOUNT}/etc/wpa_supplicant/wpa_supplicant.conf
-country=US
-network={
-  ssid="${WIFI_SSID}"
-  psk="${WIFI_PWD}"
-}
+  local nm_dir=${FILESYSTEM_MOUNT}/etc/NetworkManager/system-connections
+  sudo mkdir -p ${nm_dir}
+
+  if [ -n "${STATIC_IP}" ]; then
+    local ipv4_config="method=manual
+address1=${STATIC_IP}/24,${ROUTER}
+dns=${DNS};"
+  else
+    local ipv4_config="method=auto"
+  fi
+
+  if [ "${WIFI_SECURITY:-wpa}" = "wep" ]; then
+    local security_config="[wifi-security]
+key-mgmt=none
+auth-alg=open
+wep-key0=${WIFI_PWD}
+wep-key-type=1"
+  else
+    local security_config="[wifi-security]
+key-mgmt=wpa-psk
+psk=${WIFI_PWD}"
+  fi
+
+  sudo tee ${nm_dir}/wifi.nmconnection <<-EOF
+[connection]
+id=wifi
+type=wifi
+autoconnect=true
+
+[wifi]
+mode=infrastructure
+ssid=${WIFI_SSID}
+
+${security_config}
+
+[ipv4]
+${ipv4_config}
+
+[ipv6]
+method=auto
+addr-gen-mode=default
 EOF
-  sudo sed -i -E \
-    's/(update_config=)1/\10/' \
-    ${FILESYSTEM_MOUNT}/etc/wpa_supplicant/wpa_supplicant.conf
+  sudo chmod 600 ${nm_dir}/wifi.nmconnection
+  # crda is deprecated on Trixie; cfg80211 module param is the persistent way
+  echo "options cfg80211 ieee80211_regdom=US" | sudo tee \
+    ${FILESYSTEM_MOUNT}/etc/modprobe.d/cfg80211.conf
 }
 
 unblock_rfkill() {
   log "Unblocking rfkill"
   for f in ${FILESYSTEM_MOUNT}/var/lib/systemd/rfkill/*:wlan; do
+    [ -e "$f" ] || continue
     echo 0 | sudo tee ${f}
   done
 }
@@ -79,20 +116,24 @@ set_hostname() {
 }
 
 add_static_ip() {
-  log "Setting Static IP: ${STATIC_IP}"
-  cat <<-EOF | sudo tee -a ${FILESYSTEM_MOUNT}/etc/dhcpcd.conf
-interface ${INTERFACE}
-static ip_address=${STATIC_IP}/16
-static routers=${ROUTER}
-static domain_name_servers=${DNS}
-EOF
+  : # handled in add_wifi_settings via NetworkManager keyfile
 }
 
 add_user() {
   if [ "${NEW_USER}" != "pi" ]; then
-    log "Deleting \"pi\" user"
-    sudo chroot ${FILESYSTEM_MOUNT} userdel -r pi
-    sudo rm -v ${FILESYSTEM_MOUNT}/etc/sudoers.d/010_pi-nopasswd
+    if [ ! -f /proc/sys/fs/binfmt_misc/qemu-arm ]; then
+      echo "ERROR: qemu-arm binfmt not registered. Install qemu-user and qemu-user-binfmt."
+      exit 1
+    fi
+    if sudo chroot ${FILESYSTEM_MOUNT} id pi &>/dev/null; then
+      log "Deleting \"pi\" user"
+      sudo chroot ${FILESYSTEM_MOUNT} userdel -r pi
+      sudo rm -vf ${FILESYSTEM_MOUNT}/etc/sudoers.d/010_pi-nopasswd
+    fi
+    if sudo chroot ${FILESYSTEM_MOUNT} id ${NEW_USER} &>/dev/null; then
+      log "Removing existing user: ${NEW_USER}"
+      sudo chroot ${FILESYSTEM_MOUNT} userdel -r ${NEW_USER}
+    fi
     log "Adding User: ${NEW_USER}"
     sudo chroot ${FILESYSTEM_MOUNT} useradd -m -s /bin/bash ${NEW_USER}
     sudo chroot ${FILESYSTEM_MOUNT} bash -c \
@@ -137,7 +178,7 @@ unmount() {
 
 reimage() {
   log "Reimaging device: /dev/${BLOCK_DEVICE}"
-  sudo dd bs=4M if=${IMAGE_LOCATION} of=/dev/${BLOCK_DEVICE}
+  sudo dd bs=4M if=${IMAGE_LOCATION} of=/dev/${BLOCK_DEVICE} || true
   sync
 }
 
@@ -183,6 +224,7 @@ get_user_input() {
 log_settings() {
   echo ""
   echo -e "\033[1;95mWIFI_SSID\033[0;0m:    ${WIFI_SSID}"
+  echo -e "\033[1;95mWIFI_SECURITY\033[0;0m: ${WIFI_SECURITY:-wpa}"
   echo -e "\033[1;95mWIFI_PWD\033[0;0m:     ${WIFI_PWD}"
   echo -e "\033[1;95mSTATIC_IP\033[0;0m:    ${STATIC_IP}"
   echo -e "\033[1;95mINTERFACE\033[0;0m:    ${INTERFACE}"
@@ -191,7 +233,7 @@ log_settings() {
   echo -e "\033[1;95mNEW_USER_PWD\033[0;0m: ${NEW_USER_PWD}"
   echo -e "\033[1;95mBLOCK_DEVICE\033[0;0m: ${BLOCK_DEVICE}"
   echo -e "\033[1;95mROUTER\033[0;0m:       ${ROUTER}"
-  echo -e "\033[1;95mROUTER\033[0;0m:       ${DNS}"
+  echo -e "\033[1;95mDNS\033[0;0m:       ${DNS}"
   echo ""
 }
 
@@ -204,6 +246,8 @@ options:
   --wifi-ssid=<ssid>       Sets wifi SSID
 
   --wifi-pwd=<pwd>         Sets wifi password
+
+  --wifi-security=<wpa|wep> Sets wifi security type [default=wpa]
 
   --ip=<ip>                Sets a static IP
 
@@ -242,6 +286,10 @@ for i in "$@"; do
       ;;
     --wifi-pwd=*)
       WIFI_PWD="${i#*=}"
+      shift
+      ;;
+    --wifi-security=*)
+      WIFI_SECURITY="${i#*=}"
       shift
       ;;
     --ip=*)
@@ -283,12 +331,11 @@ for i in "$@"; do
   esac
 done
 
-#trap "clean_up" EXIT
+trap "clean_up" EXIT
 
 get_user_input
 log_settings
 download_image
-extract_image
 make_mount_dirs
 mount ${BOOT_MOUNT}
 enable_ssh
