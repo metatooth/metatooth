@@ -1,16 +1,16 @@
 from conan import ConanFile
-from conan.tools.cmake import CMakeToolchain, cmake_layout, CMakeDeps, CMake
+from conan.tools.cmake import CMake, CMakeToolchain, cmake_layout, CMakeDeps
 
-class MultidrawConan(ConanFile):
-    name = "libmultidraw"
+class FabriqueConan(ConanFile):
+    name = "libfabrique"
     version = "0.1"
 
     # Optional metadata
     license = "MIT"
     author = "Terry Lorber terry@metatooth.com"
-    url = "https://github.com/metatooth/multidraw"
-    description = "A multi-platform framework for domain-specific editors."
-    topics = ("framework", "design", "visualization", "2D", "3D")
+    url = "https://github.com/metatooth/fabrique"
+    description = "A fabrication framework built on the multidraw editor platform."
+    topics = ("framework", "fabrication", "design", "visualization")
 
     # Binary configuration
     settings = "os", "compiler", "build_type", "arch"
@@ -19,7 +19,7 @@ class MultidrawConan(ConanFile):
 
     # Sources are located in the same place as this recipe, copy them
     # to the recipe
-    exports_sources = "CMakeLists.txt", "VERSION", "libmultidraw/*", "doc/*", "tests/*"
+    exports_sources = "CMakeLists.txt", "VERSION", "fabrique/*", "doc/*", "tests/*"
 
     def config_options(self):
         if self.settings.os == "Windows":
@@ -29,12 +29,7 @@ class MultidrawConan(ConanFile):
         cmake_layout(self)
 
     def requirements(self):
-        self.requires("fltk/1.3.8")
-        self.requires("freetype/2.13.2")
-        self.requires("libxft/2.3.6")
-
-    def build_requirements(self):
-        self.tool_requires("doxygen/1.9.4")
+        self.requires("libmultidraw/0.1")
 
     def generate(self):
         deps = CMakeDeps(self)
@@ -53,4 +48,4 @@ class MultidrawConan(ConanFile):
         cmake.install()
 
     def package_info(self):
-        self.cpp_info.libs = ["multidraw"]
+        self.cpp_info.libs = ["libfabrique"]
