@@ -11,6 +11,5 @@ int main(int argc, char* argv[]) {
     return 0;
   }
 
-  std::cout << "fabrique-" << __version__ << std::endl;
   return 0;
 }
