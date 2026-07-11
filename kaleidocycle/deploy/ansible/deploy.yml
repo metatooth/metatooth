@@ -5,6 +5,13 @@
       ansible.builtin.shell:
         cmd: "mkdir -p {{ app_dir }}"
 
+    - name: Stop kaleidocycle.metatooth.com service
+      become: true
+      ansible.builtin.systemd:
+        name: com.metatooth.kaleidocycle
+        state: stopped
+      ignore_errors: true
+
     - name: Sync docker image
       synchronize:
         src: "{{ src_dir }}/kaleidocycle_app_latest.tar.gz"
@@ -37,12 +44,12 @@
         mode: "0644"
 
     - name: Enable and start kaleidocycle.metatooth.com service
-      become: yes
-      systemd:
+      become: true
+      ansible.builtin.systemd:
         name: com.metatooth.kaleidocycle
         state: restarted
-        daemon_reload: yes
-        enabled: yes
+        daemon_reload: true
+        enabled: true
 
 - hosts: balancers
 
@@ -61,7 +68,7 @@
         state: link
 
     - name: Restart nginx
-      service:
+      ansible.builtin.service:
         name: nginx
         state: restarted
-      become: yes
+      become: true

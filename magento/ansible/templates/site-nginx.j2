@@ -6,10 +6,6 @@ server {
   listen 443 ssl;
   server_name www.{{ site_domain }} {{ site_domain }};
 
-  if ($scheme = http) {
-    return 301 https://$host$request_uri;
-  }
-
   client_max_body_size 64m;
 
   location / {
