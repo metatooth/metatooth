@@ -234,15 +234,20 @@
           docker exec php-{{ site_slug }}-1
           php /var/www/html/bin/magento cache:flush
 
-    - name: Update Magento base URLs in database
+    - name: Set Magento base URLs
+      become: yes
       ansible.builtin.shell:
-        cmd: >
-          mysql -h {{ db_host }} -P {{ db_port | default('3306') }}
-          -u {{ db_user }} {{ db_name }} -e
-          "UPDATE core_config_data SET value='https://{{ site_domain }}/'
-          WHERE path LIKE 'web/%/base%url' AND value IS NOT NULL;"
-      environment:
-        MYSQL_PWD: "{{ db_password }}"
+        cmd: |
+          set -e
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set web/unsecure/base_url "http://{{ site_domain }}/"
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set web/secure/base_url "https://{{ site_domain }}/"
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set web/unsecure/base_static_url "http://{{ site_domain }}/static/"
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set web/secure/base_static_url "https://{{ site_domain }}/static/"
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set web/unsecure/base_media_url "http://{{ site_domain }}/media/"
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set web/secure/base_media_url "https://{{ site_domain }}/media/"
+      register: magento_base_urls
+      changed_when: magento_base_urls.rc == 0
+      failed_when: magento_base_urls.rc != 0
       tags: urls
 
     - name: Install {{ site_domain }} service
