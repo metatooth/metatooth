@@ -7,6 +7,7 @@ add_custom_target(VersionHeader
 
 add_library(libfabrique STATIC
   libfabrique/libfabrique.cpp
+  libfabrique/commands/WaferCmd.cpp
 )
 
 add_dependencies(libfabrique VersionHeader)
@@ -26,3 +27,4 @@ target_include_directories(fabrique PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/libfabriq
 
 install(TARGETS fabrique libfabrique)
 install(FILES libfabrique/libfabrique.hpp DESTINATION include/libfabrique)
+install(FILES libfabrique/commands/WaferCmd.hpp DESTINATION include/libfabrique/commands)

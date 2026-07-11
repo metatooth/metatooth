@@ -26,7 +26,7 @@ class FabriqueConan(ConanFile):
             del self.options.fPIC
 
     def layout(self):
-        cmake_layout(self)
+        cmake_layout(self, build_folder="_build")
 
     def requirements(self):
         self.requires("libmultidraw/0.1")
