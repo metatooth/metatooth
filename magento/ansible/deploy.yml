@@ -17,7 +17,7 @@
     - name: Sync active theme
       synchronize:
         src: "{{ playbook_dir }}/../themes/metatooth/default/"
-        dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/default/"
+        dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/threetwenty/"
         rsync_opts:
           - "--exclude=.gitignore"
       tags: sync
@@ -49,7 +49,9 @@
           grep -v "^CREATE DATABASE\|^USE " {{ build_dir }}/magento-final.sql |
           sed "s/ DEFINER=\`[^\`]*\`@\`[^\`]*\`//" |
           mysql -h {{ db_host }} -P {{ db_port | default('3306') }}
-          -u {{ db_user }} -p{{ db_password }} {{ db_name }}
+          -u {{ db_user }} {{ db_name }}
+      environment:
+        MYSQL_PWD: "{{ db_password }}"
       tags: import
 
     - name: Install env.php
@@ -66,13 +68,12 @@
       ansible.builtin.shell:
         cmd: >
           chown -R {{ ansible_user }}:{{ ansible_user }} {{ build_dir }}/public_html/{{ item }} &&
-          chmod -R 777 {{ build_dir }}/public_html/{{ item }}
+          chmod -R 775 {{ build_dir }}/public_html/{{ item }}
       loop:
         - var
         - pub/static
         - pub/media
         - generated
-        - vendor
         - app/etc
 
     - name: Install refresh script
@@ -143,6 +144,12 @@
         regexp: '^\s*\$errorNo = \$errorNo & error_reporting\(\);'
         line: "        $errorNo = $errorNo & error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED;"
 
+    - name: Patch AreaList to guard null areas (PHP 7.4 null array access notice)
+      ansible.builtin.replace:
+        path: "{{ build_dir }}/public_html/vendor/magento/framework/App/AreaList.php"
+        regexp: "if \\(\\$areaInfo\\['frontName'\\] == \\$frontName\\)"
+        replace: "if (is_array($areaInfo) && (($areaInfo['frontName'] ?? null) == $frontName))"
+
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
       ansible.builtin.shell:
@@ -194,9 +201,11 @@
       ansible.builtin.shell:
         cmd: >
           mysql -h {{ db_host }} -P {{ db_port | default('3306') }}
-          -u {{ db_user }} -p{{ db_password }} {{ db_name }} -e
+          -u {{ db_user }} {{ db_name }} -e
           "UPDATE core_config_data SET value='https://{{ site_domain }}/'
           WHERE path LIKE 'web/%/base%url' AND value IS NOT NULL;"
+      environment:
+        MYSQL_PWD: "{{ db_password }}"
       tags: urls
 
     - name: Install {{ site_domain }} service
