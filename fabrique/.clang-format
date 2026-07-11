@@ -1,0 +1,8 @@
+BasedOnStyle: Google
+IndentWidth: 2
+ColumnLimit: 100
+AccessModifierOffset: -2
+BreakBeforeBraces: Attach
+SpaceBeforeParens: ControlStatements
+AlignAfterOpenBracket: Align
+NamespaceIndentation: All

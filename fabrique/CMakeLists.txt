@@ -26,7 +26,7 @@ else (DOXYGEN_FOUND)
   message("Doxygen need to be installed to generate the doxygen documentation")
 endif (DOXYGEN_FOUND)
 
-set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=-*,readability-*)
+set(CMAKE_CXX_CLANG_TIDY clang-tidy)
 
 add_subdirectory(fabrique)
 add_subdirectory(tests)
