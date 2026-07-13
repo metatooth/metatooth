@@ -132,60 +132,12 @@
           docker exec php-{{ site_slug }}-1 mkdir -p /root/.composer
           docker cp /root/.composer/auth.json php-{{ site_slug }}-1:/root/.composer/auth.json
 
-    - name: Patch zend-code for PHP 7.4 compatibility
+    - name: Install composer dependencies
+      become: yes
       ansible.builtin.shell:
         cmd: >
-          sed -i 's/return (string) \$type;/return $type->getName();/'
-          {{ build_dir }}/public_html/vendor/zendframework/zend-code/src/Reflection/ParameterReflection.php
-
-    - name: Patch UnionExpression implode() argument order for PHP 7.4 (issue #16)
-      block:
-        - name: Check whether UnionExpression needs the implode() patch
-          ansible.builtin.shell:
-            cmd: >
-              grep -Fq 'implode($parts, $this->type)'
-              {{ build_dir }}/public_html/vendor/magento/framework/DB/Sql/UnionExpression.php
-          register: unionexpression_old_pattern
-          changed_when: false
-          failed_when: false
-
-        - name: Check whether UnionExpression is already patched
-          ansible.builtin.shell:
-            cmd: >
-              grep -Fq 'implode($this->type, $parts)'
-              {{ build_dir }}/public_html/vendor/magento/framework/DB/Sql/UnionExpression.php
-          register: unionexpression_new_pattern
-          changed_when: false
-          failed_when: false
-
-        - name: Apply UnionExpression implode() argument order patch
-          ansible.builtin.replace:
-            path: "{{ build_dir }}/public_html/vendor/magento/framework/DB/Sql/UnionExpression.php"
-            regexp: 'implode\(\$parts, \$this->type\)'
-            replace: 'implode($this->type, $parts)'
-          when: unionexpression_old_pattern.rc == 0
-
-        - name: Fail when UnionExpression patch target is missing
-          ansible.builtin.fail:
-            msg: >-
-              Unexpected UnionExpression.php contents: neither the original
-              nor the already patched implode() call was found in
-              {{ build_dir }}/public_html/vendor/magento/framework/DB/Sql/UnionExpression.php.
-          when:
-            - unionexpression_old_pattern.rc != 0
-            - unionexpression_new_pattern.rc != 0
-
-    - name: Patch Magento ErrorHandler to ignore E_DEPRECATED (PHP 7.4)
-      ansible.builtin.lineinfile:
-        path: "{{ build_dir }}/public_html/vendor/magento/framework/App/ErrorHandler.php"
-        regexp: '^\s*\$errorNo = \$errorNo & error_reporting\(\);'
-        line: "        $errorNo = $errorNo & error_reporting() & ~E_DEPRECATED & ~E_USER_DEPRECATED;"
-
-    - name: Patch AreaList to guard null areas (PHP 7.4 null array access notice)
-      ansible.builtin.replace:
-        path: "{{ build_dir }}/public_html/vendor/magento/framework/App/AreaList.php"
-        regexp: "if \\(\\$areaInfo\\['frontName'\\] == \\$frontName\\)"
-        replace: "if (is_array($areaInfo) && (($areaInfo['frontName'] ?? null) == $frontName))"
+          docker exec php-{{ site_slug }}-1
+          composer install --no-dev --optimize-autoloader -d /var/www/html
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
@@ -199,8 +151,7 @@
       ansible.builtin.shell:
         cmd: >
           docker exec php-{{ site_slug }}-1
-          php -d error_reporting=24567
-          /var/www/html/bin/magento setup:di:compile
+          php /var/www/html/bin/magento setup:di:compile
 
     - name: Regenerate autoloader (optimized — now that proxies exist)
       become: yes
@@ -209,21 +160,30 @@
           docker exec php-{{ site_slug }}-1
           composer dump-autoload --optimize -d /var/www/html
 
+    - name: Configure OpenSearch as search engine
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          php /var/www/html/bin/magento setup:config:set
+          --search-engine=opensearch
+          --opensearch-host={{ site_slug }}_opensearch
+          --opensearch-port=9200
+          --no-interaction
+
     - name: Run setup:upgrade
       become: yes
       ansible.builtin.shell:
         cmd: >
           docker exec php-{{ site_slug }}-1
-          php -d error_reporting=24567
-          /var/www/html/bin/magento setup:upgrade --keep-generated
+          php /var/www/html/bin/magento setup:upgrade --keep-generated
 
     - name: Deploy static content
       become: yes
       ansible.builtin.shell:
         cmd: >
           docker exec php-{{ site_slug }}-1
-          php -d error_reporting=24567
-          /var/www/html/bin/magento setup:static-content:deploy -f en_US
+          php /var/www/html/bin/magento setup:static-content:deploy -f en_US
         chdir: "{{ build_dir }}"
       tags: static
 
