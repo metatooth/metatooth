@@ -27,6 +27,7 @@
       ansible.builtin.shell:
         cmd: >
           docker run -d
+          --restart unless-stopped
           -p 3333:4567
           --name {{ container_name }}
           --add-host={{ db_host }}:{{ db_host_ip }}
