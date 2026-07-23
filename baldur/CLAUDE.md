@@ -50,9 +50,6 @@ baldur/
 ```bash
 cd baldur
 
-# Setup (initialize pre-commit hooks)
-make setup
-
 # Build Docker image
 make docker
 
@@ -64,9 +61,6 @@ make logs
 
 # Stop containers
 make down
-
-# Cleanup
-make clean
 ```
 
 ## Environment Variables Required
