@@ -4,6 +4,13 @@ PIP = $(VENV)/bin/pip
 CONAN = CONAN_HOME=$(CURDIR)/_conan2 $(VENV)/bin/conan
 CMAKE = cmake
 
+# Compiler used for both the Conan dependencies and the CMake build. Keeping
+# them identical avoids ABI mismatches. Override to build with a different
+# toolchain, e.g. `make CC=clang CXX=clang++`.
+CC ?= cc
+CXX ?= c++
+BUILD_TYPE ?= Release
+
 all: setup build
 
 .PHONY: setup build test clean
@@ -14,12 +21,12 @@ $(VENV)/bin/activate:
 
 setup: $(VENV)/bin/activate
 	$(PIP) install conan
-	$(CONAN) profile detect --force
-	$(CONAN) install . -s compiler=clang -s compiler.version=21 -s compiler.cppstd=20 --build=missing
-	$(CMAKE) -B _build/Release -DCMAKE_TOOLCHAIN_FILE=_build/Release/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=Release
+	CC=$(CC) CXX=$(CXX) $(CONAN) profile detect --force
+	CC=$(CC) CXX=$(CXX) $(CONAN) install . -s build_type=$(BUILD_TYPE) -s compiler.cppstd=20 --build=missing
+	CC=$(CC) CXX=$(CXX) $(CMAKE) -B _build/$(BUILD_TYPE) -DCMAKE_TOOLCHAIN_FILE=_build/$(BUILD_TYPE)/generators/conan_toolchain.cmake -DCMAKE_BUILD_TYPE=$(BUILD_TYPE)
 
 build: setup
-	$(CMAKE) --build _build/Release
+	$(CMAKE) --build _build/$(BUILD_TYPE)
 
 test: build
 
