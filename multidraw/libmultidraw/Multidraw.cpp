@@ -78,8 +78,10 @@ Multidraw::catalog(Catalog* catalog)
 void
 Multidraw::clearHistory(Component* comp)
 {
-  if (this->_histories.contains(comp)) {
-    History* history = this->_histories.at(comp);
+  auto iter = _histories.find(comp);
+  if (iter != _histories.end()) {
+    iter->second->past.clear();
+    iter->second->future.clear();
   }
 }// clearHistory
 
@@ -120,7 +122,7 @@ Multidraw::init(Catalog* catalog)
 
   _editors.clear();
   _histories.clear();
-  
+
   alive(true);
   updated(false);
 }// init
@@ -168,6 +170,6 @@ void
 Multidraw::log(Command* cmd)
 {
   if (cmd->reversible()) {
-    Component* comp = cmd->editor()->component()->root();    
+    Component* comp = cmd->editor()->component()->root();
   }
 }// log

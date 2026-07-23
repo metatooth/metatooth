@@ -31,7 +31,7 @@ MacroCmd::MacroCmd(Editor* editor) : Command(editor)
 void
 MacroCmd::execute()
 {
-  std::vector<Command*>::iterator iter = _children.begin();
+  auto iter = _children.begin();
   while (iter != _children.end()) {
     (*iter)->execute();
     iter++;
@@ -41,7 +41,7 @@ MacroCmd::execute()
 void
 MacroCmd::unexecute()
 {
-  std::vector<Command*>::iterator iter = _children.begin();
+  auto iter = _children.begin();
   while (iter != _children.end()) {
     (*iter)->unexecute();
     iter++;
@@ -53,19 +53,19 @@ MacroCmd::reversible() const
 {
   bool reversible = true;
 
-  std::vector<Command*>::const_iterator iter = _children.cbegin();
+  auto iter = _children.cbegin();
   while (reversible && iter != _children.cend()) {
     reversible = (*iter)->reversible();
     iter++;
   }
-  
+
   return reversible;
 }// reversible
 
 
 void
-MacroCmd::addChild(Command* cmd)
+MacroCmd::addChild(std::unique_ptr<Command> cmd)
 {
-  cmd->editor(this->editor());    
-  _children.push_back(cmd);
+  cmd->editor(this->editor());
+  _children.push_back(std::move(cmd));
 }// addChild

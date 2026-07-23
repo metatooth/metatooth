@@ -14,16 +14,32 @@ Original source from [vectaport/ivtools](https://github.com/vectaport/ivtools)
 
 ### Install dependencies
 
-`$ sudo apt install conan cmake build-essential clang clang-tidy libgl-dev libgl1-mesa-dev libx11-dev`
+Conan builds FLTK from source, which needs the X11 development headers present
+on the system. Install the toolchain and those headers first:
+
+```
+$ sudo apt install cmake build-essential clang clang-tidy python3-venv \
+    libgl-dev libgl1-mesa-dev \
+    libx11-dev libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev \
+    libxaw7-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxdmcp-dev \
+    libxext-dev libxfixes-dev libxi-dev libxinerama-dev libxkbfile-dev \
+    libxmu-dev libxpm-dev libxrandr-dev libxrender-dev libxres-dev \
+    libxss-dev libxt-dev libxtst-dev libxv-dev libxxf86vm-dev \
+    libxcb-glx0-dev libxcb-render0-dev libxcb-render-util0-dev \
+    libxcb-shape0-dev libxcb-randr0-dev libxcb-shm0-dev libxcb-sync-dev \
+    libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-dri3-dev uuid-dev \
+    libxcb-util-dev libxcb-cursor-dev libxcb-keysyms1-dev libxcb-image0-dev
+```
+
+If any are missing, `make` stops during `conan install` with
+`xorg/system: ... System requirements: ... are missing`, listing exactly which
+packages to add.
 
 ### Get and build
 
 ```
-$ git clone https://github.com/metatooth/multidraw.git
-$ cd multidraw
-$ mkdir _build && cd _build
-$ conan install -s compiler=clang -s compiler.version=14 ..
-$ cmake ..
+$ git clone https://github.com/metatooth/metatooth.git
+$ cd metatooth/multidraw
 $ make
 ```
 

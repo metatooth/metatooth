@@ -23,10 +23,13 @@
 #ifndef LIBMULTIDRAW_MACRO_CMD_HPP
 #define LIBMULTIDRAW_MACRO_CMD_HPP
 
+#include <memory>
+#include <utility>
+
 #include <libmultidraw/commands/Command.hpp>
 
 namespace multidraw {
-  
+
   class Editor;
   class Component;
 
@@ -34,23 +37,23 @@ namespace multidraw {
    * @brief The COMPOSITE COMMAND pattern.
    */
   class MacroCmd : public Command {
-  public: 
+  public:
     MacroCmd(Editor*);
-  
+
     virtual void execute();
 
     virtual void unexecute();
 
     virtual bool reversible() const;
 
-    void addChild(Command*);
-    
+    void addChild(std::unique_ptr<Command>);
+
   protected:
   private:
-    std::vector<Command*> _children;
-    
+    std::vector<std::unique_ptr<Command>> _children;
+
   };
 
 }
-  
+
 #endif // LIBMULTIDRAW_MACRO_CMD_HPP

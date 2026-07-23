@@ -1,23 +1,18 @@
 #ifndef LIBMULTIDRAW_HISTORY_HPP
 #define LIBMULTIDRAW_HISTORY_HPP
 
+#include <memory>
 #include <vector>
+
+#include <libmultidraw/commands/Command.hpp>
 
 namespace multidraw {
 
-  class Command;
-
   class History {
    public:
-    ~History();
-    std::vector<Command*> past;
-    std::vector<Command*> future;
+    std::vector<std::unique_ptr<Command>> past;
+    std::vector<std::unique_ptr<Command>> future;
   };
-
-  inline History::~History() {
-    for (Command* cmd : past) { delete cmd; }
-    for (Command* cmd : future) { delete cmd; }
-  }
 
 }
 
