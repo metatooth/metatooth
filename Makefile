@@ -1,7 +1,7 @@
 VENV ?= _venv
 PYTHON = $(VENV)/bin/python3
 PIP = $(VENV)/bin/pip
-PRECOMMIT = $(VENV)/bin/pre-commit
+PRE_COMMIT = $(VENV)/bin/pre-commit
 
 all: setup
 
@@ -13,7 +13,7 @@ $(VENV)/bin/activate:
 
 setup: $(VENV)/bin/activate
 	$(PIP) install pre-commit
-	$(PRECOMMIT) install
+	$(PRE_COMMIT) install
 
 clean:
 	rm -rf $(VENV)
