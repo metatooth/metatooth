@@ -26,7 +26,7 @@
 #include <vector>
 
 namespace multidraw {
-  
+
   class Editor;
   class Component;
 
@@ -34,7 +34,9 @@ namespace multidraw {
    * @brief The COMMAND pattern.
    */
   class Command {
-  public: 
+  public:
+    virtual ~Command() = default;
+
     virtual void execute();
 
     virtual void unexecute();
@@ -47,16 +49,16 @@ namespace multidraw {
     void editor(Editor* ed) { _editor = ed; };
 
     std::vector<Component*> clipboard() const { return _clipboard; };
-    
+
   protected:
     Command(Editor*, std::vector<Component*> = std::vector<Component*>());
-  
+
   private:
     Editor* _editor;
     std::vector<Component*> _clipboard;
-    
+
   };
 
 }
-  
+
 #endif // LIBMULTIDRAW_COMMAND_HPP

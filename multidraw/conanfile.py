@@ -26,10 +26,10 @@ class MultidrawConan(ConanFile):
             del self.options.fPIC
 
     def layout(self):
-        cmake_layout(self)
+        cmake_layout(self, build_folder="_build")
 
     def requirements(self):
-        self.requires("fltk/1.3.8")
+        self.requires("fltk/1.4.5")
         self.requires("doxygen/1.9.4")
         self.requires("freetype/2.13.2")
         self.requires("libxft/2.3.6")

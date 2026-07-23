@@ -78,8 +78,10 @@ Multidraw::catalog(Catalog* catalog)
 void
 Multidraw::clearHistory(Component* comp)
 {
-  if (this->_histories.contains(comp)) {
-    History* history = this->_histories.at(comp);
+  auto iter = _histories.find(comp);
+  if (iter != _histories.end()) {
+    iter->second->past.clear();
+    iter->second->future.clear();
   }
 }// clearHistory
 
@@ -97,18 +99,13 @@ void
 Multidraw::executeCmd(Command* cmd)
 {
   if (cmd != nullptr) {
+    cmd->execute();
     if (cmd->reversible()) {
-      cmd->execute();
-      if (cmd->reversible()) {
-	cmd->log();
-      } else {
-	delete cmd;
-      }
+      // log() hands the command to Multidraw::log, which adopts ownership.
+      cmd->log();
     } else {
-      cmd->execute();
-      if (cmd->reversible()) {
-	cmd->log();
-      }
+      // Non-reversible commands are not retained in any history.
+      delete cmd;
     }
   }
 }// executeCmd
@@ -120,7 +117,7 @@ Multidraw::init(Catalog* catalog)
 
   _editors.clear();
   _histories.clear();
-  
+
   alive(true);
   updated(false);
 }// init
@@ -168,6 +165,18 @@ void
 Multidraw::log(Command* cmd)
 {
   if (cmd->reversible()) {
-    Component* comp = cmd->editor()->component()->root();    
+    Component* comp = cmd->editor()->component()->root();
+
+    History*& history = instance()->_histories[comp];
+    if (history == nullptr) {
+      history = new History();
+    }
+
+    // Adopt ownership of the command and record it as the most recent action.
+    // A newly logged command invalidates any pending redo history.
+    history->past.push_back(std::unique_ptr<Command>(cmd));
+    history->future.clear();
+  } else {
+    delete cmd;
   }
 }// log
