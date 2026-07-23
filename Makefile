@@ -21,4 +21,8 @@ $(STAMP): $(VENV)/bin/activate
 	touch $(STAMP)
 
 clean:
-	rm -rf $(VENV) $(STAMP)
+	@if [ -z "$(VENV)" ] || [ "$(VENV)" = "/" ]; then \
+		echo "Refusing to clean: VENV is empty or '/'"; exit 1; \
+	fi
+	-[ -x "$(PRE_COMMIT)" ] && "$(PRE_COMMIT)" uninstall
+	rm -rf "$(VENV)" "$(STAMP)"
