@@ -3,6 +3,7 @@
 Baldur is a Sinatra-based Ruby web application for managing and displaying artist portfolios. It is built specifically for Lara Miranda Goodman's artwork gallery (laramirandagoodman.com).
 
 ## Technology Stack
+
 - **Language**: Ruby 3.3
 - **Framework**: Sinatra (web framework)
 - **ORM**: ROM with PostgreSQL adapter
@@ -13,6 +14,7 @@ Baldur is a Sinatra-based Ruby web application for managing and displaying artis
 - **Port**: 4567 (default)
 
 ## Key Features
+
 - Artist portfolio with artwork organization into series/collections
 - Responsive gallery grid with lightbox modal and slideshow navigation
 - Automatic image resizing to multiple dimensions (original, 500px, 300px, thumbnail)
@@ -24,6 +26,7 @@ Baldur is a Sinatra-based Ruby web application for managing and displaying artis
 - SEO optimization with proper meta tags and alt text
 
 ## Directory Structure
+
 ```
 baldur/
 ├── baldur/                          # Application code
@@ -64,6 +67,7 @@ make down
 ```
 
 ## Environment Variables Required
+
 - `AWS_ACCESS_KEY_ID` - AWS S3 credentials
 - `AWS_SECRET_ACCESS_KEY` - AWS S3 credentials
 - `S3_BUCKET_NAME` - S3 bucket for image storage
@@ -74,20 +78,22 @@ make down
 - `MAX_THREADS` - Number of threads per worker (default: 5)
 
 ## Database Models
+
 - **Assets** - Artwork records with dimensions, pricing, S3 URLs, sold status
 - **Series** - Collections/groups of artwork
 - **Settings** - Key-value configuration store
 
 ## Main Routes
-| Route | Method | Purpose |
-|-------|--------|---------|
-| `/` | GET | Home page |
-| `/gallery` | GET | Gallery view |
-| `/paintings` | GET | Artwork catalog |
-| `/paintings/:id` | GET | Individual artwork detail |
-| `/pricelist` | GET | Pricing for available artwork |
-| `/upload` | GET/POST | Password-protected upload interface |
-| `/contact` | GET | Contact information |
-| `/CV` | GET | Artist CV/resume |
-| `/css/:stylesheet.css` | GET | Dynamic SASS compilation |
-| `/assets/:id` | GET/POST | Asset detail and admin edit |
+
+| Route                  | Method   | Purpose                             |
+| ---------------------- | -------- | ----------------------------------- |
+| `/`                    | GET      | Home page                           |
+| `/gallery`             | GET      | Gallery view                        |
+| `/paintings`           | GET      | Artwork catalog                     |
+| `/paintings/:id`       | GET      | Individual artwork detail           |
+| `/pricelist`           | GET      | Pricing for available artwork       |
+| `/upload`              | GET/POST | Password-protected upload interface |
+| `/contact`             | GET      | Contact information                 |
+| `/CV`                  | GET      | Artist CV/resume                    |
+| `/css/:stylesheet.css` | GET      | Dynamic SASS compilation            |
+| `/assets/:id`          | GET/POST | Asset detail and admin edit         |
