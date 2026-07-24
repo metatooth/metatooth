@@ -43,6 +43,13 @@ $ cd metatooth/multidraw
 $ make
 ```
 
+## Examples
+
+See [examples/stlviewer](./examples/stlviewer) for a complete application built
+on the framework: an interactive 3D viewer for STL meshes. It is built and run
+as part of `make`, and its README walks through how each framework role
+(Component, Creator, Catalog, Viewer, Editor) is used.
+
 ## License
 
 Copyright (c) 2023-2026 Metatooth LLC. See the [License](../LICENSE).
