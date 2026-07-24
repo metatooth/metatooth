@@ -28,7 +28,7 @@
 #include <filesystem>
 
 namespace multidraw {
-  
+
   class Component;
   class Command;
   class Creator;
@@ -40,26 +40,27 @@ namespace multidraw {
   class Catalog {
   public:
     Catalog(const std::string&, Creator*);
+    virtual ~Catalog() = default;
 
     virtual bool save(Command*, const std::filesystem::path&);
     virtual bool save(Component*, const std::filesystem::path&);
-  
+
     virtual bool retrieve(const std::filesystem::path&, Command*&);
     virtual bool retrieve(const std::filesystem::path&, Component*&);
 
     Creator* creator() const { return _creator; };
-    
+
     const std::string& name() const { return _name; };
-  
+
     std::string name(Command*) const;
     std::string name(Component*) const;
-  
+
   private:
     std::string _name;
     Creator* _creator;
     std::map<std::string, Component*> _compMap;
     std::map<std::string, Command*> _cmdMap;
-  
+
   };
 
 }

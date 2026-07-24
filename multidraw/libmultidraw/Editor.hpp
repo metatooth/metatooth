@@ -45,25 +45,25 @@ namespace multidraw {
   class Editor {
   public:
     Editor(const std::string&, const std::string&);
-    ~Editor();
+    virtual ~Editor();
 
     void open();
     void close();
     void update() const;
-  
+
     Component* component() const { return _component; }
     virtual Viewer* viewer(int id = 0) const { return (id == 0) ? _viewer : nullptr; }
     Tool* tool() const { return _tool; }
     bool modified() const;
     Command* command() const { return _command; }
     Fl_Window* window() const { return  _window; }
-    
+
     void component(Component* comp) { _component = comp; }
     virtual void viewer(Viewer* viewer, int id = 0) { if (id == 0) _viewer = viewer; }
     void tool(Tool* tool) { _tool = tool; }
     void command(Command* cmd) { _command = cmd; }
     void window(Fl_Window* window) { _window = window; }
-    
+
     void addTool(Tool*);
     bool hasTool(Tool*);
     void removeTool(Tool*);
@@ -71,10 +71,10 @@ namespace multidraw {
     StateVar* state(const std::string&) const;
 
     virtual int keystroke(int event);
-    
+
   private:
     void init(Component*);
-  
+
     Component* _component;
     Tool* _tool;
     Command* _command;
