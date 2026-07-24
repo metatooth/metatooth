@@ -33,6 +33,10 @@ class MultidrawConan(ConanFile):
         self.requires("doxygen/1.9.4")
         self.requires("freetype/2.13.2")
         self.requires("libxft/2.3.6")
+        # fltk resolves fontconfig via a version range (2.17.1) while libxft
+        # pins 2.15.0, producing a version conflict. Pin the graph to 2.15.0,
+        # which satisfies both constraints.
+        self.requires("fontconfig/2.15.0", override=True)
 
     def generate(self):
         deps = CMakeDeps(self)
