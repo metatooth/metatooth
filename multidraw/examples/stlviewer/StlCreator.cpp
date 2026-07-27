@@ -25,9 +25,13 @@ namespace {
 
     file.seekg(HEADER_BYTES, std::ios::beg);
     std::uint32_t count = 0;
-    file.read(reinterpret_cast<char*>(&count), sizeof(count));
+    if (!file.read(reinterpret_cast<char*>(&count), sizeof(count))) {
+      file.clear();
+      file.seekg(0, std::ios::beg);
+      return false;
+    }
+    file.clear();
     file.seekg(0, std::ios::beg);
-
     return size == HEADER_BYTES + COUNT_BYTES +
       static_cast<std::streamoff>(count) * FACET_BYTES;
   }
