@@ -15,6 +15,7 @@ using namespace multidraw;
 class StlEditor : public Editor {
 public:
   explicit StlEditor(const std::string& initial_file);
+  virtual ~StlEditor();
 
   virtual Viewer* viewer(int id = 0) const { return (id == 0) ? _viewer : nullptr; }
 

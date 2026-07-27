@@ -21,3 +21,12 @@ StlEditor::StlEditor(const std::string& initial_file) :
 
   this->window(window);
 }// constructor
+
+StlEditor::~StlEditor()
+{
+  // The StlViewer was added as a child of the window, so deleting the window
+  // also deletes the viewer; do not delete _viewer separately.
+  delete window();
+  window(nullptr);
+  _viewer = nullptr;
+}// destructor

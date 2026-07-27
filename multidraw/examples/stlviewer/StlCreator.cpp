@@ -32,8 +32,14 @@ namespace {
     }
     file.clear();
     file.seekg(0, std::ios::beg);
-    return size == HEADER_BYTES + COUNT_BYTES +
-      static_cast<std::streamoff>(count) * FACET_BYTES;
+
+    // Compare via the facet count the size implies rather than multiplying
+    // count out, which could overflow std::streamoff for a bogus count. The
+    // body must be an exact number of facet records equal to the declared
+    // count.
+    std::streamoff body = size - HEADER_BYTES - COUNT_BYTES;
+    return body % FACET_BYTES == 0 &&
+      body / FACET_BYTES == static_cast<std::streamoff>(count);
   }
 
   void readBinary(std::ifstream& file, StlComponent* comp)
