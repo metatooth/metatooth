@@ -14,6 +14,7 @@ StlCatalog::retrieve(const fs::path& source, Component*& comp)
 {
   StlCreator* creator = dynamic_cast<StlCreator*>(this->creator());
   if (creator == nullptr) {
+    comp = nullptr;
     return false;
   }
 
