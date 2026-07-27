@@ -40,7 +40,7 @@ namespace multidraw {
   class Catalog {
   public:
     Catalog(const std::string&, Creator*);
-    virtual ~Catalog() = default;
+    virtual ~Catalog();
 
     virtual bool save(Command*, const std::filesystem::path&);
     virtual bool save(Component*, const std::filesystem::path&);
