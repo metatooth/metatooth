@@ -37,6 +37,14 @@ Catalog::Catalog(const std::string& name, Creator* creator) :
 
 }
 
+Catalog::~Catalog()
+{
+  // The Catalog adopts the Creator it is constructed with; delete it here so
+  // it does not leak when Multidraw tears the Catalog down.
+  delete _creator;
+  _creator = nullptr;
+}
+
 bool
 Catalog::save(Command* comp, const fs::path& target)
 {

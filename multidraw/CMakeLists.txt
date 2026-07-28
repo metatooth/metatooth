@@ -40,4 +40,5 @@ endif (DOXYGEN_FOUND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in")
 set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=-*,readability-*)
 
 add_subdirectory(libmultidraw)
+add_subdirectory(examples)
 add_subdirectory(tests)

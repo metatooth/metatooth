@@ -82,6 +82,12 @@ Editor::~Editor()
   delete _modified;
   delete _outpath;
   delete _command;
+
+  // The Editor adopts the Component the Catalog retrieves for it (installed
+  // via init()); delete it last, after the state vars that reference it, so
+  // the loaded model does not leak when Multidraw tears the Editor down.
+  delete _component;
+  _component = nullptr;
 }// destructor
 
 void

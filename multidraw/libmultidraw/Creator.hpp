@@ -25,16 +25,17 @@
 
 namespace multidraw {
   class Component;
-  
+
   /**
    * Creator is a participant in the BUILDER design pattern.
    */
   class Creator {
   public:
     Creator();
+    virtual ~Creator() = default;
 
     virtual Component* create();
-    
+
   private:
   };
 
