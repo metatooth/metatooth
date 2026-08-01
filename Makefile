@@ -15,7 +15,7 @@ $(VENV)/bin/activate:
 
 setup: $(STAMP)
 
-$(STAMP): $(VENV)/bin/activate
+$(STAMP): $(VENV)/bin/activate package.json package-lock.json
 	$(PIP) install pre-commit
 	$(PRE_COMMIT) install
 	npm ci
