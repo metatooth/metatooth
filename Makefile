@@ -18,8 +18,8 @@ setup: $(STAMP)
 $(STAMP): $(VENV)/bin/activate
 	$(PIP) install pre-commit
 	$(PRE_COMMIT) install
-	npm install
-	npx openspec init --tools claude,codex
+	npm ci
+	npx --no-install openspec init --tools claude,codex
 	touch $(STAMP)
 
 clean:
