@@ -19,5 +19,8 @@
   },
   "dependencies": {
     "@fission-ai/openspec": "^1.7.0"
+  },
+  "engines": {
+    "node": ">=20.19.0"
   }
 }
