@@ -15,9 +15,11 @@ $(VENV)/bin/activate:
 
 setup: $(STAMP)
 
-$(STAMP): $(VENV)/bin/activate
+$(STAMP): $(VENV)/bin/activate package.json package-lock.json
 	$(PIP) install pre-commit
 	$(PRE_COMMIT) install
+	npm ci
+	npx --no-install openspec init --tools claude,codex
 	touch $(STAMP)
 
 clean:
@@ -25,4 +27,4 @@ clean:
 		echo "Refusing to clean: VENV is empty or '/'"; exit 1; \
 	fi
 	-[ -x "$(PRE_COMMIT)" ] && "$(PRE_COMMIT)" uninstall
-	rm -rf "$(VENV)" "$(STAMP)"
+	rm -rf "$(VENV)" "$(STAMP)" ".claude" ".codex"
