@@ -2,3 +2,6 @@
 *~
 _venv
 .setup.stamp
+node_modules/
+.claude/
+.codex/
