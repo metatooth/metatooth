@@ -1,0 +1,44 @@
+{
+    "$schema": "https://json-schema.org/draft/2020-12/schema",
+    "$id": "https://metatooth.com/schemas/device.schema.json",
+    "title": "Device",
+    "description": "A semiconductor device",
+    "type": "object",
+    "properties": {
+        "width": {
+            "description": "The overall width in X of the device, in nanometers",
+            "type": "number",
+            "minimum": 0
+        },
+        "height": {
+            "description": "The overall height in Y of the device, in nanometers",
+            "type": "number",
+            "minimum": 0
+        },
+        "materials": {
+            "description": "An array of materials present in the device",
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "name": {
+                        "description": "The material's name",
+                        "type": "string"
+                    },
+                    "boundary": {
+                        "description": "The material's non-intersecting boundary polygons",
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "type": "number"
+                            }
+                        }
+                    }
+                },
+                "required": ["name"]
+            }
+        }
+    },
+    "required": ["width", "height"]
+}
