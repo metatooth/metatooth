@@ -22,7 +22,7 @@ device.
   producing output that validates against `device.schema.json`.
 - **BREAKING**: extend `wafer`'s command-line syntax to accept a `height`
   argument in addition to the existing `width` argument (e.g. `wafer Si
-  500nm 300nm <1,1,1>`), instead of deriving `height` from `width`.
+500nm 300nm <1,1,1>`), instead of deriving `height` from `width`.
 - Users may supply units on `width`/`height` command-line tokens (e.g.
   `500nm`, `0.5um`); `WaferCmd` converts any supplied unit to nanometers
   before building the `Device`. A bare number with no unit suffix is
@@ -37,10 +37,12 @@ device.
 ## Capabilities
 
 ### New Capabilities
+
 - `json-output`: `fabrique` renders parsed command results as JSON conforming
   to `device.schema.json`.
 
 ### Modified Capabilities
+
 <!-- none: no existing capability spec covers `wafer`'s CLI syntax or
      output format today, so there is nothing to mark Modified; the syntax
      and output changes are captured as part of the new `json-output`

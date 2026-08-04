@@ -13,6 +13,7 @@ data, and its CLI syntax has no `height` token. See proposal.md - Why.
 ## Goals / Non-Goals
 
 **Goals:**
+
 - Introduce a `Device` value type in `libfabrique` that mirrors
   `device.schema.json` and can be serialized to JSON.
 - Extend `WaferCmd`'s CLI syntax to accept an explicit `height` argument
@@ -29,6 +30,7 @@ data, and its CLI syntax has no `height` token. See proposal.md - Why.
   of truth for the output shape.
 
 **Non-Goals:**
+
 - Full JSON Schema validation at runtime (e.g. pulling in a schema
   validator library) — conformance is ensured by construction and covered
   by tests, not runtime validation.
@@ -46,7 +48,7 @@ data, and its CLI syntax has no `height` token. See proposal.md - Why.
   `rapidjson` (rejected — more verbose API for this small use case).
 - **`Device` type placement**: add `fabrique/fabrique/libfabrique/Device.hpp`
   / `.cpp` as a plain data type with a `to_json(nlohmann::json&, const
-  Device&)` free function (ADL-friendly, matches nlohmann/json conventions),
+Device&)` free function (ADL-friendly, matches nlohmann/json conventions),
   rather than embedding serialization logic inside `WaferCmd`. This lets
   future commands reuse `Device` and its JSON output.
 - **Width/height parsing and units**: `WaferCmd` gains a new `height` CLI
