@@ -30,6 +30,7 @@ class FabriqueConan(ConanFile):
 
     def requirements(self):
         self.requires("libmultidraw/0.1")
+        self.requires("nlohmann_json/3.11.3")
 
     def generate(self):
         deps = CMakeDeps(self)
