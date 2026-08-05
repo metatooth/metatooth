@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -euo pipefail
+
 BRANCH=$1
 INVENTORY=$2
 
