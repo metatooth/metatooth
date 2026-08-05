@@ -1,4 +1,4 @@
-FROM ruby:3.3-alpine AS base
+FROM ruby:3.3.10-alpine AS base
 
 ENV RACK_ENV=production
 
