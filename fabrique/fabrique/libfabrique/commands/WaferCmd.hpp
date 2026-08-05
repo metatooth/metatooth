@@ -9,7 +9,7 @@ namespace fabrique {
    * @brief Command to define a wafer: material, simulation width/height,
    * and crystal orientation (Miller indices).
    *
-   * Usage: wafer [material] [width] [height] [miller]
+   * Usage: wafer <material> <width> <height> [miller]
    *   e.g. wafer Si 500nm 300nm <1,1,1>
    *
    * `width`/`height` accept an optional unit suffix (e.g. `500nm`,
