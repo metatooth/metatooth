@@ -1,0 +1,57 @@
+services:
+  db:
+    image: mariadb:10.6
+    container_name: magento-local-db
+    restart: unless-stopped
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: magento
+      MARIADB_USER: magento
+      MARIADB_PASSWORD: magento
+    volumes:
+      - db_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+
+  php:
+    image: markoshust/magento-php:8.3-fpm-0
+    container_name: magento-local-php
+    restart: unless-stopped
+    volumes:
+      - ../src:/var/www/html
+      - ../themes/metatooth:/var/www/html/app/design/frontend/Metatooth
+      - ./php-fpm.conf:/usr/local/etc/php-fpm.conf
+      - sock:/sock
+    depends_on:
+      - db
+      - opensearch
+
+  nginx:
+    image: nginx:1.24-alpine
+    container_name: magento-local-nginx
+    restart: unless-stopped
+    ports:
+      - "3360:80"
+    volumes:
+      - ../src:/var/www/html
+      - ../themes/metatooth:/var/www/html/app/design/frontend/Metatooth
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf
+      - sock:/sock
+    depends_on:
+      - php
+
+  opensearch:
+    image: opensearchproject/opensearch:3
+    container_name: magento-local-opensearch
+    restart: unless-stopped
+    environment:
+      - discovery.type=single-node
+      - DISABLE_SECURITY_PLUGIN=true
+      - "OPENSEARCH_JAVA_OPTS=-Xms512m -Xmx512m"
+    volumes:
+      - opensearch_data:/usr/share/opensearch/data
+
+volumes:
+  db_data:
+  sock:
+  opensearch_data:

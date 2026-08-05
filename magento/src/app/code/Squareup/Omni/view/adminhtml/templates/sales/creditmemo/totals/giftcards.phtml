@@ -1,7 +1,0 @@
-<?php $giftCards = $this->getGiftCards(); ?>
-<?php foreach ($giftCards as $giftCard): ?>
-    <tr>
-        <td class="label">Square Gift Card Refund <?php echo $giftCard->getCardCode(); ?></td>
-        <td><?php echo $giftCard->getRefundedAmount(); ?></td>
-    </tr>
-<?php endforeach; ?>
