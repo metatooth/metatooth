@@ -1,4 +1,4 @@
-import 'dotenv/config';
+import "dotenv/config";
 
 export const config = {
   meross: {
@@ -20,7 +20,7 @@ export const config = {
     deviceId: process.env.SWITCHBOT_DEVICE_ID || null,
   },
   scanIntervalMs: parseInt(process.env.SCAN_INTERVAL_MS, 10) || 30000,
-  logLevel: process.env.LOG_LEVEL || 'info',
+  logLevel: process.env.LOG_LEVEL || "info",
 };
 
 export function validate() {
@@ -28,13 +28,15 @@ export function validate() {
   const hasMeross = config.meross.address && config.meross.key;
   const hasWyze = config.wyze.email && config.wyze.password && config.wyze.mac;
   if (!hasMeross && !hasWyze) {
-    errors.push('At least one plug must be configured: set MEROSS_PLUG_ADDRESS + MEROSS_KEY, or WYZE_EMAIL + WYZE_PASSWORD + WYZE_DEVICE_MAC');
+    errors.push(
+      "At least one plug must be configured: set MEROSS_PLUG_ADDRESS + MEROSS_KEY, or WYZE_EMAIL + WYZE_PASSWORD + WYZE_DEVICE_MAC",
+    );
   }
   if (config.wyze.email && (!config.wyze.keyId || !config.wyze.apiKey)) {
-    errors.push('WYZE_KEY_ID and WYZE_API_KEY are required when using Wyze');
+    errors.push("WYZE_KEY_ID and WYZE_API_KEY are required when using Wyze");
   }
   if (config.thermostat.lowThreshold >= config.thermostat.highThreshold) {
-    errors.push('LOW_THRESHOLD must be less than HIGH_THRESHOLD');
+    errors.push("LOW_THRESHOLD must be less than HIGH_THRESHOLD");
   }
   return errors;
 }

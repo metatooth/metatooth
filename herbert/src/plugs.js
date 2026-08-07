@@ -1,6 +1,6 @@
-import { MerossSmartPlug } from 'meross-local';
-import Wyze from 'wyze-node';
-import { config } from './config.js';
+import { MerossSmartPlug } from "meross-local";
+import Wyze from "wyze-node";
+import { config } from "./config.js";
 
 export class MerossPlug {
   constructor({ address, key }) {
@@ -8,9 +8,15 @@ export class MerossPlug {
     this.name = `meross:${address}`;
   }
 
-  async turnOn() { await this.client.turnOn(); }
-  async turnOff() { await this.client.turnOff(); }
-  async getPower() { return this.client.getPower(); }
+  async turnOn() {
+    await this.client.turnOn();
+  }
+  async turnOff() {
+    await this.client.turnOff();
+  }
+  async getPower() {
+    return this.client.getPower();
+  }
 }
 
 export class WyzePlug {
@@ -24,7 +30,7 @@ export class WyzePlug {
   async _getDevice() {
     if (!this._device) {
       const devices = await this.client.getDeviceList();
-      this._device = devices.find(d => d.mac === this.mac);
+      this._device = devices.find((d) => d.mac === this.mac);
       if (!this._device) throw new Error(`Wyze device not found: ${this.mac}`);
     }
     return this._device;
@@ -42,9 +48,12 @@ export class WyzePlug {
 
   async getPower() {
     const device = await this._getDevice();
-    const propertyList = await this.client.getPropertyList(device.mac, device.product_model);
-    const prop = propertyList.find(p => p.pid === 'P3');
-    return prop?.value === '1';
+    const propertyList = await this.client.getPropertyList(
+      device.mac,
+      device.product_model,
+    );
+    const prop = propertyList.find((p) => p.pid === "P3");
+    return prop?.value === "1";
   }
 }
 
