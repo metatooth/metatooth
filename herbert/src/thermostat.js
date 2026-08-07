@@ -154,9 +154,14 @@ export default class Thermostat {
     const states = results
       .filter((r) => r.status === "fulfilled")
       .map((r) => r.value);
-    this.plugState = states.length > 0 ? (states.some(Boolean) ? "on" : "off") : null;
+    this.plugState =
+      states.length > 0 ? (states.some(Boolean) ? "on" : "off") : null;
     logger.info(
-      { plugState: this.plugState, plugs: this.plugs.map((p) => p.name), failed },
+      {
+        plugState: this.plugState,
+        plugs: this.plugs.map((p) => p.name),
+        failed,
+      },
       "Initial plug state",
     );
   }
