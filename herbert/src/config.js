@@ -36,7 +36,9 @@ export function validate() {
     errors.push("WYZE_KEY_ID and WYZE_API_KEY are required when using Wyze");
   }
   if (config.thermostat.lowThreshold >= config.thermostat.highThreshold) {
-    errors.push("LOW_THRESHOLD must be less than HIGH_THRESHOLD");
+    errors.push(
+      "THERMOSTAT_LOW_THRESHOLD must be less than THERMOSTAT_HIGH_THRESHOLD",
+    );
   }
   return errors;
 }

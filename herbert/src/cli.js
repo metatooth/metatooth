@@ -10,7 +10,7 @@ export function createCLI() {
   program
     .name("herbert")
     .description(
-      "Thermostat controller for SwitchBot Meter and Meross smart plug",
+      "Thermostat controller for SwitchBot Meter and Meross/Wyze smart plugs",
     )
     .version(pkg.version);
 

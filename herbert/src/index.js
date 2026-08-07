@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 import { createCLI } from "./cli.js";
-import { config, validate } from "./config.js";
+import { validate } from "./config.js";
 import { createPlugs } from "./plugs.js";
 import Thermostat from "./thermostat.js";
 import logger from "./utils/logger.js";

@@ -1,8 +1,8 @@
-{% if meross_plug_address is defined %}
+{% if meross_plug_address is defined and meross_key is defined %}
 MEROSS_PLUG_ADDRESS={{ meross_plug_address }}
 MEROSS_KEY={{ meross_key }}
 {% endif %}
-{% if wyze_email is defined %}
+{% if wyze_email is defined and wyze_password is defined and wyze_key_id is defined and wyze_api_key is defined and wyze_device_mac is defined %}
 WYZE_EMAIL={{ wyze_email }}
 WYZE_PASSWORD={{ wyze_password }}
 WYZE_KEY_ID={{ wyze_key_id }}

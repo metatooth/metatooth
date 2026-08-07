@@ -62,7 +62,13 @@ export function createPlugs() {
   if (config.meross.address && config.meross.key) {
     plugs.push(new MerossPlug(config.meross));
   }
-  if (config.wyze.email && config.wyze.password && config.wyze.mac) {
+  if (
+    config.wyze.email &&
+    config.wyze.password &&
+    config.wyze.keyId &&
+    config.wyze.apiKey &&
+    config.wyze.mac
+  ) {
     plugs.push(new WyzePlug(config.wyze));
   }
   return plugs;

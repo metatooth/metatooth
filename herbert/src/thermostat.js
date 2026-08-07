@@ -125,37 +125,52 @@ export default class Thermostat {
   }
 
   async turnPlugOn() {
-    try {
-      await Promise.all(this.plugs.map((p) => p.turnOn()));
-      this.plugState = "on";
-      logger.info({ plugs: this.plugs.map((p) => p.name) }, "Plugs turned ON");
-    } catch (err) {
-      logger.error({ err }, "Failed to turn plugs ON");
-    }
+    const results = await Promise.allSettled(this.plugs.map((p) => p.turnOn()));
+    const failed = this.logFailures(results, "Failed to turn plug ON");
+    this.plugState = failed.length === 0 ? "on" : null;
+    logger.info(
+      { plugs: this.plugs.map((p) => p.name), failed },
+      "Plugs turned ON",
+    );
   }
 
   async turnPlugOff() {
-    try {
-      await Promise.all(this.plugs.map((p) => p.turnOff()));
-      this.plugState = "off";
-      logger.info({ plugs: this.plugs.map((p) => p.name) }, "Plugs turned OFF");
-    } catch (err) {
-      logger.error({ err }, "Failed to turn plugs OFF");
-    }
+    const results = await Promise.allSettled(
+      this.plugs.map((p) => p.turnOff()),
+    );
+    const failed = this.logFailures(results, "Failed to turn plug OFF");
+    this.plugState = failed.length === 0 ? "off" : null;
+    logger.info(
+      { plugs: this.plugs.map((p) => p.name), failed },
+      "Plugs turned OFF",
+    );
   }
 
   async updatePlugState() {
-    try {
-      const states = await Promise.all(this.plugs.map((p) => p.getPower()));
-      this.plugState = states.some(Boolean) ? "on" : "off";
-      logger.info(
-        { plugState: this.plugState, plugs: this.plugs.map((p) => p.name) },
-        "Initial plug state",
-      );
-    } catch (err) {
-      logger.error({ err }, "Failed to get plug state");
-      this.plugState = null;
-    }
+    const results = await Promise.allSettled(
+      this.plugs.map((p) => p.getPower()),
+    );
+    const failed = this.logFailures(results, "Failed to get plug power state");
+    const states = results
+      .filter((r) => r.status === "fulfilled")
+      .map((r) => r.value);
+    this.plugState = states.length > 0 ? (states.some(Boolean) ? "on" : "off") : null;
+    logger.info(
+      { plugState: this.plugState, plugs: this.plugs.map((p) => p.name), failed },
+      "Initial plug state",
+    );
+  }
+
+  logFailures(results, message) {
+    const failed = [];
+    results.forEach((result, i) => {
+      if (result.status === "rejected") {
+        const plug = this.plugs[i];
+        failed.push(plug.name);
+        logger.error({ err: result.reason, plug: plug.name }, message);
+      }
+    });
+    return failed;
   }
 
   celsiusToFahrenheit(c) {
