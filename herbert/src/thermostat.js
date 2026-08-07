@@ -1,6 +1,6 @@
 import noble from '@stoprocent/noble';
-import { MerossSmartPlug } from 'meross-local';
 import { config } from './config.js';
+import { createPlugs } from './plugs.js';
 import logger from './utils/logger.js';
 import { parseMeterAd } from './utils/meter.js';
 
@@ -10,7 +10,7 @@ export default class Thermostat {
     this.highThreshold = options.highThreshold || config.thermostat.highThreshold;
     this.scanIntervalMs = options.scanIntervalMs || config.scanIntervalMs;
 
-    this.meross = new MerossSmartPlug(config.meross.address, config.meross.key);
+    this.plugs = createPlugs();
     this.nobleReady = noble.waitForPoweredOnAsync();
 
     this.currentTemp = null;
@@ -106,29 +106,29 @@ export default class Thermostat {
 
   async turnPlugOn() {
     try {
-      await this.meross.turnOn();
+      await Promise.all(this.plugs.map(p => p.turnOn()));
       this.plugState = 'on';
-      logger.info('Plug turned ON');
+      logger.info({ plugs: this.plugs.map(p => p.name) }, 'Plugs turned ON');
     } catch (err) {
-      logger.error({ err }, 'Failed to turn plug ON');
+      logger.error({ err }, 'Failed to turn plugs ON');
     }
   }
 
   async turnPlugOff() {
     try {
-      await this.meross.turnOff();
+      await Promise.all(this.plugs.map(p => p.turnOff()));
       this.plugState = 'off';
-      logger.info('Plug turned OFF');
+      logger.info({ plugs: this.plugs.map(p => p.name) }, 'Plugs turned OFF');
     } catch (err) {
-      logger.error({ err }, 'Failed to turn plug OFF');
+      logger.error({ err }, 'Failed to turn plugs OFF');
     }
   }
 
   async updatePlugState() {
     try {
-      const power = await this.meross.getPower();
-      this.plugState = power ? 'on' : 'off';
-      logger.info({ plugState: this.plugState }, 'Initial plug state');
+      const states = await Promise.all(this.plugs.map(p => p.getPower()));
+      this.plugState = states.some(Boolean) ? 'on' : 'off';
+      logger.info({ plugState: this.plugState, plugs: this.plugs.map(p => p.name) }, 'Initial plug state');
     } catch (err) {
       logger.error({ err }, 'Failed to get plug state');
       this.plugState = null;

@@ -13,7 +13,8 @@
   "scripts": {
     "start": "node src/index.js",
     "scan": "node src/index.js scan",
-    "status": "node src/index.js status"
+    "status": "node src/index.js status",
+    "cycle": "node src/index.js cycle"
   },
   "dependencies": {
     "@stoprocent/noble": "^2.3.17",
@@ -22,7 +23,8 @@
     "meross-local": "^1.0.0",
     "node-switchbot": "^3.6.8",
     "pino": "^9.0.0",
-    "pino-pretty": "^11.0.0"
+    "pino-pretty": "^11.0.0",
+    "wyze-node": "2.12.2"
   },
   "keywords": [
     "thermostat",

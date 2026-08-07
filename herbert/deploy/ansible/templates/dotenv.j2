@@ -1,5 +1,14 @@
+{% if meross_plug_address is defined %}
 MEROSS_PLUG_ADDRESS={{ meross_plug_address }}
 MEROSS_KEY={{ meross_key }}
+{% endif %}
+{% if wyze_email is defined %}
+WYZE_EMAIL={{ wyze_email }}
+WYZE_PASSWORD={{ wyze_password }}
+WYZE_KEY_ID={{ wyze_key_id }}
+WYZE_API_KEY={{ wyze_api_key }}
+WYZE_DEVICE_MAC={{ wyze_device_mac }}
+{% endif %}
 THERMOSTAT_LOW_THRESHOLD={{ thermostat_low_threshold | default(68) }}
 THERMOSTAT_HIGH_THRESHOLD={{ thermostat_high_threshold | default(72) }}
 SCAN_INTERVAL_MS={{ scan_interval_ms | default(30000) }}

@@ -2,10 +2,10 @@
 
 import { createCLI } from './cli.js';
 import { config, validate } from './config.js';
+import { createPlugs } from './plugs.js';
 import Thermostat from './thermostat.js';
 import logger from './utils/logger.js';
 import noble from '@stoprocent/noble';
-import { MerossSmartPlug } from 'meross-local';
 import { parseMeterAd } from './utils/meter.js';
 
 async function main() {
@@ -29,6 +29,9 @@ async function main() {
       break;
     case 'temp':
       await readTemp();
+      break;
+    case 'cycle':
+      await cyclePlug(program.commands.find(c => c.name() === 'cycle')?.opts() || {});
       break;
     default:
       await runThermostat({});
@@ -97,12 +100,14 @@ async function showStatus() {
     process.exit(1);
   }
 
-  const meross = new MerossSmartPlug(config.meross.address, config.meross.key);
-  try {
-    const power = await meross.getPower();
-    console.log(`Plug state: ${power ? 'ON' : 'OFF'}`);
-  } catch (err) {
-    logger.error({ err }, 'Failed to get plug status');
+  const plugs = createPlugs();
+  for (const plug of plugs) {
+    try {
+      const power = await plug.getPower();
+      console.log(`${plug.name}: ${power ? 'ON' : 'OFF'}`);
+    } catch (err) {
+      logger.error({ err, plug: plug.name }, 'Failed to get plug status');
+    }
   }
 
   await noble.waitForPoweredOnAsync();
@@ -132,20 +137,26 @@ async function controlPlug(action) {
     process.exit(1);
   }
 
-  const meross = new MerossSmartPlug(config.meross.address, config.meross.key);
+  const plugs = createPlugs();
 
   switch (action) {
     case 'on':
-      await meross.turnOn();
-      console.log('Plug turned ON');
+      await Promise.all(plugs.map(p => p.turnOn()));
+      console.log('Plugs turned ON');
       break;
     case 'off':
-      await meross.turnOff();
-      console.log('Plug turned OFF');
+      await Promise.all(plugs.map(p => p.turnOff()));
+      console.log('Plugs turned OFF');
       break;
     case 'status':
-      const power = await meross.getPower();
-      console.log(`Plug is ${power ? 'ON' : 'OFF'}`);
+      for (const plug of plugs) {
+        try {
+          const power = await plug.getPower();
+          console.log(`${plug.name}: ${power ? 'ON' : 'OFF'}`);
+        } catch (err) {
+          logger.error({ err, plug: plug.name }, 'Failed to get plug status');
+        }
+      }
       break;
     default:
       console.error('Invalid action. Use: on, off, or status');
@@ -172,6 +183,51 @@ async function readTemp() {
     console.error('No temperature reading');
     process.exit(1);
   }, 10000);
+}
+
+async function cyclePlug(opts) {
+  const errors = validate();
+  if (errors.length > 0) {
+    logger.error({ errors }, 'Configuration errors');
+    process.exit(1);
+  }
+
+  const plugs = createPlugs().filter(p => p.name.startsWith('wyze:'));
+  if (plugs.length === 0) {
+    logger.error('No Wyze plug configured');
+    process.exit(1);
+  }
+
+  const intervalMs = opts.interval || 3000;
+  let running = true;
+
+  process.on('SIGINT', () => {
+    logger.info('Received SIGINT, stopping cycle...');
+    running = false;
+  });
+
+  logger.info({ plugs: plugs.map(p => p.name), intervalMs }, 'Cycling plug on and off');
+
+  while (running) {
+    for (const plug of plugs) {
+      await plug.turnOn();
+      logger.info({ plug: plug.name }, 'Plug ON');
+    }
+    await sleep(intervalMs);
+    if (!running) break;
+
+    for (const plug of plugs) {
+      await plug.turnOff();
+      logger.info({ plug: plug.name }, 'Plug OFF');
+    }
+    await sleep(intervalMs);
+  }
+
+  process.exit(0);
+}
+
+function sleep(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 main().catch((err) => {

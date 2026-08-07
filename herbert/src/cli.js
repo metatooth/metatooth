@@ -37,5 +37,10 @@ export function createCLI() {
     .command('temp')
     .description('Read temperature once and exit');
 
+  program
+    .command('cycle')
+    .description('Cycle the Wyze plug on and off until stopped')
+    .option('-i, --interval <ms>', 'Delay between on/off toggles', parseInt, 3000);
+
   return program;
 }
