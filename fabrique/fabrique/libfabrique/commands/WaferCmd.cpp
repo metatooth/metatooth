@@ -52,7 +52,12 @@ double
 WaferCmd::parse_length_nm(const std::string& token)
 {
   std::size_t pos = 0;
-  double value = std::stod(token, &pos);
+  double value = 0;
+  try {
+    value = std::stod(token, &pos);
+  } catch (const std::exception&) {
+    throw std::invalid_argument("invalid length: " + token);
+  }
 
   if (value < 0) {
     throw std::invalid_argument("length must be non-negative: " + token);
@@ -72,7 +77,7 @@ WaferCmd::parse_length_nm(const std::string& token)
 WaferCmd
 WaferCmd::parse(int argc, char* argv[])
 {
-  if (argc < 3) {
+  if (argc < 3 || argc > 4) {
     throw std::invalid_argument(
       "usage: wafer <material> <width> <height> [miller]");
   }
@@ -82,7 +87,7 @@ WaferCmd::parse(int argc, char* argv[])
   double height_nm = parse_length_nm(argv[2]);
   std::array<int, 3> miller = DEFAULT_MILLER;
 
-  if (argc > 3) {
+  if (argc == 4) {
     miller = parse_miller(argv[3]);
   }
 

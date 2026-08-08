@@ -4,7 +4,7 @@ Defines the behavior by which `fabrique` renders the result of a parsed
 command as a JSON document conforming to the published `device.schema.json`
 schema, so that command results can be consumed by other tools and scripts.
 
-## ADDED Requirements
+## Requirements
 
 ### Requirement: Device JSON output
 

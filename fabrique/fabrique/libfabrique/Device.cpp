@@ -1,7 +1,5 @@
 #include "Device.hpp" // class implemented
 
-using namespace fabrique;
-
 void
 fabrique::to_json(nlohmann::json& out, const Material& material)
 {
