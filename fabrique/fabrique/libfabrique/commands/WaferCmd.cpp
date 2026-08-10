@@ -4,6 +4,10 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <nlohmann/json.hpp>
+
+#include <libfabrique/Device.hpp>
+
 using namespace fabrique;
 
 const std::string WaferCmd::DEFAULT_MATERIAL = "Si";
@@ -34,39 +38,73 @@ namespace {
 }
 
 WaferCmd::WaferCmd(const std::string& material,
-                    const std::string& width,
+                    double width_nm,
+                    double height_nm,
                     const std::array<int, 3>& miller) :
   _material(material),
-  _width(width),
+  _width_nm(width_nm),
+  _height_nm(height_nm),
   _miller(miller)
 {
+}
+
+double
+WaferCmd::parse_length_nm(const std::string& token)
+{
+  std::size_t pos = 0;
+  double value = 0;
+  try {
+    value = std::stod(token, &pos);
+  } catch (const std::exception&) {
+    throw std::invalid_argument("invalid length: " + token);
+  }
+
+  if (value < 0) {
+    throw std::invalid_argument("length must be non-negative: " + token);
+  }
+
+  std::string unit = token.substr(pos);
+  if (unit.empty() || unit == "nm") {
+    return value;
+  }
+  if (unit == "um") {
+    return value * 1000.0;
+  }
+
+  throw std::invalid_argument("unrecognized length unit: " + unit);
 }
 
 WaferCmd
 WaferCmd::parse(int argc, char* argv[])
 {
-  std::string material = DEFAULT_MATERIAL;
-  std::string width;
+  if (argc < 3 || argc > 4) {
+    throw std::invalid_argument(
+      "usage: wafer <material> <width> <height> [miller]");
+  }
+
+  std::string material = argv[0];
+  double width_nm = parse_length_nm(argv[1]);
+  double height_nm = parse_length_nm(argv[2]);
   std::array<int, 3> miller = DEFAULT_MILLER;
 
-  if (argc > 0) {
-    material = argv[0];
-  }
-  if (argc > 1) {
-    width = argv[1];
-  }
-  if (argc > 2) {
-    miller = parse_miller(argv[2]);
+  if (argc == 4) {
+    miller = parse_miller(argv[3]);
   }
 
-  return WaferCmd(material, width, miller);
+  return WaferCmd(material, width_nm, height_nm, miller);
 }
 
 void
 WaferCmd::execute()
 {
-  std::cout << "wafer material=" << _material
-            << " width=" << _width
-            << " miller=<" << _miller[0] << "," << _miller[1] << "," << _miller[2] << ">"
-            << std::endl;
+  Device device;
+  device.width = _width_nm;
+  device.height = _height_nm;
+  device.materials.push_back(Material{
+    _material,
+    {{0, 0, _width_nm, 0, _width_nm, _height_nm, 0, _height_nm}}
+  });
+
+  nlohmann::json out = device;
+  std::cout << out.dump() << std::endl;
 }

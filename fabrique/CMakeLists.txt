@@ -6,6 +6,7 @@ project(libfabrique CXX)
 include(CTest)
 
 find_package(libmultidraw REQUIRED)
+find_package(nlohmann_json REQUIRED)
 
 option(BUILD_DOC "Build documentation" ON)
 
