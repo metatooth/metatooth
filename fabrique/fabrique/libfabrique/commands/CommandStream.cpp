@@ -28,6 +28,9 @@ fabrique::run_command_stream(std::istream& in)
 {
   std::string line;
   while (std::getline(in, line)) {
+    if (!line.empty() && line.back() == '\r') {
+      line.pop_back();
+    }
     if (is_blank_or_comment(line)) {
       continue;
     }
