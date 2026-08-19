@@ -37,7 +37,7 @@
       line stops processing and propagates an error without executing
       subsequent lines
 - [x] 3.2 Add/extend `fabrique` CLI-level tests covering: `--file
-      <path>` with a file of valid commands, `--file <path>` with a
+    <path>` with a file of valid commands, `--file <path>` with a
       nonexistent file (non-zero exit, no JSON), commands piped via stdin,
       an `argv` command taking precedence over piped stdin content, and no
       command with no piped stdin (interactive) exiting 0 with no output
