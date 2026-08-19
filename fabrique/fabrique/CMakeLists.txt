@@ -9,6 +9,8 @@ add_library(libfabrique STATIC
   libfabrique/libfabrique.cpp
   libfabrique/Device.cpp
   libfabrique/commands/WaferCmd.cpp
+  libfabrique/commands/Dispatch.cpp
+  libfabrique/commands/CommandStream.cpp
 )
 
 add_dependencies(libfabrique VersionHeader)
@@ -28,9 +30,23 @@ target_include_directories(fabrique PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/libfabriq
 
 install(TARGETS fabrique libfabrique)
 install(FILES libfabrique/libfabrique.hpp libfabrique/Device.hpp DESTINATION include/libfabrique)
-install(FILES libfabrique/commands/WaferCmd.hpp DESTINATION include/libfabrique/commands)
+install(FILES
+  libfabrique/commands/WaferCmd.hpp
+  libfabrique/commands/Dispatch.hpp
+  libfabrique/commands/CommandStream.hpp
+  DESTINATION include/libfabrique/commands)
 
 add_executable(test_wafer libfabrique/commands/WaferCmd.test.cpp)
 target_link_libraries(test_wafer libfabrique)
 target_include_directories(test_wafer PUBLIC ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
 add_test(NAME test_wafer COMMAND test_wafer)
+
+add_executable(test_command_stream libfabrique/commands/CommandStream.test.cpp)
+target_link_libraries(test_command_stream libfabrique)
+target_include_directories(test_command_stream PUBLIC ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+add_test(NAME test_command_stream COMMAND test_command_stream)
+
+add_executable(test_dispatch libfabrique/commands/Dispatch.test.cpp)
+target_link_libraries(test_dispatch libfabrique)
+target_include_directories(test_dispatch PUBLIC ${CMAKE_SOURCE_DIR} ${CMAKE_BINARY_DIR})
+add_test(NAME test_dispatch COMMAND test_dispatch)
