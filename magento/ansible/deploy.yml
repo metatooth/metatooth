@@ -122,12 +122,6 @@
       ansible.builtin.shell:
         cmd: cd {{ build_dir }} && docker compose up -d --remove-orphans
 
-    - name: Remove stale composer.lock
-      become: yes
-      file:
-        path: "{{ build_dir }}/public_html/composer.lock"
-        state: absent
-
     - name: Copy auth.json into phpfpm container
       become: yes
       ansible.builtin.shell:
