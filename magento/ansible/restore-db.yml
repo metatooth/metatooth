@@ -13,6 +13,7 @@
         dest: "{{ build_dir }}/magento-final.sql"
 
     - name: Import database dump
+      become: yes
       ansible.builtin.shell:
         cmd: >
           grep -v "^CREATE DATABASE\|^USE " {{ build_dir }}/magento-final.sql |
@@ -21,3 +22,9 @@
           -u {{ db_user }} {{ db_name }}
       environment:
         MYSQL_PWD: "{{ db_password }}"
+
+    - name: Remove database dump from server
+      become: yes
+      file:
+        path: "{{ build_dir }}/magento-final.sql"
+        state: absent
