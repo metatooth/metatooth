@@ -55,10 +55,19 @@
         group: root
         mode: '0644'
 
-    - name: Set ownership for container app user
+    - name: Set ownership for container app user on writable directories
       become: yes
-      ansible.builtin.shell:
-        cmd: chown -R 1000:1000 {{ build_dir }}/public_html
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/{{ item }}"
+        owner: "1000"
+        group: "1000"
+        recurse: yes
+      loop:
+        - var
+        - pub/static
+        - pub/media
+        - generated
+        - app/etc/config.php
 
     - name: Install refresh script
       template:
