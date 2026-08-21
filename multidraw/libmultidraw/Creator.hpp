@@ -39,6 +39,6 @@ namespace multidraw {
   private:
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_CREATOR_HPP
+#endif  // LIBMULTIDRAW_CREATOR_HPP

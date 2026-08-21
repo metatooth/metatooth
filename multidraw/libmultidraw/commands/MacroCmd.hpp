@@ -46,14 +46,13 @@ namespace multidraw {
 
     virtual bool reversible() const;
 
-    void addChild(std::unique_ptr<Command>);
+    void add_child(std::unique_ptr<Command>);
 
   protected:
   private:
     std::vector<std::unique_ptr<Command>> _children;
-
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_MACRO_CMD_HPP
+#endif  // LIBMULTIDRAW_MACRO_CMD_HPP

@@ -52,25 +52,25 @@ namespace multidraw {
 
     void open(Editor*);
     void close(Editor*);
-    void closeAll();
-  
+    void close_all();
+
     static void log(Command*);
     void undo(Component*, int);
     void redo(Component*, int);
-    void clearHistory(Component*);
+    void clear_history(Component*);
 
-    static void executeCmd(Command*);
+    static void execute_cmd(Command*);
 
     bool alive() const { return _alive; }
     bool updated() const { return _updated; }
     void alive(bool val) { _alive = val; }
     void updated(bool val) { _updated = val; }
-  
+
     Catalog* catalog() const { return _catalog; };
 
     /// Setting the Catalog has a side-effect of reseting the class's member variables.
     void catalog(Catalog*);
-    
+
   private:
     /**
      * @brief Default constructor.
@@ -84,12 +84,11 @@ namespace multidraw {
     bool _updated;
     std::map<Component*, History*> _histories;
 
-    void doUpdate();
+    void do_update();
 
     void init(Catalog*);
-  
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_MULTIDRAW_HPP
+#endif  // LIBMULTIDRAW_MULTIDRAW_HPP

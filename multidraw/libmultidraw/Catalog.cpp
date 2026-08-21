@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/Catalog.hpp> // class implemented
+#include <libmultidraw/Catalog.hpp>  // class implemented
 #include <libmultidraw/Creator.hpp>
 
 #include <iostream>
@@ -30,11 +30,8 @@ namespace fs = std::filesystem;
 
 using namespace multidraw;
 
-Catalog::Catalog(const std::string& name, Creator* creator) :
-  _name(name),
-  _creator(creator)
+Catalog::Catalog(const std::string& name, Creator* creator) : _name(name), _creator(creator)
 {
-
 }
 
 Catalog::~Catalog()
@@ -61,20 +58,20 @@ bool
 Catalog::retrieve(const fs::path& source, Component*& comp)
 {
   return false;
-}// retrieve
+}  // retrieve
 
 bool
 Catalog::retrieve(const fs::path& source, Command*& cmd)
 {
   return false;
-}// retrieve
+}  // retrieve
 
 std::string
 Catalog::name(Component* comp) const
 {
   std::string result;
-  std::map<std::string, Component*>::const_iterator iter = _compMap.cbegin();
-  while (iter != _compMap.cend()) {
+  std::map<std::string, Component*>::const_iterator iter = _comp_map.cbegin();
+  while (iter != _comp_map.cend()) {
     if (iter->second == comp) {
       result = iter->first;
       break;
@@ -82,15 +79,14 @@ Catalog::name(Component* comp) const
     iter++;
   }
   return result;
-}// name
-
+}  // name
 
 std::string
 Catalog::name(Command* cmd) const
 {
   std::string result;
-  std::map<std::string, Command*>::const_iterator iter = _cmdMap.cbegin();
-  while (iter != _cmdMap.cend()) {
+  std::map<std::string, Command*>::const_iterator iter = _cmd_map.cbegin();
+  while (iter != _cmd_map.cend()) {
     if (iter->second == cmd) {
       result = iter->first;
       break;
@@ -98,4 +94,4 @@ Catalog::name(Command* cmd) const
     iter++;
   }
   return result;
-}// name
+}  // name

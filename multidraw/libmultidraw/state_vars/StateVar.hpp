@@ -24,7 +24,7 @@
 #define LIBMULTIDRAW_STATE_VAR_HPP
 
 namespace multidraw {
-  
+
   /**
    * A State Variable is useful for storing a value.
    */
@@ -34,6 +34,6 @@ namespace multidraw {
     virtual ~StateVar() {};
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_STATE_VAR_HPP
+#endif  // LIBMULTIDRAW_STATE_VAR_HPP

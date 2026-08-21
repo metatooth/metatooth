@@ -15,4 +15,4 @@ public:
   virtual bool retrieve(const fs::path& source, Component*& comp);
 };
 
-#endif // EXAMPLE_CATALOG_HPP
+#endif  // EXAMPLE_CATALOG_HPP

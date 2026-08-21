@@ -35,16 +35,15 @@ namespace multidraw {
   class SaveAsCmd : public Command {
   public:
     SaveAsCmd(Editor*, const std::string& path);
-  
+
     virtual void execute();
 
     virtual bool reversible();
 
   private:
     std::string _path;
-  
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_SAVE_AS_CMD_HPP
+#endif  // LIBMULTIDRAW_SAVE_AS_CMD_HPP

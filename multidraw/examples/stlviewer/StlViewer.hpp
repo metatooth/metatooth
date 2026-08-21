@@ -31,4 +31,4 @@ private:
   int _last_y;
 };
 
-#endif // STL_VIEWER_HPP
+#endif  // STL_VIEWER_HPP

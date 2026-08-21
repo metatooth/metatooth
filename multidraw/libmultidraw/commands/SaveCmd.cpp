@@ -20,19 +20,25 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/commands/SaveCmd.hpp> // class implemented
+#include <libmultidraw/commands/SaveCmd.hpp>  // class implemented
 
 using namespace multidraw;
 
-SaveCmd::SaveCmd(Editor* editor) : Command(editor) {}
-  
+SaveCmd::SaveCmd(Editor* editor) : Command(editor)
+{
+}
+
 void
 SaveCmd::execute()
 {
   Editor* editor = this->editor();
 
   // NOTE 20221013 Terry: Now what?
-  
-}// execute
 
-bool SaveCmd::reversible() { return false; }
+}  // execute
+
+bool
+SaveCmd::reversible()
+{
+  return false;
+}

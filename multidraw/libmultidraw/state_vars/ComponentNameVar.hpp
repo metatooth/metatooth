@@ -30,7 +30,7 @@
 namespace multidraw {
 
   class Component;
-  
+
   /**
    * A name for a component.
    */
@@ -41,11 +41,11 @@ namespace multidraw {
     Component* component() const;
     void component(Component*);
     void update();
-  
+
   private:
     Component* _component;
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_COMPONENT_NAME_VAR_HPP
+#endif  // LIBMULTIDRAW_COMPONENT_NAME_VAR_HPP

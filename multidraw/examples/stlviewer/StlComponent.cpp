@@ -1,4 +1,4 @@
-#include "StlComponent.hpp" // class implemented
+#include "StlComponent.hpp"  // class implemented
 
 #include <FL/gl.h>
 
@@ -11,13 +11,13 @@ const float TARGET_SIZE = 100.0F;
 
 StlComponent::StlComponent(const std::string& name) : Component(name)
 {
-}// constructor
+}  // constructor
 
 void
-StlComponent::addFacet(const Facet& facet)
+StlComponent::add_facet(const Facet& facet)
 {
   _facets.push_back(facet);
-}// addFacet
+}  // add_facet
 
 void
 StlComponent::normalize()
@@ -27,8 +27,7 @@ StlComponent::normalize()
     return;
   }
 
-  std::array<float, 3> lo = {std::numeric_limits<float>::max(),
-                             std::numeric_limits<float>::max(),
+  std::array<float, 3> lo = {std::numeric_limits<float>::max(), std::numeric_limits<float>::max(),
                              std::numeric_limits<float>::max()};
   std::array<float, 3> hi = {std::numeric_limits<float>::lowest(),
                              std::numeric_limits<float>::lowest(),
@@ -43,8 +42,7 @@ StlComponent::normalize()
     }
   }
 
-  std::array<float, 3> center = {(lo[0] + hi[0]) / 2.0F,
-                                 (lo[1] + hi[1]) / 2.0F,
+  std::array<float, 3> center = {(lo[0] + hi[0]) / 2.0F, (lo[1] + hi[1]) / 2.0F,
                                  (lo[2] + hi[2]) / 2.0F};
 
   float span = std::max({hi[0] - lo[0], hi[1] - lo[1], hi[2] - lo[2]});
@@ -61,7 +59,7 @@ StlComponent::normalize()
   }
 
   visible(true);
-}// normalize
+}  // normalize
 
 void
 StlComponent::draw3() const
@@ -80,4 +78,4 @@ StlComponent::draw3() const
     glVertex3fv(facet.vertices[2].data());
   }
   glEnd();
-}// draw3
+}  // draw3

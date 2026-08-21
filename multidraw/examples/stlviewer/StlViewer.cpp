@@ -1,4 +1,4 @@
-#include "StlViewer.hpp" // class implemented
+#include "StlViewer.hpp"  // class implemented
 
 #include <libmultidraw/Editor.hpp>
 #include <libmultidraw/Multidraw.hpp>
@@ -13,18 +13,10 @@ const int CLIP = 1000;
 const float DARK = 0.15F;
 const float ROTATE_SPEED = 0.5F;
 
-StlViewer::StlViewer(int posx,
-                     int posy,
-                     int width,
-                     int height,
-                     Editor* editor) :
-  Viewer(posx, posy, width, height, editor),
-  _rot_x(20.0F),
-  _rot_y(-30.0F),
-  _last_x(0),
-  _last_y(0)
+StlViewer::StlViewer(int posx, int posy, int width, int height, Editor* editor) :
+    Viewer(posx, posy, width, height, editor), _rot_x(20.0F), _rot_y(-30.0F), _last_x(0), _last_y(0)
 {
-}// constructor
+}  // constructor
 
 void
 StlViewer::draw()
@@ -36,9 +28,7 @@ StlViewer::draw()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-pixel_w() / 2.0, pixel_w() / 2.0,
-            -pixel_h() / 2.0, pixel_h() / 2.0,
-            -CLIP, CLIP);
+    glOrtho(-pixel_w() / 2.0, pixel_w() / 2.0, -pixel_h() / 2.0, pixel_h() / 2.0, -CLIP, CLIP);
 
     glClearColor(DARK, DARK, DARK, 1.0F);
 
@@ -72,7 +62,7 @@ StlViewer::draw()
   if (comp != nullptr) {
     comp->draw3();
   }
-}// draw
+}  // draw
 
 int
 StlViewer::keys(int key)
@@ -92,7 +82,7 @@ StlViewer::keys(int key)
   default:
     return Viewer::keys(key);
   }
-}// keys
+}  // keys
 
 int
 StlViewer::mouse(int event, int posx, int posy)
@@ -115,4 +105,4 @@ StlViewer::mouse(int event, int posx, int posy)
   default:
     return 0;
   }
-}// mouse
+}  // mouse

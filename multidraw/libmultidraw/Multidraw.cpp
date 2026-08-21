@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/Multidraw.hpp> // class implemented
+#include <libmultidraw/Multidraw.hpp>  // class implemented
 
 #include <libmultidraw/Catalog.hpp>
 #include <libmultidraw/Editor.hpp>
@@ -44,12 +44,12 @@ Multidraw::instance()
   }
 
   return _instance;
-}// instance
+}  // instance
 
 Multidraw::Multidraw()
 {
   init(nullptr);
-}// constructor
+}  // constructor
 
 Multidraw::~Multidraw()
 {
@@ -67,36 +67,36 @@ Multidraw::~Multidraw()
   _editors.clear();
 
   alive(false);
-}// destructor
+}  // destructor
 
 void
 Multidraw::catalog(Catalog* catalog)
 {
   init(catalog);
-}// catalog
+}  // catalog
 
 void
-Multidraw::clearHistory(Component* comp)
+Multidraw::clear_history(Component* comp)
 {
   auto iter = _histories.find(comp);
   if (iter != _histories.end()) {
     iter->second->past.clear();
     iter->second->future.clear();
   }
-}// clearHistory
+}  // clear_history
 
 void
-Multidraw::doUpdate()
+Multidraw::do_update()
 {
   // TODO solve constraints
 
   for (auto iter = _editors.cbegin(); iter != _editors.cend(); iter++) {
     (*iter)->update();
   }
-}// doUpdate
+}  // do_update
 
 void
-Multidraw::executeCmd(Command* cmd)
+Multidraw::execute_cmd(Command* cmd)
 {
   if (cmd != nullptr) {
     cmd->execute();
@@ -108,7 +108,7 @@ Multidraw::executeCmd(Command* cmd)
       delete cmd;
     }
   }
-}// executeCmd
+}  // execute_cmd
 
 void
 Multidraw::init(Catalog* catalog)
@@ -120,14 +120,14 @@ Multidraw::init(Catalog* catalog)
 
   alive(true);
   updated(false);
-}// init
+}  // init
 
 void
 Multidraw::open(Editor* editor)
 {
   _editors.push_back(editor);
   editor->open();
-}// open
+}  // open
 
 void
 Multidraw::run()
@@ -143,23 +143,23 @@ Multidraw::run()
 
     Fl::wait(FOREVER);
   }
-}// run
+}  // run
 
 void
 Multidraw::update(bool immediate)
 {
   if (immediate) {
-    doUpdate();
+    do_update();
   }
 
   updated(!immediate);
-}// update
+}  // update
 
 void
 Multidraw::quit()
 {
   alive(false);
-}// quit
+}  // quit
 
 void
 Multidraw::log(Command* cmd)
@@ -179,4 +179,4 @@ Multidraw::log(Command* cmd)
   } else {
     delete cmd;
   }
-}// log
+}  // log

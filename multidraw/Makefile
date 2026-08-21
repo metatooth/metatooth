@@ -21,10 +21,15 @@ ifeq ($(origin CXX),default)
 CXX := g++
 endif
 BUILD_TYPE ?= Release
+CLANG_FORMAT ?= clang-format
+
+# Source files subject to formatting. Excludes build/tooling output dirs
+# (which all start with an underscore, per .gitignore's `_*/` rule).
+SOURCES := $(shell find libmultidraw examples tests -name '*.cpp' -o -name '*.hpp')
 
 all: setup build
 
-.PHONY: setup build test clean
+.PHONY: setup build test clean format format-check
 
 $(VENV)/bin/activate:
 	python3 -m venv $(VENV)
@@ -40,6 +45,12 @@ build: setup
 	$(CMAKE) --build _build/$(BUILD_TYPE)
 
 test: build
+
+format:
+	$(CLANG_FORMAT) -i $(SOURCES)
+
+format-check:
+	$(CLANG_FORMAT) --dry-run --Werror $(SOURCES)
 
 clean:
 	rm -rf $(VENV)

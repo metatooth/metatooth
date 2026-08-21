@@ -14,9 +14,10 @@ namespace fs = std::filesystem;
 
 // The build copies this sample model next to the binary so the example runs
 // with no arguments.
-const char* DEFAULT_MODEL = "cube.stl";
+const char* default_model = "cube.stl";
 
-int main(int argc, char** argv)
+int
+main(int argc, char** argv)
 {
   // Resolve the default relative to the binary's own directory (from argv[0]),
   // not the current working directory, so `./path/to/stlviewer` finds the
@@ -25,13 +26,12 @@ int main(int argc, char** argv)
   if (argc > 1) {
     path = argv[1];
   } else {
-    path = (fs::path(argv[0]).parent_path() / DEFAULT_MODEL).string();
+    path = (fs::path(argv[0]).parent_path() / default_model).string();
   }
 
   std::cout << "libmultidraw-" << multidraw_version << std::endl;
   std::cout << "stlviewer: opening " << path << std::endl;
-  std::cout << "  drag to rotate, wheel to zoom, 'r' to reset, 'q' to quit"
-            << std::endl;
+  std::cout << "  drag to rotate, wheel to zoom, 'r' to reset, 'q' to quit" << std::endl;
 
   // Wire up the framework: a Catalog that reads STL (via its Creator), then an
   // Editor for the requested file. Opening the Editor shows its window; run()

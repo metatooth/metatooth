@@ -38,15 +38,16 @@ namespace multidraw {
     virtual Command* manipulate(Component*) { return 0; };
 
     virtual Command* wield() = 0;
-  
+
     virtual Component* component() { return 0; };
-  
+
   private:
-  
   };
 
-  inline Tool::~Tool() {}
+  inline Tool::~Tool()
+  {
+  }
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_TOOL_HPP
+#endif  // LIBMULTIDRAW_TOOL_HPP

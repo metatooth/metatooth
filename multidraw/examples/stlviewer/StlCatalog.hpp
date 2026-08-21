@@ -22,4 +22,4 @@ public:
   virtual bool retrieve(const fs::path& source, Component*& comp);
 };
 
-#endif // STL_CATALOG_HPP
+#endif  // STL_CATALOG_HPP

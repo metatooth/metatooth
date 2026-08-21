@@ -10,4 +10,4 @@ public:
   ExampleViewer(int posx, int posy, int width, int height, Editor* editor);
 };
 
-#endif // EXAMPLE_VIEWER_HPP
+#endif  // EXAMPLE_VIEWER_HPP

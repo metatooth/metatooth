@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/Viewer.hpp> // class implemented
+#include <libmultidraw/Viewer.hpp>  // class implemented
 
 #include <libmultidraw/Editor.hpp>
 #include <libmultidraw/components/Component.hpp>
@@ -39,16 +39,16 @@ const float GREY = 0.5F;
 const int CLIPZ = 100;
 
 Viewer::Viewer(int posx, int posy, int width, int height, Editor* editor) :
-  Fl_Gl_Window(posx, posy, width, height),
-  _editor(editor),
-  _zoom(ZOOM),
-  _pan_x(PANX),
-  _pan_y(PANY),
-  _mouse_x(0),
-  _mouse_y(0)
+    Fl_Gl_Window(posx, posy, width, height),
+    _editor(editor),
+    _zoom(ZOOM),
+    _pan_x(PANX),
+    _pan_y(PANY),
+    _mouse_x(0),
+    _mouse_y(0)
 {
-  mode(FL_DOUBLE | FL_RGB | FL_DEPTH);  
-}// constructor
+  mode(FL_DOUBLE | FL_RGB | FL_DEPTH);
+}  // constructor
 
 void
 Viewer::draw()
@@ -64,41 +64,38 @@ Viewer::draw()
   glLoadIdentity();
   glScalef(zoom(), zoom(), 1.0F);
   glTranslatef(pan_x(), pan_y(), 0.0F);
-}// draw
+}  // draw
 
 int
 Viewer::keys(int key)
 {
   return _editor->keystroke(key);
-}// keys
+}  // keys
 
 int
 Viewer::mouse(int event, int posx, int posy)
 {
   switch (event) {
-  case FL_PUSH:
-    {
-      _mouse_x = posx;
-      _mouse_y = posy;
-    }
+  case FL_PUSH: {
+    _mouse_x = posx;
+    _mouse_y = posy;
+  }
     return 1;
-  case FL_DRAG:
-    {
-      pan((posx - _mouse_x), (_mouse_y - posy));
-      _mouse_x = posx;
-      _mouse_y = posy;
-    }
+  case FL_DRAG: {
+    pan((posx - _mouse_x), (_mouse_y - posy));
+    _mouse_x = posx;
+    _mouse_y = posy;
+  }
     return 1;
-  case FL_RELEASE:
-    {
-      _mouse_x = posx;
-      _mouse_y = posy;
-    }
+  case FL_RELEASE: {
+    _mouse_x = posx;
+    _mouse_y = posy;
+  }
     return 1;
   default:
     return 0;
   }
-}// mouse
+}  // mouse
 
 int
 Viewer::handle(int event)
@@ -109,7 +106,7 @@ Viewer::handle(int event)
     return 1;
   case FL_KEYUP:
   case FL_KEYDOWN:
-    return keys(Fl::event_key());    
+    return keys(Fl::event_key());
   case FL_PUSH:
   case FL_DRAG:
   case FL_RELEASE:
@@ -117,13 +114,13 @@ Viewer::handle(int event)
   default:
     return Fl_Gl_Window::handle(event);
   }
-}// handle
+}  // handle
 
 void
 Viewer::update()
 {
   redraw();
-}// update
+}  // update
 
 void
 Viewer::resize(int posx, int posy, int width, int height)
@@ -131,7 +128,7 @@ Viewer::resize(int posx, int posy, int width, int height)
   Fl_Gl_Window::resize(posx, posy, width, height);
   viewport(width, height);
   redraw();
-}// resize
+}  // resize
 
 void
 Viewer::viewport(int width, int height)
@@ -139,8 +136,8 @@ Viewer::viewport(int width, int height)
   glViewport(0, 0, width, height);
   glMatrixMode(GL_PROJECTION);
   glLoadIdentity();
-  glOrtho(-width/2, width/2, -height/2, height/2, -CLIPZ, CLIPZ);  
-}// viewport
+  glOrtho(-width / 2, width / 2, -height / 2, height / 2, -CLIPZ, CLIPZ);
+}  // viewport
 
 void
 Viewer::reset()
@@ -149,7 +146,7 @@ Viewer::reset()
   _pan_x = PANX;
   _pan_y = PANY;
   redraw();
-}// reset
+}  // reset
 
 void
 Viewer::pan(float deltax, float deltay)
@@ -157,12 +154,11 @@ Viewer::pan(float deltax, float deltay)
   _pan_x += deltax / _zoom;
   _pan_y += deltay / _zoom;
   redraw();
-}// pan
+}  // pan
 
 void
 Viewer::zoom(float factor)
 {
   _zoom *= factor;
   redraw();
-}// zoom
-
+}  // zoom

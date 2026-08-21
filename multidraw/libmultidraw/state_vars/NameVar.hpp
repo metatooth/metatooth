@@ -35,14 +35,14 @@ namespace multidraw {
   class NameVar : public StateVar {
   public:
     NameVar(const std::string&);
-    
+
     std::string name() const;
     void name(const std::string&);
-    
+
   private:
     std::string _name;
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_NAME_VAR_HPP
+#endif  // LIBMULTIDRAW_NAME_VAR_HPP

@@ -20,13 +20,13 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/commands/MacroCmd.hpp> // class implemented
+#include <libmultidraw/commands/MacroCmd.hpp>  // class implemented
 
 using namespace multidraw;
 
 MacroCmd::MacroCmd(Editor* editor) : Command(editor)
 {
-}// constructor
+}  // constructor
 
 void
 MacroCmd::execute()
@@ -36,7 +36,7 @@ MacroCmd::execute()
     (*iter)->execute();
     iter++;
   }
-}// execute
+}  // execute
 
 void
 MacroCmd::unexecute()
@@ -46,7 +46,7 @@ MacroCmd::unexecute()
     (*iter)->unexecute();
     iter++;
   }
-}// unexecute
+}  // unexecute
 
 bool
 MacroCmd::reversible() const
@@ -60,12 +60,11 @@ MacroCmd::reversible() const
   }
 
   return reversible;
-}// reversible
-
+}  // reversible
 
 void
-MacroCmd::addChild(std::unique_ptr<Command> cmd)
+MacroCmd::add_child(std::unique_ptr<Command> cmd)
 {
   cmd->editor(this->editor());
   _children.push_back(std::move(cmd));
-}// addChild
+}  // add_child

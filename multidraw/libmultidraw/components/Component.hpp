@@ -27,7 +27,7 @@
 #include <iostream>
 
 namespace multidraw {
-  
+
   class Command;
   class Tool;
 
@@ -51,8 +51,8 @@ namespace multidraw {
     virtual Command* accept(Tool&);
 
     /// Sub-classes to define how to execute command(s)
-    virtual void interpret(Command*) { };
-    virtual void uninterpret(Command*) { };
+    virtual void interpret(Command*) {};
+    virtual void uninterpret(Command*) {};
 
     /// Add a child
     virtual void add_child(Component*);
@@ -70,23 +70,23 @@ namespace multidraw {
 
     Component* child(size_t index) const;
     Component* child(const std::string&) const;
-    
+
     void parent(Component* parent) { _parent = parent; };
     Component* parent() const { return _parent; }
     Component* root();
 
     virtual void draw2() const;
     virtual void draw3() const;
-  
+
   protected:
     std::vector<Component*> _children;
     bool _visible;
+
   private:
     std::string _name;
     Component* _parent;
-
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_COMPONENT_HPP
+#endif  // LIBMULTIDRAW_COMPONENT_HPP

@@ -20,16 +20,18 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/Creator.hpp> // class implemented
+#include <libmultidraw/Creator.hpp>  // class implemented
 
 #include <libmultidraw/components/Component.hpp>
 
 using namespace multidraw;
 
-Creator::Creator() { }
+Creator::Creator()
+{
+}
 
 Component*
 Creator::create()
 {
   return nullptr;
-}// create
+}  // create

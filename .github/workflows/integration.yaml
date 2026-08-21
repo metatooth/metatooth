@@ -24,3 +24,67 @@ jobs:
           # This part is also where you can pass other options, for example:
           prettier_options: --write **/*.{js,md,html}
           only_changed: True
+
+  clang-format:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.x"
+
+      # Pinned to match the version developers run locally (see
+      # multidraw/Makefile's `format`/`format-check` targets), so CI and
+      # local runs agree on what "formatted" means.
+      - name: Install clang-format
+        run: pip install clang-format==20.1.4
+
+      - name: Check formatting
+        working-directory: multidraw
+        run: make format-check
+
+  clang-tidy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      # Keep this list in sync with the "Install dependencies" section of
+      # multidraw/README.md - Conan builds FLTK from source and needs the
+      # X11 headers, and clang-tidy runs as part of the build below via
+      # CMAKE_CXX_CLANG_TIDY (see multidraw/CMakeLists.txt), so it also
+      # needs the clang-tidy binary itself.
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y cmake build-essential clang clang-tidy python3-venv \
+            libgl-dev libgl1-mesa-dev \
+            libx11-dev libx11-xcb-dev libfontenc-dev libice-dev libsm-dev libxau-dev \
+            libxaw7-dev libxcomposite-dev libxcursor-dev libxdamage-dev libxdmcp-dev \
+            libxext-dev libxfixes-dev libxi-dev libxinerama-dev libxkbfile-dev \
+            libxmu-dev libxpm-dev libxrandr-dev libxrender-dev libxres-dev \
+            libxss-dev libxt-dev libxtst-dev libxv-dev libxxf86vm-dev \
+            libxcb-glx0-dev libxcb-render0-dev libxcb-render-util0-dev \
+            libxcb-shape0-dev libxcb-randr0-dev libxcb-shm0-dev libxcb-sync-dev \
+            libxcb-xfixes0-dev libxcb-xinerama0-dev libxcb-dri3-dev uuid-dev \
+            libxcb-util-dev libxcb-cursor-dev libxcb-keysyms1-dev libxcb-image0-dev
+
+      - name: Cache Conan packages
+        uses: actions/cache@v4
+        with:
+          path: multidraw/_conan2
+          key: conan-${{ runner.os }}-${{ hashFiles('multidraw/conanfile.py') }}
+
+      # `make build` configures CMake with CMAKE_CXX_CLANG_TIDY set, so
+      # clang-tidy runs on every translation unit as part of compilation and
+      # fails the build on readability-identifier-naming violations (see
+      # multidraw/.clang-tidy and the --warnings-as-errors flag in
+      # multidraw/CMakeLists.txt).
+      - name: Build with clang-tidy
+        working-directory: multidraw
+        run: make build

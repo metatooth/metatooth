@@ -58,11 +58,10 @@ namespace multidraw {
   private:
     std::string _name;
     Creator* _creator;
-    std::map<std::string, Component*> _compMap;
-    std::map<std::string, Command*> _cmdMap;
-
+    std::map<std::string, Component*> _comp_map;
+    std::map<std::string, Command*> _cmd_map;
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_CATALOG_HPP
+#endif  // LIBMULTIDRAW_CATALOG_HPP

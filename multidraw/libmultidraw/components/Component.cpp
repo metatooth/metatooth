@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/components/Component.hpp> // class implemented
+#include <libmultidraw/components/Component.hpp>  // class implemented
 
 #include <libmultidraw/tools/Tool.hpp>
 
@@ -30,18 +30,15 @@ using namespace multidraw;
 
 typedef std::vector<Component*> comps;
 
-Component::Component(const std::string& name) :
-  _parent(nullptr),
-  _name(name),
-  _visible(false)
+Component::Component(const std::string& name) : _parent(nullptr), _name(name), _visible(false)
 {
-}// constructor
+}  // constructor
 
 Command*
 Component::accept(Tool& tool)
 {
   return 0;
-}// accept
+}  // accept
 
 void
 Component::add_child(Component* comp)
@@ -51,7 +48,7 @@ Component::add_child(Component* comp)
     comp->parent(this);
     _children.push_back(comp);
   }
-}// add_child
+}  // add_child
 
 Component*
 Component::child(size_t index) const
@@ -60,7 +57,7 @@ Component::child(size_t index) const
     return _children[index];
   }
   return nullptr;
-}// child
+}  // child
 
 Component*
 Component::child(const std::string& name) const
@@ -76,7 +73,7 @@ Component::child(const std::string& name) const
   }
 
   return child;
-}// child
+}  // child
 
 Component*
 Component::root()
@@ -90,7 +87,7 @@ Component::root()
   } while (parent != nullptr);
 
   return current;
-}// root
+}  // root
 
 void
 Component::draw2() const
@@ -100,7 +97,7 @@ Component::draw2() const
       (*iter)->draw2();
     }
   }
-}// draw2
+}  // draw2
 
 void
 Component::draw3() const
@@ -110,4 +107,4 @@ Component::draw3() const
       (*iter)->draw3();
     }
   }
-}// draw3
+}  // draw3

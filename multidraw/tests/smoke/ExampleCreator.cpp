@@ -1,17 +1,14 @@
-#include "ExampleCreator.hpp" // class implemented
+#include "ExampleCreator.hpp"  // class implemented
 #include "ExampleComponent.hpp"
 
 ExampleCreator::ExampleCreator()
 {
-}// constructor
+}  // constructor
 
 ExampleComponent*
-ExampleCreator::readSTL(const fs::path& source)
+ExampleCreator::read_stl(const fs::path& source)
 {
   ExampleComponent* result = new ExampleComponent();
 
-
-  
-  
   return result;
-}// readSTL
+}  // read_stl

@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/Editor.hpp> // class implemented
+#include <libmultidraw/Editor.hpp>  // class implemented
 
 #include <libmultidraw/Catalog.hpp>
 #include <libmultidraw/Multidraw.hpp>
@@ -44,13 +44,13 @@ const int WIDTH = 800;
 const int HEIGHT = 800;
 
 Editor::Editor(const std::string& inpath, const std::string& outpath) :
-  _component(nullptr),
-  _tool(nullptr),
-  _command(nullptr),
-  _name(nullptr),
-  _modified(nullptr),
-  _window(nullptr),
-  _viewer(nullptr)
+    _component(nullptr),
+    _tool(nullptr),
+    _command(nullptr),
+    _name(nullptr),
+    _modified(nullptr),
+    _window(nullptr),
+    _viewer(nullptr)
 {
   Catalog* catalog = Multidraw::instance()->catalog();
 
@@ -70,11 +70,11 @@ Editor::Editor(const std::string& inpath, const std::string& outpath) :
 
   // try to parse commands from the input file, then execute
 
-  _command = dynamic_cast<Command*> (new MacroCmd(this));
+  _command = dynamic_cast<Command*>(new MacroCmd(this));
   catalog->retrieve(inpath, _command);
 
   _command->execute();
-}// constructor
+}  // constructor
 
 Editor::~Editor()
 {
@@ -88,18 +88,18 @@ Editor::~Editor()
   // the loaded model does not leak when Multidraw tears the Editor down.
   delete _component;
   _component = nullptr;
-}// destructor
+}  // destructor
 
 void
 Editor::open()
 {
   _window->show();
-}// open
+}  // open
 
 void
 Editor::close()
 {
-}// close
+}  // close
 
 void
 Editor::update() const
@@ -108,7 +108,7 @@ Editor::update() const
   for (int i = 0; (view = viewer(i)) != nullptr; ++i) {
     view->update();
   }
-}// update
+}  // update
 
 bool
 Editor::modified() const
@@ -119,27 +119,29 @@ Editor::modified() const
 StateVar*
 Editor::state(const std::string& name) const
 {
-  std::string ALLCAPS = name;
-  for (auto& character: ALLCAPS) { character = (char)std::toupper(character); }
+  std::string all_caps = name;
+  for (auto& character : all_caps) {
+    character = (char)std::toupper(character);
+  }
 
   StateVar* var = nullptr;
 
-  if (ALLCAPS == "COMPONENTNAME") {
+  if (all_caps == "COMPONENTNAME") {
     var = _name;
-  } else if (ALLCAPS == "MODIFIED") {
+  } else if (all_caps == "MODIFIED") {
     var = _modified;
-  } else if (ALLCAPS == "OUTPATH") {
+  } else if (all_caps == "OUTPATH") {
     var = _outpath;
   }
 
   return var;
-}// state
+}  // state
 
 int
 Editor::keystroke(int event)
 {
   return 0;
-}// keystroke
+}  // keystroke
 
 void
 Editor::init(Component* comp)
@@ -147,4 +149,4 @@ Editor::init(Component* comp)
   _component = comp;
 
   _modified = new ModifiedStatusVar(_component);
-}// init
+}  // init

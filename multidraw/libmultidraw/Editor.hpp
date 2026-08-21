@@ -56,17 +56,21 @@ namespace multidraw {
     Tool* tool() const { return _tool; }
     bool modified() const;
     Command* command() const { return _command; }
-    Fl_Window* window() const { return  _window; }
+    Fl_Window* window() const { return _window; }
 
     void component(Component* comp) { _component = comp; }
-    virtual void viewer(Viewer* viewer, int id = 0) { if (id == 0) _viewer = viewer; }
+    virtual void viewer(Viewer* viewer, int id = 0)
+    {
+      if (id == 0)
+        _viewer = viewer;
+    }
     void tool(Tool* tool) { _tool = tool; }
     void command(Command* cmd) { _command = cmd; }
     void window(Fl_Window* window) { _window = window; }
 
-    void addTool(Tool*);
-    bool hasTool(Tool*);
-    void removeTool(Tool*);
+    void add_tool(Tool*);
+    bool has_tool(Tool*);
+    void remove_tool(Tool*);
 
     StateVar* state(const std::string&) const;
 
@@ -87,6 +91,6 @@ namespace multidraw {
     Viewer* _viewer;
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_EDITOR_HPP
+#endif  // LIBMULTIDRAW_EDITOR_HPP

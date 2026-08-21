@@ -22,7 +22,7 @@ public:
   StlCreator();
 
   /// Parse @p source and return a populated (normalized) StlComponent.
-  StlComponent* readSTL(const fs::path& source);
+  StlComponent* read_stl(const fs::path& source);
 };
 
-#endif // STL_CREATOR_HPP
+#endif  // STL_CREATOR_HPP

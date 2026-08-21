@@ -1,4 +1,4 @@
-#include "StlCreator.hpp" // class implemented
+#include "StlCreator.hpp"  // class implemented
 #include "StlComponent.hpp"
 
 #include <cstdint>
@@ -17,7 +17,7 @@ namespace {
   const std::streamoff COUNT_BYTES = 4;
   const std::streamoff FACET_BYTES = 50;
 
-  bool looksBinary(std::ifstream& file, std::streamoff size)
+  bool looks_binary(std::ifstream& file, std::streamoff size)
   {
     if (size < HEADER_BYTES + COUNT_BYTES) {
       return false;
@@ -38,11 +38,10 @@ namespace {
     // body must be an exact number of facet records equal to the declared
     // count.
     std::streamoff body = size - HEADER_BYTES - COUNT_BYTES;
-    return body % FACET_BYTES == 0 &&
-      body / FACET_BYTES == static_cast<std::streamoff>(count);
+    return body % FACET_BYTES == 0 && body / FACET_BYTES == static_cast<std::streamoff>(count);
   }
 
-  void readBinary(std::ifstream& file, StlComponent* comp)
+  void read_binary(std::ifstream& file, StlComponent* comp)
   {
     file.seekg(HEADER_BYTES, std::ios::beg);
 
@@ -64,11 +63,11 @@ namespace {
       if (!file) {
         break;
       }
-      comp->addFacet(facet);
+      comp->add_facet(facet);
     }
   }
 
-  void readAscii(std::ifstream& file, StlComponent* comp)
+  void read_ascii(std::ifstream& file, StlComponent* comp)
   {
     file.seekg(0, std::ios::beg);
 
@@ -81,28 +80,27 @@ namespace {
         file >> facet.normal[0] >> facet.normal[1] >> facet.normal[2];
       } else if (token == "vertex") {
         if (vertex < 3) {
-          file >> facet.vertices[vertex][0]
-               >> facet.vertices[vertex][1]
-               >> facet.vertices[vertex][2];
+          file >> facet.vertices[vertex][0] >> facet.vertices[vertex][1] >>
+              facet.vertices[vertex][2];
           ++vertex;
         }
       } else if (token == "endfacet") {
         if (vertex == 3) {
-          comp->addFacet(facet);
+          comp->add_facet(facet);
         }
         vertex = 0;
       }
     }
   }
 
-}// anonymous namespace
+}  // anonymous namespace
 
 StlCreator::StlCreator()
 {
-}// constructor
+}  // constructor
 
 StlComponent*
-StlCreator::readSTL(const fs::path& source)
+StlCreator::read_stl(const fs::path& source)
 {
   StlComponent* comp = new StlComponent(source.filename().string());
 
@@ -117,15 +115,15 @@ StlCreator::readSTL(const fs::path& source)
   std::streamoff size = file.tellg();
   file.seekg(0, std::ios::beg);
 
-  if (looksBinary(file, size)) {
-    readBinary(file, comp);
+  if (looks_binary(file, size)) {
+    read_binary(file, comp);
   } else {
-    readAscii(file, comp);
+    read_ascii(file, comp);
   }
 
-  std::cout << "stlviewer: loaded " << comp->facets() << " facets from "
-            << source.string() << std::endl;
+  std::cout << "stlviewer: loaded " << comp->facets() << " facets from " << source.string()
+            << std::endl;
 
   comp->normalize();
   return comp;
-}// readSTL
+}  // read_stl

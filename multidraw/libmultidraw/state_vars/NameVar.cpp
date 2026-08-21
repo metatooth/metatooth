@@ -20,20 +20,22 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/state_vars/NameVar.hpp> // class implemented
+#include <libmultidraw/state_vars/NameVar.hpp>  // class implemented
 
 using namespace multidraw;
 
-NameVar::NameVar(const std::string& name) : _name(name) { }
+NameVar::NameVar(const std::string& name) : _name(name)
+{
+}
 
 std::string
 NameVar::name() const
 {
   return _name;
-}// name
+}  // name
 
 void
 NameVar::name(const std::string& name)
 {
   _name = name;
-}// name
+}  // name

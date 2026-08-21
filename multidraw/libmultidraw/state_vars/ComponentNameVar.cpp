@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/state_vars/ComponentNameVar.hpp> // class implemented
+#include <libmultidraw/state_vars/ComponentNameVar.hpp>  // class implemented
 
 #include <libmultidraw/Catalog.hpp>
 #include <libmultidraw/Multidraw.hpp>
@@ -28,17 +28,15 @@
 
 using namespace multidraw;
 
-ComponentNameVar::ComponentNameVar(Component* comp) :
-  NameVar(""),
-  _component(comp)
+ComponentNameVar::ComponentNameVar(Component* comp) : NameVar(""), _component(comp)
 {
-}// constructor
+}  // constructor
 
 Component*
 ComponentNameVar::component() const
 {
   return _component;
-}// component
+}  // component
 
 void
 ComponentNameVar::component(Component* comp)
@@ -47,7 +45,7 @@ ComponentNameVar::component(Component* comp)
     _component = comp;
     update();
   }
-}// component
+}  // component
 
 void
 ComponentNameVar::update()
@@ -58,4 +56,4 @@ ComponentNameVar::update()
     std::string compname = Multidraw::instance()->catalog()->name(_component);
     name(compname);
   }
-}// update
+}  // update

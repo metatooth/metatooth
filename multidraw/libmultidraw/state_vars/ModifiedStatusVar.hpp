@@ -26,7 +26,7 @@
 #include <libmultidraw/state_vars/StateVar.hpp>
 
 namespace multidraw {
-  
+
   class Component;
 
   /**
@@ -35,18 +35,18 @@ namespace multidraw {
   class ModifiedStatusVar : public StateVar {
   public:
     ModifiedStatusVar(Component* = 0, bool = false);
-  
+
     Component* component() const;
     void component(Component*);
-  
+
     bool modified() const;
     void modified(bool);
-  
+
   private:
     Component* _component;
     bool _modified;
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_MODIFIED_STATUS_VAR_HPP
+#endif  // LIBMULTIDRAW_MODIFIED_STATUS_VAR_HPP

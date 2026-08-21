@@ -28,7 +28,7 @@ public:
   explicit StlComponent(const std::string& name = "stl-model");
 
   /// Append a facet parsed from an STL file.
-  void addFacet(const Facet& facet);
+  void add_facet(const Facet& facet);
 
   /// How many facets make up this mesh?
   size_t facets() const { return _facets.size(); }
@@ -50,4 +50,4 @@ private:
   std::vector<Facet> _facets;
 };
 
-#endif // STL_COMPONENT_HPP
+#endif  // STL_COMPONENT_HPP

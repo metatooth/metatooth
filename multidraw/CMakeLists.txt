@@ -37,7 +37,10 @@ else (DOXYGEN_FOUND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in")
   message("Doxygen configuration (docs/Doxyfile.in) not found, skipping documentation build")
 endif (DOXYGEN_FOUND AND EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/docs/Doxyfile.in")
 
-set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=-*,readability-*)
+# Naming rules live in .clang-tidy (readability-identifier-naming); only that
+# check is fatal here so other readability-* findings stay advisory and don't
+# block CI on pre-existing style debt unrelated to this project's naming rule.
+set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=-*,readability-* --warnings-as-errors=readability-identifier-naming)
 
 add_subdirectory(libmultidraw)
 add_subdirectory(examples)

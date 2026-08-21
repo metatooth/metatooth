@@ -10,16 +10,16 @@
 
 using namespace multidraw;
 
-int main() {
+int
+main()
+{
   Multidraw* multidraw = Multidraw::instance();
-  multidraw->catalog(
-    new ExampleCatalog("MultidrawSmokeTest", new ExampleCreator())
-  );
+  multidraw->catalog(new ExampleCatalog("MultidrawSmokeTest", new ExampleCreator()));
 
   ExampleEditor* editor = new ExampleEditor("./metatooth.stl");
 
   multidraw->open(editor);
-  std::cout << "libmultidraw-" <<  multidraw_version << std::endl;
+  std::cout << "libmultidraw-" << multidraw_version << std::endl;
 
   multidraw->run();
 

@@ -23,4 +23,4 @@ private:
   Viewer* _viewer;
 };
 
-#endif // STL_EDITOR_HPP
+#endif  // STL_EDITOR_HPP

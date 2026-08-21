@@ -33,13 +33,12 @@ namespace multidraw {
   class SaveCmd : public Command {
   public:
     SaveCmd(Editor*);
-  
+
     virtual void execute();
-    
+
     virtual bool reversible();
-  
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_SAVE_CMD_HPP
+#endif  // LIBMULTIDRAW_SAVE_CMD_HPP

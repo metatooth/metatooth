@@ -56,9 +56,8 @@ namespace multidraw {
   private:
     Editor* _editor;
     std::vector<Component*> _clipboard;
-
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_COMMAND_HPP
+#endif  // LIBMULTIDRAW_COMMAND_HPP

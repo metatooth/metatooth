@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/commands/SaveAsCmd.hpp> // class implemented
+#include <libmultidraw/commands/SaveAsCmd.hpp>  // class implemented
 
 #include <libmultidraw/Catalog.hpp>
 #include <libmultidraw/Editor.hpp>
@@ -29,16 +29,18 @@
 using namespace multidraw;
 
 SaveAsCmd::SaveAsCmd(Editor* editor, const std::string& path) :
-  Command(editor, std::vector<Component*>()),
-  _path(path)
+    Command(editor, std::vector<Component*>()), _path(path)
 {
 }
-  
+
 void
 SaveAsCmd::execute()
 {
   Multidraw::instance()->catalog()->save(editor()->component(), _path);
-}// execute
+}  // execute
 
-bool SaveAsCmd::reversible() { return false; }
-
+bool
+SaveAsCmd::reversible()
+{
+  return false;
+}

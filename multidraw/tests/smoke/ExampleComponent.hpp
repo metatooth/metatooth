@@ -10,5 +10,4 @@ public:
   ExampleComponent();
 };
 
-#endif // EXAMPLE_COMPONENT_HPP
-
+#endif  // EXAMPLE_COMPONENT_HPP

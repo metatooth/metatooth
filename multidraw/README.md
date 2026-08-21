@@ -43,6 +43,20 @@ $ cd metatooth/multidraw
 $ make
 ```
 
+## Code style
+
+Function and variable names use snake_case. Formatting is defined in
+[.clang-format](./.clang-format) and enforced in CI; run it locally with:
+
+```
+$ make format        # rewrite files in place
+$ make format-check  # fail if any file isn't formatted (what CI runs)
+```
+
+Naming is enforced separately via clang-tidy's `readability-identifier-naming`
+check (configured in [.clang-tidy](./.clang-tidy)), since clang-format itself
+only handles whitespace/brace style, not identifier casing.
+
 ## Examples
 
 See [examples/stlviewer](./examples/stlviewer) for a complete application built

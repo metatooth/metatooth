@@ -9,11 +9,11 @@
 namespace multidraw {
 
   class History {
-   public:
+  public:
     std::vector<std::unique_ptr<Command>> past;
     std::vector<std::unique_ptr<Command>> future;
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_HISTORY_HPP
+#endif  // LIBMULTIDRAW_HISTORY_HPP

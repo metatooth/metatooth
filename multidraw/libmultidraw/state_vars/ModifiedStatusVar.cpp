@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/state_vars/ModifiedStatusVar.hpp> // class implemented
+#include <libmultidraw/state_vars/ModifiedStatusVar.hpp>  // class implemented
 
 #include <libmultidraw/components/Component.hpp>
 

@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-#include <libmultidraw/commands/Command.hpp> // class implemented
+#include <libmultidraw/commands/Command.hpp>  // class implemented
 
 #include <libmultidraw/Multidraw.hpp>
 #include <libmultidraw/components/Component.hpp>
@@ -28,8 +28,7 @@
 using namespace multidraw;
 
 Command::Command(Editor* editor, std::vector<Component*> clipboard) :
-  _editor(editor),
-  _clipboard(clipboard)
+    _editor(editor), _clipboard(clipboard)
 {
 }
 
@@ -41,7 +40,7 @@ Command::execute()
     (*iter)->interpret(this);
     iter++;
   }
-}// execute
+}  // execute
 
 void
 Command::unexecute()
@@ -51,16 +50,16 @@ Command::unexecute()
     (*iter)->uninterpret(this);
     iter++;
   }
-}// unexecute
+}  // unexecute
 
 bool
 Command::reversible() const
 {
   return !_clipboard.empty();
-}// reversible
+}  // reversible
 
 void
 Command::log()
 {
   Multidraw::log(this);
-}// log
+}  // log

@@ -1,13 +1,12 @@
-#include "StlCatalog.hpp" // class implemented
+#include "StlCatalog.hpp"  // class implemented
 #include "StlComponent.hpp"
 #include "StlCreator.hpp"
 
 #include <libmultidraw/components/Component.hpp>
 
-StlCatalog::StlCatalog(const std::string& name, Creator* creator) :
-  Catalog(name, creator)
+StlCatalog::StlCatalog(const std::string& name, Creator* creator) : Catalog(name, creator)
 {
-}// constructor
+}  // constructor
 
 bool
 StlCatalog::retrieve(const fs::path& source, Component*& comp)
@@ -18,9 +17,9 @@ StlCatalog::retrieve(const fs::path& source, Component*& comp)
     return false;
   }
 
-  comp = dynamic_cast<Component*>(creator->readSTL(source));
+  comp = dynamic_cast<Component*>(creator->read_stl(source));
 
   // Returning true tells the Editor a Component was produced, so it will be
   // installed as the model the Viewer renders.
   return comp != nullptr;
-}// retrieve
+}  // retrieve

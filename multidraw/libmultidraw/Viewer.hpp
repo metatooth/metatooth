@@ -37,16 +37,16 @@ namespace multidraw {
     Viewer(int posx, int posy, int width, int height, Editor*);
 
     virtual int handle(int event);
-    
+
     virtual void draw();
 
     virtual void resize(int posx, int posy, int width, int height);
-    
+
     virtual void update();
 
   protected:
     Editor* editor() const { return _editor; };
-    
+
     float zoom() const { return _zoom; };
     float pan_x() const { return _pan_x; };
     float pan_y() const { return _pan_y; };
@@ -60,7 +60,7 @@ namespace multidraw {
 
     virtual void viewport(int width, int height);
 
-  private:    
+  private:
     Editor* _editor;
     float _zoom;
     float _pan_x;
@@ -69,6 +69,6 @@ namespace multidraw {
     int _mouse_y;
   };
 
-}
+}  // namespace multidraw
 
-#endif // LIBMULTIDRAW_VIEWER_HPP
+#endif  // LIBMULTIDRAW_VIEWER_HPP
