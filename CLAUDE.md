@@ -7,11 +7,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 Metatooth is a monorepo containing:
 
 **WordPress Deployments** (managed via Ansible):
+
 - **growherbert** (growherbert.com) - exposed on port 3030
 - **lynngrown** (lynngrown.com) - exposed on port 3300
 - **metatooth/www** (metatooth.com) - exposed on port 3330
 
 **Other Projects**:
+
 - **baldur** - Ruby-based image gallery web application for artist portfolio management (exposed on port 4567). See [baldur/CLAUDE.md](baldur/CLAUDE.md) for details.
 - **magento** (shop.metatooth.com) - Magento 2.3.4 e-commerce shop running PHP-FPM + Nginx in Docker, exposed on port 3360. Source in `magento/src/`; themes in `magento/themes/`. No build step — source files rsync'd from `~/metaspace/magento/` at deploy time.
 
@@ -54,10 +56,12 @@ make clean    # Remove setup stamp
 ```
 
 ### Environment Variables
+
 - `GROWHERBERT_BRANCH` / `LYNNGROWN_BRANCH` / `METATOOTH_BRANCH` - Git branch/tag to deploy (default: "local")
 - `ANSIBLE_INVENTORY` - Path to Ansible inventory file
 
 ### Maintenance Playbooks
+
 ```bash
 # Update packages on all hosts
 ansible-playbook -i /path/to/inventory deploy/ansible/apt-upgrade.yml
@@ -94,10 +98,12 @@ ansible-playbook -i /path/to/inventory deploy/ansible/reboot.yml
 ```
 
 ### Ansible Host Groups
+
 - **servers**: Docker Compose stack hosts (WordPress + local Nginx)
 - **balancers**: Load balancer hosts (SSL nginx reverse proxy)
 
 ### Deployment Flow
+
 1. `build.sh` stages files to `/tmp/{domain}.com/deployment/`
 2. Ansible synchronizes to target servers
 3. `.env` generated from `dotenv.j2` template
@@ -105,14 +111,14 @@ ansible-playbook -i /path/to/inventory deploy/ansible/reboot.yml
 
 ## Key Files Per Site
 
-| File | Purpose |
-|------|---------|
-| `docker-compose.yml` | WordPress FPM + Nginx containers |
-| `nginx.conf` | Local container nginx config |
-| `{site}-com` | Remote balancer nginx site config |
-| `deploy/ansible/deploy.yml` | Main deployment playbook |
-| `deploy/ansible/templates/dotenv.j2` | Environment variable template |
-| `deploy/ansible/templates/systemd-service.j2` | Systemd service template |
+| File                                          | Purpose                           |
+| --------------------------------------------- | --------------------------------- |
+| `docker-compose.yml`                          | WordPress FPM + Nginx containers  |
+| `nginx.conf`                                  | Local container nginx config      |
+| `{site}-com`                                  | Remote balancer nginx site config |
+| `deploy/ansible/deploy.yml`                   | Main deployment playbook          |
+| `deploy/ansible/templates/dotenv.j2`          | Environment variable template     |
+| `deploy/ansible/templates/systemd-service.j2` | Systemd service template          |
 
 ## Pre-commit Hooks
 
