@@ -26,9 +26,11 @@ cd magento
 ANSIBLE_INVENTORY=/path/to/inventory make deploy
 
 # Selective deploy tags
-ansible-playbook -i ... --tags sync ansible/deploy.yml   # sync src + theme + DB dump only
-ansible-playbook -i ... --tags import ansible/deploy.yml # DB import only
+ansible-playbook -i ... --tags sync ansible/deploy.yml   # sync src + theme only
 ansible-playbook -i ... --tags urls ansible/deploy.yml   # update base URLs only
+
+# Restore a database backup (separate from deploy; not run automatically)
+ANSIBLE_INVENTORY=/path/to/inventory make restore-db
 ```
 
 Inventory, `auth.json`, and `magento-final.sql` live in the configs repo at
