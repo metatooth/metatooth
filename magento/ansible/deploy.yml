@@ -7,25 +7,28 @@
         state: directory
 
     - name: Sync Magento source
+      become: yes
       synchronize:
         src: "{{ playbook_dir }}/../src/"
         dest: "{{ build_dir }}/public_html/"
+        delete: yes
         rsync_opts:
           - "--exclude=.gitignore"
+          - "--exclude=/var"
+          - "--exclude=/generated"
+          - "--exclude=/pub/media"
+          - "--exclude=/pub/static"
+          - "--exclude=/app/etc/env.php"
+          - "--exclude=/app/etc/config.php"
       tags: sync
 
     - name: Sync active theme
+      become: yes
       synchronize:
         src: "{{ playbook_dir }}/../themes/metatooth/default/"
         dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/threetwenty/"
         rsync_opts:
           - "--exclude=.gitignore"
-      tags: sync
-
-    - name: Copy database dump
-      synchronize:
-        src: "{{ db_dump_path }}"
-        dest: "{{ build_dir }}/magento-final.sql"
       tags: sync
 
     - name: Ensure /root/.composer dir exists
@@ -43,17 +46,6 @@
         mode: '0600'
 
 
-    - name: Import database dump
-      ansible.builtin.shell:
-        cmd: >
-          grep -v "^CREATE DATABASE\|^USE " {{ build_dir }}/magento-final.sql |
-          sed "s/ DEFINER=\`[^\`]*\`@\`[^\`]*\`//" |
-          mysql -h {{ db_host }} -P {{ db_port | default('3306') }}
-          -u {{ db_user }} {{ db_name }}
-      environment:
-        MYSQL_PWD: "{{ db_password }}"
-      tags: import
-
     - name: Install env.php
       become: yes
       template:
@@ -63,18 +55,23 @@
         group: root
         mode: '0644'
 
-    - name: Set writable directory permissions
+    - name: Set ownership for container app user on writable directories
       become: yes
       ansible.builtin.shell:
-        cmd: >
-          chown -R {{ ansible_user }}:{{ ansible_user }} {{ build_dir }}/public_html/{{ item }} &&
-          chmod -R 775 {{ build_dir }}/public_html/{{ item }}
+        cmd: chown -R 1000:1000 {{ build_dir }}/public_html/{{ item }}
       loop:
         - var
         - pub/static
         - pub/media
         - generated
-        - app/etc
+      changed_when: true
+
+    - name: Set ownership for container app user on app/etc/config.php
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+        owner: "1000"
+        group: "1000"
 
     - name: Install refresh script
       template:
@@ -129,15 +126,16 @@
       become: yes
       ansible.builtin.shell:
         cmd: |
-          docker exec php-{{ site_slug }}-1 mkdir -p /root/.composer
-          docker cp /root/.composer/auth.json php-{{ site_slug }}-1:/root/.composer/auth.json
+          docker exec php-{{ site_slug }}-1 mkdir -p /var/www/.composer
+          docker cp /root/.composer/auth.json php-{{ site_slug }}-1:/var/www/.composer/auth.json
+          docker exec -u root php-{{ site_slug }}-1 chown -R app:app /var/www/.composer
 
     - name: Install composer dependencies
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
-          composer install --no-dev --optimize-autoloader -d /var/www/html
+          docker exec -e COMPOSER_DISABLE_PARALLEL_INSTALL=1 -e COMPOSER_PROCESS_TIMEOUT=1800 php-{{ site_slug }}-1
+          composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-ftp -d /var/www/html
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
@@ -146,7 +144,21 @@
           docker exec php-{{ site_slug }}-1
           composer dump-autoload -d /var/www/html
 
-    - name: Compile DI
+    - name: Compile DI (pass 1 — unblocks setup:upgrade's non-compiled DI resolution for brand-new modules)
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          php /var/www/html/bin/magento setup:di:compile
+
+    - name: Run setup:upgrade (registers new modules, applies schema/data patches)
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          php /var/www/html/bin/magento setup:upgrade --keep-generated
+
+    - name: Compile DI (pass 2 — final, covers everything setup:upgrade just enabled)
       become: yes
       ansible.builtin.shell:
         cmd: >
@@ -163,20 +175,11 @@
     - name: Configure OpenSearch as search engine
       become: yes
       ansible.builtin.shell:
-        cmd: >
-          docker exec php-{{ site_slug }}-1
-          php /var/www/html/bin/magento setup:config:set
-          --search-engine=opensearch
-          --opensearch-host={{ site_slug }}_opensearch
-          --opensearch-port=9200
-          --no-interaction
-
-    - name: Run setup:upgrade
-      become: yes
-      ansible.builtin.shell:
-        cmd: >
-          docker exec php-{{ site_slug }}-1
-          php /var/www/html/bin/magento setup:upgrade --keep-generated
+        cmd: |
+          set -e
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/engine opensearch
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_hostname {{ site_slug }}_opensearch
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_port 9200
 
     - name: Deploy static content
       become: yes

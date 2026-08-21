@@ -1,0 +1,30 @@
+- hosts: servers
+
+  tasks:
+    - name: Ensure {{ build_dir }} dir exists
+      file:
+        path: "{{ build_dir }}"
+        state: directory
+
+    - name: Copy database dump
+      become: yes
+      synchronize:
+        src: "{{ db_dump_path }}"
+        dest: "{{ build_dir }}/magento-final.sql"
+
+    - name: Import database dump
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          grep -v "^CREATE DATABASE\|^USE " {{ build_dir }}/magento-final.sql |
+          sed "s/ DEFINER=\`[^\`]*\`@\`[^\`]*\`//" |
+          mysql -h {{ db_host }} -P {{ db_port | default('3306') }}
+          -u {{ db_user }} {{ db_name }}
+      environment:
+        MYSQL_PWD: "{{ db_password }}"
+
+    - name: Remove database dump from server
+      become: yes
+      file:
+        path: "{{ build_dir }}/magento-final.sql"
+        state: absent
