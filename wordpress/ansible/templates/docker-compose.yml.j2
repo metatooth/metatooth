@@ -1,6 +1,6 @@
 services:
   {{ site_slug }}_wordpress:
-    image: wordpress:6.5.5-php8.3-fpm-alpine
+    image: {{ wordpress_image }}
     container_name: wordpress-{{ site_slug }}-1
     restart: unless-stopped
     env_file: .env

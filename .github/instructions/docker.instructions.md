@@ -11,7 +11,7 @@ applyTo: "**/docker-compose.yml"
 
 ## Image Versions
 - Pin specific image versions, avoid `latest` tag
-- Current versions: `wordpress:6.5.5-php8.3-fpm-alpine`, `nginx:1.27.0-alpine`
+- Current versions: `wordpress:7.1-php8.3-fpm-alpine`, `nginx:1.27.0-alpine`
 
 ## Volume Configuration
 - Use named volumes for persistent data

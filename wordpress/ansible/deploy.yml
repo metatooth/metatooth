@@ -1,5 +1,8 @@
 - hosts: servers
 
+  vars:
+    wordpress_image: wordpress:7.1-php8.3-fpm-alpine
+
   tasks:
     - name: Ensures {{ build_dir }} dir exists
       file:
@@ -33,9 +36,21 @@
         group: root
         mode: '0644'
 
+    - name: Pull {{ wordpress_image }}
+      become: yes
+      ansible.builtin.shell:
+        cmd: docker pull {{ wordpress_image }}
+
+    - name: Resync WordPress core files into {{ volume_name }} (preserving wp-content)
+      become: yes
+      ansible.builtin.shell:
+        cmd: >-
+          docker run --rm -v {{ volume_name }}:/var/www/html {{ wordpress_image }}
+          sh -c "tar --exclude='wp-content' -cf - -C /usr/src/wordpress . | tar xf - -C /var/www/html"
+
     - name: Run docker compose up
       ansible.builtin.shell:
-        cmd: cd {{ build_dir }} && docker compose up -d --remove-orphans
+        cmd: cd {{ build_dir }} && docker compose up -d --remove-orphans --force-recreate
 
     - name: Install {{ site_domain }} service
       become: yes
