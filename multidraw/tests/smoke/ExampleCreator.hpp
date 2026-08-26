@@ -14,7 +14,7 @@ class ExampleCreator : public Creator {
 public:
   ExampleCreator();
 
-  ExampleComponent* read_stl(const fs::path& source);
+  static ExampleComponent* read_stl(const fs::path& source);
 };
 
 #endif  // EXAMPLE_CREATOR_HPP

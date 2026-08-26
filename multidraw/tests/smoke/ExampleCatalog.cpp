@@ -18,9 +18,7 @@ ExampleCatalog::retrieve(const fs::path& source, Component*& comp)
 {
   std::cout << "Ready to retrieve " << source.string() << std::endl;
 
-  ExampleCreator* creator = dynamic_cast<ExampleCreator*>(this->creator());
-
-  comp = dynamic_cast<Component*>(creator->read_stl(source));
+  comp = dynamic_cast<Component*>(ExampleCreator::read_stl(source));
 
   return false;
 }  // retrieve

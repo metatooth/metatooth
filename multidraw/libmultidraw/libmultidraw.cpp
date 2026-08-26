@@ -37,7 +37,7 @@ libmultidraw()
 #endif
 
 // Libstdc++
-#if defined _GLIBCXX_USE_CXX11_ABI
+#ifdef _GLIBCXX_USE_CXX11_ABI
   std::cout << "  libmultidraw/0.1: _GLIBCXX_USE_CXX11_ABI " << _GLIBCXX_USE_CXX11_ABI << "\n";
 #endif
 

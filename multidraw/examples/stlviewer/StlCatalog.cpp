@@ -17,7 +17,7 @@ StlCatalog::retrieve(const fs::path& source, Component*& comp)
     return false;
   }
 
-  comp = dynamic_cast<Component*>(creator->read_stl(source));
+  comp = dynamic_cast<Component*>(StlCreator::read_stl(source));
 
   // Returning true tells the Editor a Component was produced, so it will be
   // installed as the model the Viewer renders.

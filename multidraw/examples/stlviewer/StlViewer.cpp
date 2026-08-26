@@ -12,9 +12,16 @@
 const int CLIP = 1000;
 const float DARK = 0.15F;
 const float ROTATE_SPEED = 0.5F;
+const double HALF = 0.5;
+const float INITIAL_ROT_X = 20.0F;
+const float INITIAL_ROT_Y = -30.0F;
 
 StlViewer::StlViewer(int posx, int posy, int width, int height, Editor* editor) :
-    Viewer(posx, posy, width, height, editor), _rot_x(20.0F), _rot_y(-30.0F), _last_x(0), _last_y(0)
+    Viewer(posx, posy, width, height, editor),
+    _rot_x(INITIAL_ROT_X),
+    _rot_y(INITIAL_ROT_Y),
+    _last_x(0),
+    _last_y(0)
 {
 }  // constructor
 
@@ -28,7 +35,7 @@ StlViewer::draw()
 
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(-pixel_w() / 2.0, pixel_w() / 2.0, -pixel_h() / 2.0, pixel_h() / 2.0, -CLIP, CLIP);
+    glOrtho(-pixel_w() * HALF, pixel_w() * HALF, -pixel_h() * HALF, pixel_h() * HALF, -CLIP, CLIP);
 
     glClearColor(DARK, DARK, DARK, 1.0F);
 
@@ -71,8 +78,8 @@ StlViewer::keys(int key)
   case 'r':
     // Frame the model again: reset() restores the base zoom/pan.
     reset();
-    _rot_x = 20.0F;
-    _rot_y = -30.0F;
+    _rot_x = INITIAL_ROT_X;
+    _rot_y = INITIAL_ROT_Y;
     redraw();
     return 1;
   case 'q':

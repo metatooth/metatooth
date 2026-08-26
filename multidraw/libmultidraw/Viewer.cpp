@@ -102,7 +102,7 @@ Viewer::handle(int event)
 {
   switch (event) {
   case FL_MOUSEWHEEL:
-    zoom(1 + Fl::event_dy() / SCALE);
+    zoom(1 + (Fl::event_dy() / SCALE));
     return 1;
   case FL_KEYUP:
   case FL_KEYDOWN:
