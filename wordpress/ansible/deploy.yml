@@ -36,16 +36,16 @@
         group: root
         mode: '0644'
 
-    - name: Pull {{ wordpress_image }}
+    - name: Pull images
       become: yes
       ansible.builtin.shell:
-        cmd: docker pull {{ wordpress_image }}
+        cmd: cd {{ build_dir }} && docker compose pull
 
-    - name: Resync WordPress core files into {{ volume_name }} (preserving wp-content)
+    - name: Resync WordPress core files (preserving wp-content)
       become: yes
       ansible.builtin.shell:
         cmd: >-
-          docker run --rm -v {{ volume_name }}:/var/www/html {{ wordpress_image }}
+          cd {{ build_dir }} && docker compose run --rm --no-deps -T {{ site_slug }}_wordpress
           sh -c "tar --exclude='wp-content' -cf - -C /usr/src/wordpress . | tar xf - -C /var/www/html"
 
     - name: Run docker compose up
