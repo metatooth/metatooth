@@ -33,6 +33,20 @@
           - "--exclude=.gitignore"
       tags: sync
 
+    - name: Check for config.php in source tree
+      delegate_to: localhost
+      become: no
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../src/app/etc/config.php"
+      register: magento_source_config_php
+
+    - name: Check for config.php in inventory
+      delegate_to: localhost
+      become: no
+      ansible.builtin.stat:
+        path: "{{ inventory_dir }}/config.php"
+      register: magento_inventory_config_php
+
     - name: Check for composer.lock in source tree
       delegate_to: localhost
       become: no
@@ -96,6 +110,28 @@
         owner: root
         group: root
         mode: '0644'
+
+    - name: Install config.php from source tree when provided
+      become: yes
+      ansible.builtin.copy:
+        src: "{{ playbook_dir }}/../src/app/etc/config.php"
+        dest: "{{ build_dir }}/public_html/app/etc/config.php"
+        owner: root
+        group: root
+        mode: '0644'
+      when: magento_source_config_php.stat.exists
+
+    - name: Install config.php from inventory when source tree does not include it
+      become: yes
+      ansible.builtin.copy:
+        src: "{{ inventory_dir }}/config.php"
+        dest: "{{ build_dir }}/public_html/app/etc/config.php"
+        owner: root
+        group: root
+        mode: '0644'
+      when:
+        - not magento_source_config_php.stat.exists
+        - magento_inventory_config_php.stat.exists
 
     - name: Ensure required writable directories exist for container app user
       become: yes
@@ -205,7 +241,10 @@
         cmd: >
           docker exec php-{{ site_slug }}-1
           php /var/www/html/bin/magento module:enable --all
-      when: not magento_config_php.stat.exists
+      when:
+        - not magento_config_php.stat.exists
+        - not magento_source_config_php.stat.exists
+        - not magento_inventory_config_php.stat.exists
 
     - name: Check whether app/etc/config.php exists after bootstrap
       become: yes
@@ -219,7 +258,10 @@
         path: "{{ build_dir }}/public_html/app/etc/config.php"
         owner: "1000"
         group: "1000"
-      when: magento_config_php_ready.stat.exists
+      when:
+        - magento_config_php_ready.stat.exists
+        - not magento_source_config_php.stat.exists
+        - not magento_inventory_config_php.stat.exists
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
