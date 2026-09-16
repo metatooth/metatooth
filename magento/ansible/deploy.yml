@@ -261,10 +261,7 @@
         path: "{{ build_dir }}/public_html/app/etc/config.php"
         owner: "{{ magento_app_owner }}"
         group: "{{ magento_app_group }}"
-      when:
-        - magento_config_php_ready.stat.exists
-        - not magento_source_config_php.stat.exists
-        - not magento_inventory_config_php.stat.exists
+      when: magento_config_php_ready.stat.exists
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
