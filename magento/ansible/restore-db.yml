@@ -11,8 +11,8 @@
       synchronize:
         src: "{{ db_dump_path }}"
         dest: "{{ build_dir }}/magento-final.sql"
-
-    - name: Import database dump
+        rsync_opts:
+          - "--chmod=Fu=rw,Fgo="
       become: yes
       ansible.builtin.shell:
         cmd: >
