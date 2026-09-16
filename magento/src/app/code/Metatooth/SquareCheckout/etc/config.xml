@@ -3,7 +3,7 @@
     <default>
         <payment>
             <squarecheckout>
-                <active>1</active>
+                <active>0</active>
                 <title>Pay with Square</title>
                 <order_status>pending</order_status>
                 <sandbox>1</sandbox>
