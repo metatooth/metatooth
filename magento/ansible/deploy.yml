@@ -170,12 +170,6 @@
       loop: "{{ magento_generated_paths.results }}"
       when: item.stat.exists
 
-    - name: Check whether app/etc/config.php already exists
-      become: yes
-      ansible.builtin.stat:
-        path: "{{ build_dir }}/public_html/app/etc/config.php"
-      register: magento_config_php
-
     - name: Install refresh script
       template:
         src: ./templates/refresh.j2
@@ -240,22 +234,19 @@
           docker exec -e COMPOSER_DISABLE_PARALLEL_INSTALL=1 -e COMPOSER_PROCESS_TIMEOUT=1800 php-{{ site_slug }}-1
           composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-ftp -d /var/www/html
 
-    - name: Generate app/etc/config.php for first-time deployments
-      become: yes
-      ansible.builtin.shell:
-        cmd: >
-          docker exec php-{{ site_slug }}-1
-          php /var/www/html/bin/magento module:enable --all
-      when:
-        - not magento_config_php.stat.exists
-        - not magento_source_config_php.stat.exists
-        - not magento_inventory_config_php.stat.exists
-
-    - name: Check whether app/etc/config.php exists after bootstrap
+    - name: Check whether app/etc/config.php exists before Magento bootstrap
       become: yes
       ansible.builtin.stat:
         path: "{{ build_dir }}/public_html/app/etc/config.php"
       register: magento_config_php_ready
+
+    - name: Require app/etc/config.php before Magento bootstrap
+      ansible.builtin.assert:
+        that:
+          - magento_config_php_ready.stat.exists
+        fail_msg: >
+          app/etc/config.php must already exist in the release or be provided from
+          source/inventory before running Magento CLI tasks.
 
     - name: Set ownership for container app user on app/etc/config.php
       become: yes
@@ -263,7 +254,6 @@
         path: "{{ build_dir }}/public_html/app/etc/config.php"
         owner: "{{ magento_app_owner }}"
         group: "{{ magento_app_group }}"
-      when: magento_config_php_ready.stat.exists
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
