@@ -1,4 +1,7 @@
 - hosts: servers
+  vars:
+    magento_app_owner: "{{ magento_container_app_uid | default('1000') }}"
+    magento_app_group: "{{ magento_container_app_gid | default('1000') }}"
 
   tasks:
     - name: Ensure {{ build_dir }} dir exists
@@ -138,8 +141,8 @@
       ansible.builtin.file:
         path: "{{ build_dir }}/public_html/{{ item }}"
         state: directory
-        owner: "1000"
-        group: "1000"
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
         recurse: yes
       loop:
         - var
@@ -159,8 +162,8 @@
       ansible.builtin.file:
         path: "{{ build_dir }}/public_html/{{ item.item }}"
         state: directory
-        owner: "1000"
-        group: "1000"
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
         recurse: yes
       loop: "{{ magento_generated_paths.results }}"
       when: item.stat.exists
@@ -256,8 +259,8 @@
       become: yes
       ansible.builtin.file:
         path: "{{ build_dir }}/public_html/app/etc/config.php"
-        owner: "1000"
-        group: "1000"
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
       when:
         - magento_config_php_ready.stat.exists
         - not magento_source_config_php.stat.exists
