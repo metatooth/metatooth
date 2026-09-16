@@ -143,7 +143,6 @@
         state: directory
         owner: "{{ magento_app_owner }}"
         group: "{{ magento_app_group }}"
-        recurse: yes
       loop:
         - var
         - pub/media
