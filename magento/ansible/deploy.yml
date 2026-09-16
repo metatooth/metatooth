@@ -14,6 +14,8 @@
         delete: yes
         rsync_opts:
           - "--exclude=.gitignore"
+          - "--filter=P /app/etc/env.php"
+          - "--filter=P /app/etc/config.php"
           - "--exclude=/var"
           - "--exclude=/generated"
           - "--exclude=/pub/media"
@@ -95,7 +97,7 @@
         group: root
         mode: '0644'
 
-    - name: Set ownership for container app user on writable directories
+    - name: Ensure required writable directories exist for container app user
       become: yes
       ansible.builtin.file:
         path: "{{ build_dir }}/public_html/{{ item }}"
@@ -105,9 +107,27 @@
         recurse: yes
       loop:
         - var
-        - pub/static
         - pub/media
+
+    - name: Check whether generated writable directories already exist
+      become: yes
+      ansible.builtin.stat:
+        path: "{{ build_dir }}/public_html/{{ item }}"
+      loop:
+        - pub/static
         - generated
+      register: magento_generated_paths
+
+    - name: Set ownership for generated writable directories when present
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/{{ item.item }}"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        recurse: yes
+      loop: "{{ magento_generated_paths.results }}"
+      when: item.stat.exists
 
     - name: Check whether app/etc/config.php already exists
       become: yes
