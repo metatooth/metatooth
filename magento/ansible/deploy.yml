@@ -14,6 +14,7 @@
         delete: yes
         rsync_opts:
           - "--exclude=.gitignore"
+          - "--filter=P /composer.lock"
           - "--exclude=/var"
           - "--exclude=/generated"
           - "--exclude=/pub/media"
@@ -30,6 +31,20 @@
         rsync_opts:
           - "--exclude=.gitignore"
       tags: sync
+
+    - name: Check for composer.lock in the deployed release
+      become: yes
+      ansible.builtin.stat:
+        path: "{{ build_dir }}/public_html/composer.lock"
+      register: magento_composer_lock
+
+    - name: Require composer.lock for deterministic Composer installs
+      ansible.builtin.assert:
+        that:
+          - magento_composer_lock.stat.exists
+        fail_msg: >
+          composer.lock must be present in {{ build_dir }}/public_html before running
+          composer install so deployments stay deterministic.
 
     - name: Ensure /root/.composer dir exists
       become: yes
@@ -57,14 +72,23 @@
 
     - name: Set ownership for container app user on writable directories
       become: yes
-      ansible.builtin.shell:
-        cmd: chown -R 1000:1000 {{ build_dir }}/public_html/{{ item }}
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/{{ item }}"
+        state: directory
+        owner: "1000"
+        group: "1000"
+        recurse: yes
       loop:
         - var
         - pub/static
         - pub/media
         - generated
-      changed_when: true
+
+    - name: Check whether app/etc/config.php already exists
+      become: yes
+      ansible.builtin.stat:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+      register: magento_config_php
 
     - name: Set ownership for container app user on app/etc/config.php
       become: yes
@@ -72,6 +96,7 @@
         path: "{{ build_dir }}/public_html/app/etc/config.php"
         owner: "1000"
         group: "1000"
+      when: magento_config_php.stat.exists
 
     - name: Install refresh script
       template:
