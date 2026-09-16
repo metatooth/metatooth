@@ -143,6 +143,7 @@
         state: directory
         owner: "{{ magento_app_owner }}"
         group: "{{ magento_app_group }}"
+        mode: '0775'
       loop:
         - var
         - pub/media
@@ -154,6 +155,7 @@
       loop:
         - pub/static
         - generated
+        - var/view_preprocessed
       register: magento_generated_paths
 
     - name: Set ownership for generated writable directories when present
@@ -163,6 +165,7 @@
         state: directory
         owner: "{{ magento_app_owner }}"
         group: "{{ magento_app_group }}"
+        mode: '0775'
         recurse: yes
       loop: "{{ magento_generated_paths.results }}"
       when: item.stat.exists
