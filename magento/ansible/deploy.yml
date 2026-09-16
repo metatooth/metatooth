@@ -187,12 +187,19 @@
           php /var/www/html/bin/magento module:enable --all
       when: not magento_config_php.stat.exists
 
+    - name: Check whether app/etc/config.php exists after bootstrap
+      become: yes
+      ansible.builtin.stat:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+      register: magento_config_php_ready
+
     - name: Set ownership for container app user on app/etc/config.php
       become: yes
       ansible.builtin.file:
         path: "{{ build_dir }}/public_html/app/etc/config.php"
         owner: "1000"
         group: "1000"
+      when: magento_config_php_ready.stat.exists
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
