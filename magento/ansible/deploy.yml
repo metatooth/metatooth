@@ -115,14 +115,6 @@
         path: "{{ build_dir }}/public_html/app/etc/config.php"
       register: magento_config_php
 
-    - name: Set ownership for container app user on app/etc/config.php
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html/app/etc/config.php"
-        owner: "1000"
-        group: "1000"
-      when: magento_config_php.stat.exists
-
     - name: Install refresh script
       template:
         src: ./templates/refresh.j2
@@ -186,6 +178,21 @@
         cmd: >
           docker exec -e COMPOSER_DISABLE_PARALLEL_INSTALL=1 -e COMPOSER_PROCESS_TIMEOUT=1800 php-{{ site_slug }}-1
           composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-ftp -d /var/www/html
+
+    - name: Generate app/etc/config.php for first-time deployments
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec php-{{ site_slug }}-1
+          php /var/www/html/bin/magento module:enable --all
+      when: not magento_config_php.stat.exists
+
+    - name: Set ownership for container app user on app/etc/config.php
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+        owner: "1000"
+        group: "1000"
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes

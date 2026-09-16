@@ -27,6 +27,7 @@
       register: magento_service_status
       changed_when: false
       failed_when: false
+      when: magento_service_unit.stat.exists
 
     - name: Restore database safely
       block:
@@ -37,7 +38,7 @@
             state: stopped
           when:
             - magento_service_unit.stat.exists
-            - magento_service_status.rc == 0
+            - magento_service_status.rc | default(1) == 0
 
         - name: Import database dump
           become: yes
