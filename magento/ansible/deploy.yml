@@ -126,32 +126,10 @@
       ansible.builtin.copy:
         src: "{{ inventory_dir }}/config.php"
         dest: "{{ build_dir }}/public_html/app/etc/config.php"
-        owner: "{{ magento_app_owner }}"
-        group: "{{ magento_app_group }}"
+        owner: root
+        group: root
         mode: '0644'
       when: magento_inventory_config_php.stat.exists
-
-    - name: Allow deployment tasks to update app/etc/config.php
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html/app/etc/config.php"
-        owner: "{{ magento_app_owner }}"
-        group: "{{ magento_app_group }}"
-
-    - name: Remove vendor dir before Composer install
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html/vendor"
-        state: absent
-
-    - name: Recreate vendor dir for container app user
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html/vendor"
-        state: directory
-        owner: "{{ magento_app_owner }}"
-        group: "{{ magento_app_group }}"
-        mode: '0775'
 
     - name: Ensure required writable directories exist for container app user
       become: yes
@@ -225,28 +203,12 @@
           docker cp /root/.composer/auth.json php-{{ site_slug }}-1:/var/www/.composer/auth.json
           docker exec -u root php-{{ site_slug }}-1 chown -R app:app /var/www/.composer
 
-    - name: Allow Composer to update composer.lock during install
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html/composer.lock"
-        owner: "{{ magento_app_owner }}"
-        group: "{{ magento_app_group }}"
-        mode: '0644'
-
     - name: Install composer dependencies
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec -e COMPOSER_DISABLE_PARALLEL_INSTALL=1 -e COMPOSER_PROCESS_TIMEOUT=1800 php-{{ site_slug }}-1
+          docker exec -u root -e COMPOSER_DISABLE_PARALLEL_INSTALL=1 -e COMPOSER_PROCESS_TIMEOUT=1800 php-{{ site_slug }}-1
           composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-ftp -d /var/www/html
-
-    - name: Restore root ownership on composer.lock after install
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html/composer.lock"
-        owner: root
-        group: root
-        mode: '0644'
 
     - name: Check whether app/etc/config.php exists before Magento bootstrap
       become: yes
@@ -266,7 +228,7 @@
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
+          docker exec -u root php-{{ site_slug }}-1
           composer dump-autoload -d /var/www/html
 
     - name: Compile DI (pass 1 — unblocks setup:upgrade's non-compiled DI resolution for brand-new modules)
@@ -280,28 +242,21 @@
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
+          docker exec -u root php-{{ site_slug }}-1
           php /var/www/html/bin/magento setup:upgrade --keep-generated
-
-    - name: Restore root ownership on app/etc/config.php after setup:upgrade
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html/app/etc/config.php"
-        owner: root
-        group: root
 
     - name: Compile DI (pass 2 — final, covers everything setup:upgrade just enabled)
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
+          docker exec -u root php-{{ site_slug }}-1
           php /var/www/html/bin/magento setup:di:compile
 
     - name: Regenerate autoloader (optimized — now that proxies exist)
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
+          docker exec -u root php-{{ site_slug }}-1
           composer dump-autoload --optimize -d /var/www/html
 
     - name: Configure OpenSearch as search engine
@@ -322,7 +277,7 @@
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
+          docker exec -u root php-{{ site_slug }}-1
           php /var/www/html/bin/magento setup:static-content:deploy -f en_US
         chdir: "{{ build_dir }}"
       tags: static
