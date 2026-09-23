@@ -126,10 +126,19 @@
       ansible.builtin.copy:
         src: "{{ inventory_dir }}/config.php"
         dest: "{{ build_dir }}/public_html/app/etc/config.php"
-        owner: root
-        group: root
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
         mode: '0644'
       when: magento_inventory_config_php.stat.exists
+
+    - name: Ensure vendor dir exists for container app user
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/vendor"
+        state: directory
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
+        mode: '0775'
 
     - name: Ensure required writable directories exist for container app user
       become: yes
@@ -141,7 +150,6 @@
         mode: '0775'
         recurse: yes
       loop:
-        - vendor
         - var
         - pub/media
         - pub/static
@@ -226,6 +234,13 @@
           app/etc/config.php must already exist in the release or be provided from
           inventory before running Magento CLI tasks.
 
+    - name: Allow Magento CLI to update app/etc/config.php during bootstrap
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
+
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
       ansible.builtin.shell:
@@ -246,6 +261,13 @@
         cmd: >
           docker exec php-{{ site_slug }}-1
           php /var/www/html/bin/magento setup:upgrade --keep-generated
+
+    - name: Restore root ownership on app/etc/config.php after setup:upgrade
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+        owner: root
+        group: root
 
     - name: Compile DI (pass 2 — final, covers everything setup:upgrade just enabled)
       become: yes
