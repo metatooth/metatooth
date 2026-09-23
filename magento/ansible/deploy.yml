@@ -131,6 +131,13 @@
         mode: '0644'
       when: magento_inventory_config_php.stat.exists
 
+    - name: Allow deployment tasks to update app/etc/config.php
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
+
     - name: Ensure vendor dir exists for container app user
       become: yes
       ansible.builtin.file:
@@ -212,12 +219,26 @@
           docker cp /root/.composer/auth.json php-{{ site_slug }}-1:/var/www/.composer/auth.json
           docker exec -u root php-{{ site_slug }}-1 chown -R app:app /var/www/.composer
 
+    - name: Allow Composer to update composer.lock during install
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/composer.lock"
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
+
     - name: Install composer dependencies
       become: yes
       ansible.builtin.shell:
         cmd: >
           docker exec -e COMPOSER_DISABLE_PARALLEL_INSTALL=1 -e COMPOSER_PROCESS_TIMEOUT=1800 php-{{ site_slug }}-1
           composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-ftp -d /var/www/html
+
+    - name: Restore root ownership on composer.lock after install
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/composer.lock"
+        owner: root
+        group: root
 
     - name: Check whether app/etc/config.php exists before Magento bootstrap
       become: yes
@@ -232,13 +253,6 @@
         fail_msg: >
           app/etc/config.php must already exist in the release or be provided from
           inventory before running Magento CLI tasks.
-
-    - name: Allow Magento CLI to update app/etc/config.php during bootstrap
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html/app/etc/config.php"
-        owner: "{{ magento_app_owner }}"
-        group: "{{ magento_app_group }}"
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
