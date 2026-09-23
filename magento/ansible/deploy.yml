@@ -11,7 +11,7 @@
 
     - name: Sync Magento source
       become: yes
-      synchronize:
+      ansible.posix.synchronize:
         src: "{{ playbook_dir }}/../src/"
         dest: "{{ build_dir }}/public_html/"
         delete: yes
@@ -29,7 +29,7 @@
 
     - name: Sync active theme
       become: yes
-      synchronize:
+      ansible.posix.synchronize:
         src: "{{ playbook_dir }}/../themes/metatooth/default/"
         dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/threetwenty/"
         rsync_opts:
@@ -309,6 +309,7 @@
       ansible.builtin.shell:
         cmd: |
           set -e
+          docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento setup:config:set --search-engine=opensearch --opensearch-host={{ site_slug }}_opensearch --opensearch-port=9200
           docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/engine opensearch
           docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_hostname {{ site_slug }}_opensearch
           docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_port 9200

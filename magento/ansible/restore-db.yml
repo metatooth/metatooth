@@ -45,10 +45,10 @@
           ansible.builtin.shell:
             cmd: |
               set -o pipefail
-              grep -v "^CREATE DATABASE\|^USE " {{ build_dir }}/magento-final.sql | \
+              grep -v "^CREATE DATABASE\|^USE " {{ (build_dir ~ '/magento-final.sql') | quote }} | \
                 sed "s/ DEFINER=\`[^\`]*\`@\`[^\`]*\`//" | \
-                mysql -h {{ db_host }} -P {{ db_port | default('3306') }} \
-                  -u {{ db_user }} {{ db_name }}
+                mysql -h {{ db_host | quote }} -P {{ (db_port | default('3306')) | quote }} \
+                  -u {{ db_user | quote }} {{ db_name | quote }}
             executable: /bin/bash
           environment:
             MYSQL_PWD: "{{ db_password }}"
