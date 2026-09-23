@@ -138,7 +138,13 @@
         owner: "{{ magento_app_owner }}"
         group: "{{ magento_app_group }}"
 
-    - name: Ensure vendor dir exists for container app user
+    - name: Remove vendor dir before Composer install
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/vendor"
+        state: absent
+
+    - name: Recreate vendor dir for container app user
       become: yes
       ansible.builtin.file:
         path: "{{ build_dir }}/public_html/vendor"
@@ -225,6 +231,7 @@
         path: "{{ build_dir }}/public_html/composer.lock"
         owner: "{{ magento_app_owner }}"
         group: "{{ magento_app_group }}"
+        mode: '0644'
 
     - name: Install composer dependencies
       become: yes
@@ -239,6 +246,7 @@
         path: "{{ build_dir }}/public_html/composer.lock"
         owner: root
         group: root
+        mode: '0644'
 
     - name: Check whether app/etc/config.php exists before Magento bootstrap
       become: yes
