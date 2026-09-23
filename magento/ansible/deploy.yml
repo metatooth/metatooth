@@ -36,12 +36,14 @@
           - "--exclude=.gitignore"
       tags: sync
 
-    - name: Check for config.php in source tree
-      delegate_to: localhost
-      become: no
-      ansible.builtin.stat:
-        path: "{{ playbook_dir }}/../src/app/etc/config.php"
-      register: magento_source_config_php
+    - name: Ensure Magento release root exists for container app user
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html"
+        state: directory
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
+        mode: '0775'
 
     - name: Check for config.php in inventory
       delegate_to: localhost
@@ -114,17 +116,7 @@
         group: root
         mode: '0644'
 
-    - name: Install config.php from source tree when provided
-      become: yes
-      ansible.builtin.copy:
-        src: "{{ playbook_dir }}/../src/app/etc/config.php"
-        dest: "{{ build_dir }}/public_html/app/etc/config.php"
-        owner: root
-        group: root
-        mode: '0644'
-      when: magento_source_config_php.stat.exists
-
-    - name: Install config.php from inventory when source tree does not include it
+    - name: Install config.php from inventory when provided
       become: yes
       ansible.builtin.copy:
         src: "{{ inventory_dir }}/config.php"
@@ -132,9 +124,7 @@
         owner: root
         group: root
         mode: '0644'
-      when:
-        - not magento_source_config_php.stat.exists
-        - magento_inventory_config_php.stat.exists
+      when: magento_inventory_config_php.stat.exists
 
     - name: Ensure required writable directories exist for container app user
       become: yes
@@ -144,31 +134,13 @@
         owner: "{{ magento_app_owner }}"
         group: "{{ magento_app_group }}"
         mode: '0775'
+        recurse: yes
       loop:
         - var
         - pub/media
-
-    - name: Check whether generated writable directories already exist
-      become: yes
-      ansible.builtin.stat:
-        path: "{{ build_dir }}/public_html/{{ item }}"
-      loop:
         - pub/static
         - generated
         - var/view_preprocessed
-      register: magento_generated_paths
-
-    - name: Set ownership for generated writable directories when present
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html/{{ item.item }}"
-        state: directory
-        owner: "{{ magento_app_owner }}"
-        group: "{{ magento_app_group }}"
-        mode: '0775'
-        recurse: yes
-      loop: "{{ magento_generated_paths.results }}"
-      when: item.stat.exists
 
     - name: Install refresh script
       template:
@@ -299,6 +271,9 @@
           docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_hostname {{ site_slug }}_opensearch
           docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_port 9200
         executable: /bin/bash
+      register: magento_opensearch_config
+      changed_when: magento_opensearch_config.rc == 0
+      failed_when: magento_opensearch_config.rc != 0
 
     - name: Deploy static content
       become: yes
