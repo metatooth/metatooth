@@ -111,6 +111,15 @@
         dest: /root/.composer/auth.json
         mode: '0600'
 
+    - name: Ensure app/etc dir exists
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/app/etc"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
 
     - name: Install env.php
       become: yes
