@@ -36,21 +36,26 @@
           - "--exclude=.gitignore"
       tags: sync
 
-    - name: Ensure Magento release root exists for container app user
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html"
-        state: directory
-        owner: "{{ magento_app_owner }}"
-        group: "{{ magento_app_group }}"
-        mode: '0775'
-
     - name: Check for config.php in inventory
       delegate_to: localhost
       become: no
       ansible.builtin.stat:
         path: "{{ inventory_dir }}/config.php"
       register: magento_inventory_config_php
+
+    - name: Check for config.php in the deployed release
+      become: yes
+      ansible.builtin.stat:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+      register: magento_existing_config_php
+
+    - name: Require inventory config.php or preserved deployed config.php before Composer
+      ansible.builtin.assert:
+        that:
+          - magento_inventory_config_php.stat.exists or magento_existing_config_php.stat.exists
+        fail_msg: >
+          app/etc/config.php must already exist in {{ build_dir }}/public_html or be
+          provided as {{ inventory_dir }}/config.php before deployment continues.
 
     - name: Check for composer.lock in source tree
       delegate_to: localhost
@@ -136,6 +141,7 @@
         mode: '0775'
         recurse: yes
       loop:
+        - vendor
         - var
         - pub/media
         - pub/static
@@ -218,7 +224,7 @@
           - magento_config_php_ready.stat.exists
         fail_msg: >
           app/etc/config.php must already exist in the release or be provided from
-          source/inventory before running Magento CLI tasks.
+          inventory before running Magento CLI tasks.
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
