@@ -220,13 +220,6 @@
           app/etc/config.php must already exist in the release or be provided from
           source/inventory before running Magento CLI tasks.
 
-    - name: Set ownership for container app user on app/etc/config.php
-      become: yes
-      ansible.builtin.file:
-        path: "{{ build_dir }}/public_html/app/etc/config.php"
-        owner: "{{ magento_app_owner }}"
-        group: "{{ magento_app_group }}"
-
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
       ansible.builtin.shell:
