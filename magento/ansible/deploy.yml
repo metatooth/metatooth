@@ -265,9 +265,9 @@
         cmd: |
           set -e
           docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento setup:config:set --search-engine=opensearch --opensearch-host={{ site_slug }}_opensearch --opensearch-port=9200
-          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/engine opensearch
-          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_hostname {{ site_slug }}_opensearch
-          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_port 9200
+          docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/engine opensearch
+          docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_hostname {{ site_slug }}_opensearch
+          docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_port 9200
         executable: /bin/bash
       register: magento_opensearch_config
       changed_when: magento_opensearch_config.rc == 0
