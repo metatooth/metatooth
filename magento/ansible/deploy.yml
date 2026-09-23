@@ -235,7 +235,7 @@
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
+          docker exec -u root php-{{ site_slug }}-1
           php /var/www/html/bin/magento setup:di:compile
 
     - name: Run setup:upgrade (registers new modules, applies schema/data patches)
