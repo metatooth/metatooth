@@ -259,6 +259,18 @@
           docker exec -u root php-{{ site_slug }}-1
           composer dump-autoload --optimize -d /var/www/html
 
+    - name: Check whether OpenSearch configuration already matches desired values
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec -u root php-{{ site_slug }}-1 /bin/sh -lc
+          'test "$(php /var/www/html/bin/magento config:show catalog/search/engine 2>/dev/null)" = "opensearch"
+          && test "$(php /var/www/html/bin/magento config:show catalog/search/opensearch_server_hostname 2>/dev/null)" = "{{ site_slug }}_opensearch"
+          && test "$(php /var/www/html/bin/magento config:show catalog/search/opensearch_server_port 2>/dev/null)" = "9200"'
+      register: magento_opensearch_state
+      changed_when: false
+      failed_when: false
+
     - name: Configure OpenSearch as search engine
       become: yes
       ansible.builtin.shell:
@@ -272,6 +284,7 @@
       register: magento_opensearch_config
       changed_when: magento_opensearch_config.rc == 0
       failed_when: magento_opensearch_config.rc != 0
+      when: magento_opensearch_state.rc != 0
 
     - name: Deploy static content
       become: yes
@@ -281,6 +294,13 @@
           php /var/www/html/bin/magento setup:static-content:deploy -f en_US
         chdir: "{{ build_dir }}"
       tags: static
+
+    - name: Restore app ownership on app/etc/config.php after deployment bootstrap
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
 
     - name: Flush Magento cache
       become: yes
