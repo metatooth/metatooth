@@ -1,4 +1,5 @@
 - hosts: servers
+  become: yes
 
   tasks:
     - name: Ensure {{ build_dir }} dir exists
@@ -9,7 +10,6 @@
     - name: Copy and restore database safely
       block:
         - name: Copy database dump
-          become: yes
           ansible.posix.synchronize:
             src: "{{ db_dump_path }}"
             dest: "{{ build_dir }}/magento-final.sql"
@@ -17,13 +17,11 @@
               - "--chmod=Fu=rw,Fgo="
 
         - name: Check whether {{ site_domain }} service unit exists
-          become: yes
           ansible.builtin.stat:
             path: /etc/systemd/system/com.{{ site_slug }}.service
           register: magento_service_unit
 
         - name: Check whether {{ site_domain }} service is running
-          become: yes
           ansible.builtin.shell:
             cmd: systemctl is-active --quiet com.{{ site_slug }}
           register: magento_service_status
@@ -32,7 +30,6 @@
           when: magento_service_unit.stat.exists
 
         - name: Stop {{ site_domain }} service during restore
-          become: yes
           ansible.builtin.systemd:
             name: com.{{ site_slug }}
             state: stopped
@@ -41,7 +38,6 @@
             - magento_service_status.rc | default(1) == 0
 
         - name: Import database dump
-          become: yes
           ansible.builtin.shell:
             cmd: |
               set -o pipefail
@@ -57,13 +53,11 @@
           failed_when: magento_restore_db.rc != 0
       always:
         - name: Remove database dump from server
-          become: yes
           ansible.builtin.file:
             path: "{{ build_dir }}/magento-final.sql"
             state: absent
 
         - name: Start {{ site_domain }} service after restore
-          become: yes
           ansible.builtin.systemd:
             name: com.{{ site_slug }}
             state: started
