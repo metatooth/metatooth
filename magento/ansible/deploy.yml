@@ -36,6 +36,14 @@
           - "--exclude=.gitignore"
       tags: sync
 
+    - name: Ensure release root is writable by container app user
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html"
+        state: directory
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
+
     - name: Check for config.php in inventory
       delegate_to: localhost
       become: no
