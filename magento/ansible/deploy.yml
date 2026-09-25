@@ -210,6 +210,24 @@
       failed_when: magento_base_urls.rc != 0
       tags: urls
 
+    - name: Configure SMTP relay
+      become: yes
+      no_log: true
+      ansible.builtin.shell:
+        cmd: |
+          set -e
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/general/enabled 1
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/host smtp-relay.brevo.com
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/port 587
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/protocol tls
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/authentication login
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/username '{{ brevo_smtp_login }}'
+          docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set smtp/configuration_option/password '{{ brevo_smtp_key }}'
+      register: magento_smtp_config
+      changed_when: magento_smtp_config.rc == 0
+      failed_when: magento_smtp_config.rc != 0
+      tags: mail
+
     - name: Install {{ site_domain }} service
       become: yes
       template:
