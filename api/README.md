@@ -15,7 +15,7 @@ $ sudo apt-get install libpq-dev libxml2-dev postgresql postgresql-server-dev-14
 
 ### get code & install dependencies
 
-``` bash
+```bash
 $ git clone https://github.com/metatooth/api.git
 $ cd api
 $ bundle config set --local path 'vendor/bundle'
@@ -24,7 +24,7 @@ $ bundle install
 
 ### initialize database & environment variables
 
-``` bash
+```bash
 $ sudo -u postgres psql
 postgres=# create database metaspace_development;
 CREATE DATABASE
@@ -37,13 +37,14 @@ $ echo "DATABASE_URL=postgres://metaspace:metaspace@localhost/metaspace_developm
 ```
 
 ### serve with hot reload at localhost:9393
+
 ```
 bundle exec foreman run shotgun
 ```
 
 ### Pull a copy from Heroku
 
-``` bash
+```bash
 $ sudo -u postgres psql
 postgres=# alter user metaspace createdb;
 ALTER ROLE
