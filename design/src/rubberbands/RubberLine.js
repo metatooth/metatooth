@@ -22,12 +22,12 @@
  * OF THIS SOFTWARE.
  */
 
-import {BufferAttribute} from 'three';
-import {BufferGeometry} from 'three';
-import {Line} from 'three';
-import {LineBasicMaterial} from 'three';
+import { BufferAttribute } from "three";
+import { BufferGeometry } from "three";
+import { Line } from "three";
+import { LineBasicMaterial } from "three";
 
-import {Rubberband} from './Rubberband.js';
+import { Rubberband } from "./Rubberband.js";
 
 /**
  * Rubberbanding lines.
@@ -36,20 +36,22 @@ import {Rubberband} from './Rubberband.js';
  * @param {Vector3} moving: the x, y, z coordinates from the mouse
  * @param {Vector3} off: offset x, y, z coordinates
  */
-function RubberLine( fixed, moving, off ) {
+function RubberLine(fixed, moving, off) {
   Rubberband.call(this, off);
-  this.type = 'RubberLine';
+  this.type = "RubberLine";
 
-  this.fixed = (fixed) ? fixed.clone() : null;
-  this.moving = (moving) ? moving.clone() : null;
-  this.tracked = (moving) ? moving.clone() : null;
+  this.fixed = fixed ? fixed.clone() : null;
+  this.moving = moving ? moving.clone() : null;
+  this.tracked = moving ? moving.clone() : null;
 
-  const geometry = new BufferGeometry;
-  geometry.setAttribute( 'position',
-      new BufferAttribute( new Float32Array( 6 ), 3 ) );
-  geometry.setDrawRange( 0, 2 );
+  const geometry = new BufferGeometry();
+  geometry.setAttribute(
+    "position",
+    new BufferAttribute(new Float32Array(6), 3),
+  );
+  geometry.setDrawRange(0, 2);
 
-  const material = new LineBasicMaterial({color: 0xff7700, linewidth: 5});
+  const material = new LineBasicMaterial({ color: 0xff7700, linewidth: 5 });
 
   this.line = new Line(geometry, material);
 
@@ -62,21 +64,20 @@ function RubberLine( fixed, moving, off ) {
   this.add(this.line);
 }
 
-RubberLine.prototype = Object.assign( Object.create( Rubberband.prototype ), {
-
+RubberLine.prototype = Object.assign(Object.create(Rubberband.prototype), {
   constructor: RubberLine,
 
   isRubberLine: true,
 
-  original: function() {
+  original: function () {
     return [this.fixed, this.moving];
   },
 
-  current: function() {
+  current: function () {
     return [this.fixed, this.tracked];
   },
 
-  update: function() {
+  update: function () {
     const curr = this.current();
 
     const positions = this.line.geometry.attributes.position.array;
@@ -89,7 +90,6 @@ RubberLine.prototype = Object.assign( Object.create( Rubberband.prototype ), {
 
     this.line.geometry.attributes.position.needsUpdate = true;
   },
-
 });
 
-export {RubberLine};
+export { RubberLine };

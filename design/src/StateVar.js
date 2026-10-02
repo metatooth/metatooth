@@ -26,14 +26,13 @@
  * @constructor
  */
 function StateVar() {
-  this.type = 'StateVar';
+  this.type = "StateVar";
 }
 
-Object.assign( StateVar.prototype, {
+Object.assign(StateVar.prototype, {
   constructor: StateVar,
 
   isStateVar: true,
-
 });
 
-export {StateVar};
+export { StateVar };

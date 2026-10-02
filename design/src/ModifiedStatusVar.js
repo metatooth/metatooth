@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {StateVar} from './StateVar.js';
+import { StateVar } from "./StateVar.js";
 
 /**
  * Description: modified-status state variable
@@ -30,17 +30,15 @@ import {StateVar} from './StateVar.js';
  */
 function ModifiedStatusVar(component, modified) {
   StateVar.call(this);
-  this.type = 'ModifiedStatusVar';
+  this.type = "ModifiedStatusVar";
   this.component = component;
   this.modified = modified;
 }
 
-ModifiedStatusVar.prototype =
-  Object.assign( Object.create( StateVar.prototype ), {
-    constructor: ModifiedStatusVar,
+ModifiedStatusVar.prototype = Object.assign(Object.create(StateVar.prototype), {
+  constructor: ModifiedStatusVar,
 
-    isModifiedStatusVar: true,
+  isModifiedStatusVar: true,
+});
 
-  });
-
-export {ModifiedStatusVar};
+export { ModifiedStatusVar };

@@ -20,24 +20,24 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {Command} from './Command.js';
+import { Command } from "./Command.js";
 
 /**
  * Description: redo command
  * @constructor
  * @param {Editor} editor: the editor the command acts within
  */
-function RedoCmd( editor ) {
-  Command.call( this, editor, null );
-  this.type = 'RedoCmd';
+function RedoCmd(editor) {
+  Command.call(this, editor, null);
+  this.type = "RedoCmd";
 }
 
-RedoCmd.prototype = Object.assign( Object.create( Command.prototype ), {
+RedoCmd.prototype = Object.assign(Object.create(Command.prototype), {
   constructor: RedoCmd,
 
   isRedoCmd: true,
 
-  execute: function() {
+  execute: function () {
     this.editor.unidraw.redo(this.editor.component);
   },
 
@@ -45,10 +45,9 @@ RedoCmd.prototype = Object.assign( Object.create( Command.prototype ), {
    * If true, the command can be unexecuted.
    * @return {boolean}
    */
-  reversible: function() {
+  reversible: function () {
     return false;
   },
-
 });
 
-export {RedoCmd};
+export { RedoCmd };

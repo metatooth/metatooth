@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {Command} from './Command.js';
+import { Command } from "./Command.js";
 
 /**
  * Description: paste command
@@ -28,24 +28,24 @@ import {Command} from './Command.js';
  * @param {Editor} editor the editor the command acts within
  * @param {Array<Object3D>} clipboard an array of objects to act upon
  */
-function PasteCmd( editor, clipboard ) {
-  Command.call( this, editor, clipboard );
-  this.type = 'PasteCmd';
+function PasteCmd(editor, clipboard) {
+  Command.call(this, editor, clipboard);
+  this.type = "PasteCmd";
 }
 
-PasteCmd.prototype = Object.assign( Object.create( Command.prototype ), {
+PasteCmd.prototype = Object.assign(Object.create(Command.prototype), {
   constructor: PasteCmd,
 
   isPasteCmd: true,
 
   executed: false,
 
-  execute: function() {
+  execute: function () {
     this.editor.addObjects(this.clipboard);
     this.executed = true;
   },
 
-  unexecute: function() {
+  unexecute: function () {
     this.editor.removeObjects(this.clipboard);
     this.executed = false;
   },
@@ -54,10 +54,9 @@ PasteCmd.prototype = Object.assign( Object.create( Command.prototype ), {
    * If true, the command can be unexecuted.
    * @return {boolean}
    */
-  reversible: function() {
-    return ( this.clipboard && this.clipboard.length > 0 );
+  reversible: function () {
+    return this.clipboard && this.clipboard.length > 0;
   },
-
 });
 
-export {PasteCmd};
+export { PasteCmd };

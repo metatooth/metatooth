@@ -22,24 +22,23 @@
  * OF THIS SOFTWARE.
  */
 
-import {Group} from 'three';
-import {Vector3} from 'three';
+import { Group } from "three";
+import { Vector3 } from "three";
 
 /**
  * Rubberbanding primitive for tracking points
  * @constructor
  * @param {Vector3} offset an x, y, z offset
  */
-function Rubberband( offset ) {
+function Rubberband(offset) {
   Group.call(this);
-  this.type = 'Rubberband';
+  this.type = "Rubberband";
 
-  this.offset = (offset !== undefined) ? offset.clone() : null;
+  this.offset = offset !== undefined ? offset.clone() : null;
   this.tracked = null;
 }
 
-Rubberband.prototype = Object.assign( Object.create( Group.prototype ), {
-
+Rubberband.prototype = Object.assign(Object.create(Group.prototype), {
   constructor: Rubberband,
 
   isRubberband: true,
@@ -50,22 +49,24 @@ Rubberband.prototype = Object.assign( Object.create( Group.prototype ), {
    * @param {Vector3} v1
    * @return {Vector3}
    */
-  midpoint: function(v0, v1) {
-    return new Vector3((v0.x + v1.x) / 2.0,
-        (v0.y + v1.y) / 2.0,
-        (v0.z + v1.z) / 2.0);
+  midpoint: function (v0, v1) {
+    return new Vector3(
+      (v0.x + v1.x) / 2.0,
+      (v0.y + v1.y) / 2.0,
+      (v0.z + v1.z) / 2.0,
+    );
   },
 
-  update: function() {
-    throw new Error('Rubberband::update is an abstract method.');
+  update: function () {
+    throw new Error("Rubberband::update is an abstract method.");
   },
 
   /**
    * @param {Vector3} vec - the x, y, z coordinates to track
    */
-  track: function( vec ) {
+  track: function (vec) {
     if (!this.tracked) {
-      this.tracked = new Vector3;
+      this.tracked = new Vector3();
     }
 
     if (this.tracked !== vec) {
@@ -75,7 +76,6 @@ Rubberband.prototype = Object.assign( Object.create( Group.prototype ), {
       this.update();
     }
   },
-
 });
 
-export {Rubberband};
+export { Rubberband };

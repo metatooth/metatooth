@@ -1,13 +1,13 @@
-import {BufferGeometry} from 'three';
-import {BufferAttribute} from 'three';
-import {Line} from 'three';
-import {LineBasicMaterial} from 'three';
-import {Vector3} from 'three';
+import { BufferGeometry } from "three";
+import { BufferAttribute } from "three";
+import { Line } from "three";
+import { LineBasicMaterial } from "three";
+import { Vector3 } from "three";
 
-import {Command} from './Command.js';
-import {PasteCmd} from './PasteCmd.js';
+import { Command } from "./Command.js";
+import { PasteCmd } from "./PasteCmd.js";
 
-import {Graph} from '../Graph.js';
+import { Graph } from "../Graph.js";
 
 /**
  * Description: dijkstra command
@@ -16,27 +16,27 @@ import {Graph} from '../Graph.js';
  * @param {Vector3} source starting point
  * @param {Vector3} target finish point
  */
-function DijkstraCmd( editor, source, target ) {
-  Command.call( this, editor );
-  this.type = 'DijkstraCmd';
+function DijkstraCmd(editor, source, target) {
+  Command.call(this, editor);
+  this.type = "DijkstraCmd";
   this.source = source;
   this.target = target;
-  this.epsilon = 1e-06;
+  this.epsilon = 1e-6;
 }
 
-DijkstraCmd.prototype = Object.assign( Object.create( Command.prototype ), {
+DijkstraCmd.prototype = Object.assign(Object.create(Command.prototype), {
   constructor: DijkstraCmd,
 
   isDijkstraCmd: true,
 
-  execute: function() {
-    const now = new Date;
+  execute: function () {
+    const now = new Date();
     console.log(this.source);
     console.log(this.target);
 
     let mesh;
     for (let i = 0, l = this.editor.component.children.length; i < l; i++) {
-      if (this.editor.component.children[i].type == 'Mesh') {
+      if (this.editor.component.children[i].type == "Mesh") {
         mesh = this.editor.component.children[i];
         break;
       }
@@ -44,28 +44,34 @@ DijkstraCmd.prototype = Object.assign( Object.create( Command.prototype ), {
 
     let positions = null;
     if (mesh.geometry.index) {
-      positions = mesh.geometry.toNonIndexed().getAttribute('position');
+      positions = mesh.geometry.toNonIndexed().getAttribute("position");
     } else {
-      positions = mesh.geometry.getAttribute('position');
+      positions = mesh.geometry.getAttribute("position");
     }
 
-    console.log('positions ', positions.count);
+    console.log("positions ", positions.count);
 
-    const graph = new Graph;
+    const graph = new Graph();
     for (let i = 0, l = positions.count; i < l; i = i + 9) {
-      const a = new Vector3(positions.array[i],
-          positions.array[i+1],
-          positions.array[i+2]);
+      const a = new Vector3(
+        positions.array[i],
+        positions.array[i + 1],
+        positions.array[i + 2],
+      );
       graph.addVertex(a);
 
-      const b = new Vector3(positions.array[i+3],
-          positions.array[i+4],
-          positions.array[i+5]);
+      const b = new Vector3(
+        positions.array[i + 3],
+        positions.array[i + 4],
+        positions.array[i + 5],
+      );
       graph.addVertex(b);
 
-      const c = new Vector3(positions.array[i+6],
-          positions.array[i+7],
-          positions.array[i+8]);
+      const c = new Vector3(
+        positions.array[i + 6],
+        positions.array[i + 7],
+        positions.array[i + 8],
+      );
       graph.addVertex(c);
 
       graph.addEdge(a, b);
@@ -74,43 +80,41 @@ DijkstraCmd.prototype = Object.assign( Object.create( Command.prototype ), {
     }
 
     console.log(graph);
-    console.log(((new Date) - now), 'ms elapsed.');
+    console.log(new Date() - now, "ms elapsed.");
 
-    console.log('source vector3', this.source);
-    console.log('target vector3', this.target);
+    console.log("source vector3", this.source);
+    console.log("target vector3", this.target);
 
     if (!this.source.equals(this.target)) {
       const results = this.dijkstra(graph, this.source, this.target);
-      console.log('Done. ', ((new Date) - now), 'ms elapsed.');
+      console.log("Done. ", new Date() - now, "ms elapsed.");
 
-      console.log('Found path of length', results.length);
+      console.log("Found path of length", results.length);
 
-      const newPositions = new Float32Array(3*results.length);
+      const newPositions = new Float32Array(3 * results.length);
       for (let i = 0, l = results.length; i < l; i++) {
-        newPositions[3*i] = results[i].x;
-        newPositions[3*i+1] = results[i].y;
-        newPositions[3*i+2] = results[i].z;
+        newPositions[3 * i] = results[i].x;
+        newPositions[3 * i + 1] = results[i].y;
+        newPositions[3 * i + 2] = results[i].z;
       }
 
       const geometry = new BufferGeometry();
-      geometry.setAttribute( 'position',
-          new BufferAttribute( newPositions, 3 ));
-      geometry.setDrawRange( 0, results.length );
-      const material = new LineBasicMaterial({color: 0x00bbee, linewidth: 5});
+      geometry.setAttribute("position", new BufferAttribute(newPositions, 3));
+      geometry.setDrawRange(0, results.length);
+      const material = new LineBasicMaterial({ color: 0x00bbee, linewidth: 5 });
 
-      const cmd = new PasteCmd( this.editor, [new Line( geometry, material )] );
+      const cmd = new PasteCmd(this.editor, [new Line(geometry, material)]);
       cmd.execute();
     }
   },
 
-  unexecute: function() {
-  },
+  unexecute: function () {},
 
   /**
    * If true, the command can be unexecuted.
    * @return {boolean}
    */
-  reversible: function() {
+  reversible: function () {
     return true;
   },
 
@@ -122,10 +126,10 @@ DijkstraCmd.prototype = Object.assign( Object.create( Command.prototype ), {
    * @param {Vector3} target
    * @return {Vector3[]}
    */
-  dijkstra: function(graph, source, target) {
-    const dist = new Map;
-    const prev = new Map;
-    const Q = new Map;
+  dijkstra: function (graph, source, target) {
+    const dist = new Map();
+    const prev = new Map();
+    const Q = new Map();
 
     for (const key of graph.adjacency.keys()) {
       dist.set(key, Infinity);
@@ -136,26 +140,26 @@ DijkstraCmd.prototype = Object.assign( Object.create( Command.prototype ), {
     const sid = graph.id(source);
     const tid = graph.id(target);
 
-    console.log('source id', sid);
-    console.log('target id', tid);
+    console.log("source id", sid);
+    console.log("target id", tid);
 
     dist.set(sid, 0);
 
     while (Q.size > 0) {
-      console.log('** Q size **', Q.size);
+      console.log("** Q size **", Q.size);
       let distU = Infinity;
       let uid = null;
-      dist.forEach(function(value, key, map) {
+      dist.forEach(function (value, key, map) {
         if (value < distU) {
           distU = value;
           uid = key;
         }
       });
 
-      console.log('min u', uid);
+      console.log("min u", uid);
 
-      if (!Q.delete(uid)) console.log('Q deletion failed!', uid);
-      if (!dist.delete(uid)) console.log('dist deletion failed!', uid);
+      if (!Q.delete(uid)) console.log("Q deletion failed!", uid);
+      if (!dist.delete(uid)) console.log("dist deletion failed!", uid);
 
       if (uid === tid) break;
 
@@ -186,7 +190,6 @@ DijkstraCmd.prototype = Object.assign( Object.create( Command.prototype ), {
 
     return S;
   },
-
 });
 
-export {DijkstraCmd};
+export { DijkstraCmd };

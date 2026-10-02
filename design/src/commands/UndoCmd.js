@@ -20,24 +20,24 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {Command} from './Command.js';
+import { Command } from "./Command.js";
 
 /**
  * Description: undo command
  * @constructor
  * @param {Editor} editor: the editor the command acts within
  */
-function UndoCmd( editor ) {
-  Command.call( this, editor, null );
-  this.type = 'UndoCmd';
+function UndoCmd(editor) {
+  Command.call(this, editor, null);
+  this.type = "UndoCmd";
 }
 
-UndoCmd.prototype = Object.assign( Object.create( Command.prototype ), {
+UndoCmd.prototype = Object.assign(Object.create(Command.prototype), {
   constructor: UndoCmd,
 
   isUndoCmd: true,
 
-  execute: function() {
+  execute: function () {
     this.editor.unidraw.undo(this.editor.component);
   },
 
@@ -45,10 +45,9 @@ UndoCmd.prototype = Object.assign( Object.create( Command.prototype ), {
    * If true, the command can be unexecuted.
    * @return {boolean}
    */
-  reversible: function() {
+  reversible: function () {
     return false;
   },
-
 });
 
-export {UndoCmd};
+export { UndoCmd };

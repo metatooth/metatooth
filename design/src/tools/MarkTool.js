@@ -20,22 +20,22 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {Mesh} from 'three';
-import {MeshPhongMaterial} from 'three';
-import {SphereGeometry} from 'three';
+import { Mesh } from "three";
+import { MeshPhongMaterial } from "three";
+import { SphereGeometry } from "three";
 
-import {ClickManip} from '../manipulators/ClickManip.js';
-import {PasteCmd} from '../commands/PasteCmd.js';
-import {Tool} from './Tool.js';
+import { ClickManip } from "../manipulators/ClickManip.js";
+import { PasteCmd } from "../commands/PasteCmd.js";
+import { Tool } from "./Tool.js";
 
 /**
  * Description: A tool for drawing.
  * @constructor
  */
 function MarkTool() {
-  Tool.call( this );
+  Tool.call(this);
 
-  this.type = 'MarkTool';
+  this.type = "MarkTool";
 
   this.radius = 0.3;
   this.div = 32;
@@ -44,7 +44,7 @@ function MarkTool() {
   this.shininess = 90;
 }
 
-MarkTool.prototype = Object.assign( Object.create( Tool.prototype ), {
+MarkTool.prototype = Object.assign(Object.create(Tool.prototype), {
   constructor: MarkTool,
 
   isMarkTool: true,
@@ -54,9 +54,9 @@ MarkTool.prototype = Object.assign( Object.create( Tool.prototype ), {
    * @param {Event} event the starting event
    * @return {Manipulator}
    */
-  create: function( viewer, event ) {
-    if (event.type == 'mousedown') {
-      return new ClickManip( viewer, this );
+  create: function (viewer, event) {
+    if (event.type == "mousedown") {
+      return new ClickManip(viewer, this);
     }
     return null;
   },
@@ -65,17 +65,20 @@ MarkTool.prototype = Object.assign( Object.create( Tool.prototype ), {
    * @param {Manipulator} manipulator the manipulation to analyze
    * @return {Command}
    */
-  interpret: function( manipulator ) {
+  interpret: function (manipulator) {
     if (manipulator.found) {
-      const geometry = new SphereGeometry( this.radius, this.div, this.div );
-      const material = new MeshPhongMaterial( {color: this.color,
-        specular: this.specular, shininess: this.shininess} );
+      const geometry = new SphereGeometry(this.radius, this.div, this.div);
+      const material = new MeshPhongMaterial({
+        color: this.color,
+        specular: this.specular,
+        shininess: this.shininess,
+      });
 
-      const sphere = new Mesh( geometry, material );
+      const sphere = new Mesh(geometry, material);
       sphere.position.x = manipulator.point.x;
       sphere.position.y = manipulator.point.y;
       sphere.position.z = manipulator.point.z;
-      sphere.name = 'point';
+      sphere.name = "point";
 
       return new PasteCmd(manipulator.viewer.editor(), [sphere]);
     }
@@ -83,4 +86,4 @@ MarkTool.prototype = Object.assign( Object.create( Tool.prototype ), {
   },
 });
 
-export {MarkTool};
+export { MarkTool };

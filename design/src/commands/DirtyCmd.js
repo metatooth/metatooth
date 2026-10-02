@@ -20,25 +20,25 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {Command} from './Command.js';
+import { Command } from "./Command.js";
 
 /**
  * Description: command sets the modified flag for the root component
  * @param {Editor} editor: the editor the command acts within
  */
-function DirtyCmd( editor ) {
-  Command.call( this, editor, null );
-  this.type = 'DirtyCmd';
+function DirtyCmd(editor) {
+  Command.call(this, editor, null);
+  this.type = "DirtyCmd";
 }
 
-DirtyCmd.prototype = Object.assign( Object.create( Command.prototype ), {
+DirtyCmd.prototype = Object.assign(Object.create(Command.prototype), {
   constructor: DirtyCmd,
 
   isDirtyCmd: true,
 
   reverse: false,
 
-  execute: function() {
+  execute: function () {
     if (this.reverse) {
       this.reverse = false;
       this.unexecute();
@@ -48,7 +48,7 @@ DirtyCmd.prototype = Object.assign( Object.create( Command.prototype ), {
     }
   },
 
-  unexecute: function() {
+  unexecute: function () {
     if (this.reverse) {
       this.reverse = false;
       this.execute();
@@ -57,7 +57,6 @@ DirtyCmd.prototype = Object.assign( Object.create( Command.prototype ), {
       if (this.editor.modified) this.editor.modified.modified = false;
     }
   },
-
 });
 
-export {DirtyCmd};
+export { DirtyCmd };

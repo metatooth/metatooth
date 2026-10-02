@@ -27,13 +27,13 @@
  * @param {Editor} editor the editor the command acts within
  * @param {Array} clipboard an array of objects that will be acted upon
  */
-function Command( editor, clipboard ) {
+function Command(editor, clipboard) {
   this.editor = editor;
   this.clipboard = clipboard;
-  this.type = 'Command';
+  this.type = "Command";
 }
 
-Object.assign( Command.prototype, {
+Object.assign(Command.prototype, {
   constructor: Command,
 
   isCommand: true,
@@ -41,32 +41,27 @@ Object.assign( Command.prototype, {
   /**
    * Do something
    */
-  execute: function() {
-
-  },
+  execute: function () {},
 
   /**
    * Undo something
    */
-  unexecute: function() {
-
-  },
+  unexecute: function () {},
 
   /**
    * If true, the command can be unexecuted.
    * @return {boolean}
    */
-  reversible: function() {
+  reversible: function () {
     return false;
   },
 
   /**
    * Log the command.
    */
-  log: function() {
+  log: function () {
     this.editor.unidraw.log(this);
   },
-
 });
 
-export {Command};
+export { Command };

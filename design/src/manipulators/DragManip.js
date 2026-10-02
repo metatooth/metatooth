@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {Manipulator} from './Manipulator.js';
+import { Manipulator } from "./Manipulator.js";
 
 /**
  * Description: Mousedown. Drag... Mouseup.
@@ -28,17 +28,17 @@ import {Manipulator} from './Manipulator.js';
  * @param {Rubberband} rubberband - used to track mouse movement
  * @param {Tool} tool - for user interaction
  */
-function DragManip( viewer, rubberband, tool ) {
-  Manipulator.call( this );
+function DragManip(viewer, rubberband, tool) {
+  Manipulator.call(this);
 
-  this.type = 'DragManip';
+  this.type = "DragManip";
 
   this.viewer = viewer;
   this.rubberband = rubberband;
   this.tool = tool;
 }
 
-DragManip.prototype = Object.assign( Object.create( Manipulator.prototype ), {
+DragManip.prototype = Object.assign(Object.create(Manipulator.prototype), {
   constructor: DragManip,
 
   isDragManip: true,
@@ -46,12 +46,12 @@ DragManip.prototype = Object.assign( Object.create( Manipulator.prototype ), {
   /**
    * @param {Event} event the mousedown event to start the drag
    */
-  grasp: function( event ) {
+  grasp: function (event) {
     this.viewer.controls.enabled = false;
     this.viewer.controls.saveState();
 
-    const p = this.viewer.unproject( event.clientX, event.clientY );
-    this.rubberband.track( p );
+    const p = this.viewer.unproject(event.clientX, event.clientY);
+    this.rubberband.track(p);
 
     this.viewer.scene.add(this.rubberband);
   },
@@ -60,11 +60,11 @@ DragManip.prototype = Object.assign( Object.create( Manipulator.prototype ), {
    * @param {Event} event is dragging
    * @return {boolean}
    */
-  manipulating: function( event ) {
-    if ( event.type == 'mousemove' ) {
-      const p = this.viewer.unproject( event.clientX, event.clientY );
-      this.rubberband.track( p );
-    } else if (event.type == 'mouseup' ) {
+  manipulating: function (event) {
+    if (event.type == "mousemove") {
+      const p = this.viewer.unproject(event.clientX, event.clientY);
+      this.rubberband.track(p);
+    } else if (event.type == "mouseup") {
       return false;
     }
     return true;
@@ -73,7 +73,7 @@ DragManip.prototype = Object.assign( Object.create( Manipulator.prototype ), {
   /**
    * @param {Event} event mouseup to end the drag
    */
-  effect: function( event ) {
+  effect: function (event) {
     this.viewer.scene.remove(this.rubberband);
 
     this.viewer.controls.reset();
@@ -81,4 +81,4 @@ DragManip.prototype = Object.assign( Object.create( Manipulator.prototype ), {
   },
 });
 
-export {DragManip};
+export { DragManip };

@@ -3,8 +3,8 @@
  * @constructor
  */
 function JSONExporter() {
-  this.type = 'JSONExporter';
-};
+  this.type = "JSONExporter";
+}
 
 JSONExporter.prototype = {
   constructor: JSONExporter,
@@ -17,14 +17,14 @@ JSONExporter.prototype = {
    * @param {Function} onDone Callback on completed
    * @param {Object} options options
    */
-  parse: function( object, onDone, options ) {
+  parse: function (object, onDone, options) {
     const outputJSON = {
       __metadata__: {
-        format: 'assimp2json',
+        format: "assimp2json",
         version: 100,
       },
       rootnode: {
-        name: '<MetatoothRoot>',
+        name: "<MetatoothRoot>",
         transformation: [1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1],
       },
     };
@@ -41,18 +41,18 @@ JSONExporter.prototype = {
      * Process material
      *
      * @param {THREE.Material} material Material to process
-* @param {String} name
+     * @param {String} name
      * @return {Integer} Index of the process material in the "materials" array
      */
-    function processMaterial( material, name ) {
-      if ( cachedData.materials.has( material ) ) {
-        return cachedData.materials.get( material );
+    function processMaterial(material, name) {
+      if (cachedData.materials.has(material)) {
+        return cachedData.materials.get(material);
       }
 
       const jsonMaterial = {
         properties: [
           {
-            key: '?mat.name',
+            key: "?mat.name",
             semantic: 0,
             index: 0,
             type: 3,
@@ -61,9 +61,9 @@ JSONExporter.prototype = {
         ],
       };
 
-      if ( material.color ) {
+      if (material.color) {
         jsonMaterial.properties.push({
-          key: '?clr.diffuse',
+          key: "?clr.diffuse",
           semantic: 0,
           index: 0,
           type: 1,
@@ -71,9 +71,9 @@ JSONExporter.prototype = {
         });
       }
 
-      if ( material.specular ) {
+      if (material.specular) {
         jsonMaterial.properties.push({
-          key: '?clr.specular',
+          key: "?clr.specular",
           semantic: 0,
           index: 0,
           type: 1,
@@ -81,9 +81,9 @@ JSONExporter.prototype = {
         });
       }
 
-      if ( material.shininess ) {
+      if (material.shininess) {
         jsonMaterial.properties.push({
-          key: '?mat.shininess',
+          key: "?mat.shininess",
           semantic: 0,
           index: 0,
           type: 1,
@@ -91,17 +91,17 @@ JSONExporter.prototype = {
         });
       }
 
-      if ( ! outputJSON.materials ) {
+      if (!outputJSON.materials) {
         outputJSON.materials = [];
       }
 
-      outputJSON.materials.push( jsonMaterial );
+      outputJSON.materials.push(jsonMaterial);
 
       const index = outputJSON.materials.length - 1;
-      cachedData.materials.set( material, index );
+      cachedData.materials.set(material, index);
 
       return index;
-    };
+    }
 
     /**
      * Process mesh as an external reference.
@@ -109,14 +109,14 @@ JSONExporter.prototype = {
      * @param {THREE.Mesh} mesh Mesh to process
      * @return {Integer} Index of the mesh in the "meshRefs" array
      */
-    function processMeshRef( mesh ) {
-      const meshCacheKey = [mesh.geometry.uuid, mesh.material.uuid].join( ':' );
+    function processMeshRef(mesh) {
+      const meshCacheKey = [mesh.geometry.uuid, mesh.material.uuid].join(":");
 
-      if ( cachedData.meshes.has( meshCacheKey ) ) {
-        return cachedData.meshes.get( meshCacheKey );
+      if (cachedData.meshes.has(meshCacheKey)) {
+        return cachedData.meshes.get(meshCacheKey);
       }
 
-      const matIndex = processMaterial( mesh.material, 'meshref' );
+      const matIndex = processMaterial(mesh.material, "meshref");
 
       const jsonMeshRef = {
         name: mesh.name,
@@ -124,17 +124,17 @@ JSONExporter.prototype = {
         url: mesh.geometry.sourceUrl,
       };
 
-      if ( ! outputJSON.meshrefs ) {
+      if (!outputJSON.meshrefs) {
         outputJSON.meshrefs = [];
       }
 
-      outputJSON.meshrefs.push( jsonMeshRef );
+      outputJSON.meshrefs.push(jsonMeshRef);
 
       const index = outputJSON.meshrefs.length - 1;
-      cachedData.meshes.set( meshCacheKey, index );
+      cachedData.meshes.set(meshCacheKey, index);
 
       return index;
-    };
+    }
 
     /**
      * Process mesh
@@ -142,21 +142,21 @@ JSONExporter.prototype = {
      * @param {THREE.Mesh} mesh Mesh to process
      * @return {Integer} Index of the processed mesh in the "meshes" array
      */
-    function processMesh( mesh ) {
-      const meshCacheKey = [mesh.geometry.uuid, mesh.material.uuid].join( ':' );
+    function processMesh(mesh) {
+      const meshCacheKey = [mesh.geometry.uuid, mesh.material.uuid].join(":");
 
-      if ( cachedData.meshes.has( meshCacheKey ) ) {
-        return cachedData.meshes.get( meshCacheKey );
+      if (cachedData.meshes.has(meshCacheKey)) {
+        return cachedData.meshes.get(meshCacheKey);
       }
 
-      const matIndex = processMaterial( mesh.material, 'mesh' );
+      const matIndex = processMaterial(mesh.material, "mesh");
 
       let type;
-      if ( mesh.isPoints ) {
+      if (mesh.isPoints) {
         type = 1;
-      } else if ( mesh.isLine ) {
+      } else if (mesh.isLine) {
         type = 2;
-      } else if ( mesh.isMesh ) {
+      } else if (mesh.isMesh) {
         type = 4;
       }
 
@@ -167,59 +167,59 @@ JSONExporter.prototype = {
       };
 
       jsonMesh.vertices = [];
-      mesh.geometry.vertices.forEach(( vert ) => {
+      mesh.geometry.vertices.forEach((vert) => {
         jsonMesh.vertices.push(vert.x);
         jsonMesh.vertices.push(vert.y);
         jsonMesh.vertices.push(vert.z);
       });
 
       jsonMesh.faces = [];
-      mesh.geometry.faces.forEach(( face ) => {
+      mesh.geometry.faces.forEach((face) => {
         jsonMesh.faces.push(face.a);
         jsonMesh.faces.push(face.b);
         jsonMesh.faces.push(face.c);
       });
 
-      if ( ! outputJSON.meshes ) {
+      if (!outputJSON.meshes) {
         outputJSON.meshes = [];
       }
 
-      outputJSON.meshes.push( jsonMesh );
+      outputJSON.meshes.push(jsonMesh);
 
       const index = outputJSON.meshes.length - 1;
-      cachedData.meshes.set( meshCacheKey, index );
+      cachedData.meshes.set(meshCacheKey, index);
 
       return index;
-    };
+    }
 
     /**
      * @param {THREE.Object3D} object Object3D to processNode
      * @return {Integer} Index of the node in the nodes list
      */
-    function processNode( object ) {
+    function processNode(object) {
       const jsonNode = {};
 
-      if ( object.matrixAutoUpdate ) {
+      if (object.matrixAutoUpdate) {
         object.updateMatrix();
       }
 
-      jsonNode.name = object.name || '';
+      jsonNode.name = object.name || "";
       jsonNode.transformation = object.matrix.elements;
 
-      if ( object.isLine || object.isPoints ) {
-        const meshIndex = processMesh( object );
-        if ( meshIndex !== null ) {
+      if (object.isLine || object.isPoints) {
+        const meshIndex = processMesh(object);
+        if (meshIndex !== null) {
           jsonNode.meshes = [meshIndex];
         }
-      } else if ( object.isMesh ) {
-        if ( object.geometry.sourceUrl ) {
-          const meshRefIndex = processMeshRef( object );
-          if ( meshRefIndex !== null ) {
+      } else if (object.isMesh) {
+        if (object.geometry.sourceUrl) {
+          const meshRefIndex = processMeshRef(object);
+          if (meshRefIndex !== null) {
             jsonNode.meshrefs = [meshRefIndex];
           }
         } else {
-          const meshIndex = processMesh( object );
-          if ( meshIndex !== null ) {
+          const meshIndex = processMesh(object);
+          if (meshIndex !== null) {
             jsonNode.meshes = [meshIndex];
           }
         }
@@ -227,27 +227,26 @@ JSONExporter.prototype = {
 
       const children = [];
 
-      object.children.forEach(( child ) => {
-        const node = processNode( child );
-        if ( node !== null ) {
-          children.push( node );
+      object.children.forEach((child) => {
+        const node = processNode(child);
+        if (node !== null) {
+          children.push(node);
         }
       });
 
-      if ( children.length > 0 ) {
+      if (children.length > 0) {
         jsonNode.children = children;
       }
 
       return jsonNode;
-    };
+    }
 
-    outputJSON.rootnode = processNode( object );
+    outputJSON.rootnode = processNode(object);
 
-    Promise.all( pending ).then( function() {
-      onDone( outputJSON );
+    Promise.all(pending).then(function () {
+      onDone(outputJSON);
     });
   },
-
 };
 
-export {JSONExporter};
+export { JSONExporter };

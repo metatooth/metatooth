@@ -20,21 +20,21 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {DragManip} from '../manipulators/DragManip.js';
-import {Rubberband} from '../rubberbands/Rubberband.js';
-import {Tool} from './Tool.js';
+import { DragManip } from "../manipulators/DragManip.js";
+import { Rubberband } from "../rubberbands/Rubberband.js";
+import { Tool } from "./Tool.js";
 
 /**
  * Description: A tool for selecting.
  * @constructor
  */
 function SelectTool() {
-  Tool.call( this );
+  Tool.call(this);
 
-  this.type = 'SelectTool';
+  this.type = "SelectTool";
 }
 
-SelectTool.prototype = Object.assign( Object.create( Tool.prototype ), {
+SelectTool.prototype = Object.assign(Object.create(Tool.prototype), {
   constructor: SelectTool,
 
   isSelectTool: true,
@@ -44,13 +44,12 @@ SelectTool.prototype = Object.assign( Object.create( Tool.prototype ), {
    * @param {Event} event - the starting event
    * @return {Manipulator}
    */
-  create: function( viewer, event ) {
-    if (event.type == 'mousedown') {
-      return new DragManip( viewer, new Rubberband, this );
+  create: function (viewer, event) {
+    if (event.type == "mousedown") {
+      return new DragManip(viewer, new Rubberband(), this);
     }
     return null;
   },
-
 });
 
-export {SelectTool};
+export { SelectTool };

@@ -22,14 +22,14 @@
  * OF THIS SOFTWARE.
  */
 
-import {CylinderGeometry} from 'three';
-import {Matrix4} from 'three';
-import {Mesh} from 'three';
-import {MeshPhongMaterial} from 'three';
-import {Object3D} from 'three';
-import {Vector3} from 'three';
+import { CylinderGeometry } from "three";
+import { Matrix4 } from "three";
+import { Mesh } from "three";
+import { MeshPhongMaterial } from "three";
+import { Object3D } from "three";
+import { Vector3 } from "three";
 
-import {GrowingVertices} from './GrowingVertices.js';
+import { GrowingVertices } from "./GrowingVertices.js";
 
 /**
  * GrowingMultiLine are Rubberbands defined by a set of vertices
@@ -39,52 +39,50 @@ import {GrowingVertices} from './GrowingVertices.js';
  */
 function GrowingMultiLine(vec) {
   GrowingVertices.call(this, vec);
-  this.type = 'GrowingMultiLine';
+  this.type = "GrowingMultiLine";
 
-  this.material = new MeshPhongMaterial( {color: 0xff33bb} );
+  this.material = new MeshPhongMaterial({ color: 0xff33bb });
 }
 
-GrowingMultiLine.prototype = Object.assign( Object.create(
-    GrowingVertices.prototype ), {
-  constructor: GrowingMultiLine,
+GrowingMultiLine.prototype = Object.assign(
+  Object.create(GrowingVertices.prototype),
+  {
+    constructor: GrowingMultiLine,
 
-  isGrowingMultiLine: true,
+    isGrowingMultiLine: true,
 
-  cylinder: function( a, b ) {
-    const dir = new Vector3().subVectors( b, a );
-    const orient = new Matrix4;
-    orient.lookAt( a, b, new Object3D().up);
-    const align = new Matrix4;
-    align.set(1, 0, 0, 0,
-        0, 0, 1, 0,
-        0, -1, 0, 0,
-        0, 0, 0, 1);
-    orient.multiply(align);
+    cylinder: function (a, b) {
+      const dir = new Vector3().subVectors(b, a);
+      const orient = new Matrix4();
+      orient.lookAt(a, b, new Object3D().up);
+      const align = new Matrix4();
+      align.set(1, 0, 0, 0, 0, 0, 1, 0, 0, -1, 0, 0, 0, 0, 0, 1);
+      orient.multiply(align);
 
-    const edgeGeom = new CylinderGeometry( 0.2, 0.2, dir.length(), 8, 1 );
-    const edge = new Mesh( edgeGeom, this.material );
+      const edgeGeom = new CylinderGeometry(0.2, 0.2, dir.length(), 8, 1);
+      const edge = new Mesh(edgeGeom, this.material);
 
-    edge.applyMatrix4(orient);
+      edge.applyMatrix4(orient);
 
-    const vec = new Vector3().addVectors( a, dir.multiplyScalar(0.5) );
-    edge.position.x = vec.x;
-    edge.position.y = vec.y;
-    edge.position.z = vec.z;
+      const vec = new Vector3().addVectors(a, dir.multiplyScalar(0.5));
+      edge.position.x = vec.x;
+      edge.position.y = vec.y;
+      edge.position.z = vec.z;
 
-    return edge;
+      return edge;
+    },
+
+    update: function () {
+      const length = this.vertices.length;
+
+      if (length > 1) {
+        const v0 = this.vertices[length - 2];
+        const v1 = this.vertices[length - 1];
+
+        this.add(this.cylinder(v0, v1));
+      }
+    },
   },
+);
 
-  update: function() {
-    const length = this.vertices.length;
-
-    if (length > 1) {
-      const v0 = this.vertices[length - 2];
-      const v1 = this.vertices[length - 1];
-
-      this.add( this.cylinder( v0, v1 ) );
-    }
-  },
-
-});
-
-export {GrowingMultiLine};
+export { GrowingMultiLine };

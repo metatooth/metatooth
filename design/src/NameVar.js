@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {StateVar} from './StateVar.js';
+import { StateVar } from "./StateVar.js";
 
 /**
  * Description: state variables allow for dataflow and
@@ -30,15 +30,14 @@ import {StateVar} from './StateVar.js';
  */
 function NameVar(name) {
   StateVar.call(this);
-  this.type = 'NameVar';
+  this.type = "NameVar";
   this.name = name;
 }
 
-NameVar.prototype = Object.assign( Object.create( StateVar.prototype ), {
+NameVar.prototype = Object.assign(Object.create(StateVar.prototype), {
   constructor: NameVar,
 
   isNameVar: true,
-
 });
 
-export {NameVar};
+export { NameVar };

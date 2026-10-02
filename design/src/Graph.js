@@ -3,8 +3,8 @@
  * @constructor
  */
 function Graph() {
-  this.type = 'Graph';
-  this.adjacency = new Map;
+  this.type = "Graph";
+  this.adjacency = new Map();
   this.size = 20;
   this.vertices = [this.size];
   for (let i = 0; i < this.size; i++) {
@@ -17,18 +17,18 @@ function Graph() {
     }
   }
   this.count = 0;
-  this.epsilon = 1e-06;
+  this.epsilon = 1e-6;
 }
 
-Object.assign( Graph.prototype, {
+Object.assign(Graph.prototype, {
   constructor: Graph,
 
   isGraph: true,
 
-  addVertex: function(v) {
-    const i = Math.floor(v.x) + this.size/2;
-    const j = Math.floor(v.y) + this.size/2;
-    const k = Math.floor(v.z) + this.size/2;
+  addVertex: function (v) {
+    const i = Math.floor(v.x) + this.size / 2;
+    const j = Math.floor(v.y) + this.size / 2;
+    const k = Math.floor(v.z) + this.size / 2;
 
     let found = false;
     for (let q = 0, l = this.vertices[i][j][k].length; q < l; q++) {
@@ -45,26 +45,26 @@ Object.assign( Graph.prototype, {
     }
   },
 
-  addEdge: function(v, w) {
+  addEdge: function (v, w) {
     this.adjacency.get(this.id(v)).push(w);
     this.adjacency.get(this.id(w)).push(v);
   },
 
-  get: function(key) {
+  get: function (key) {
     const json = JSON.parse(key);
     return this.vertices[json.i][json.j][json.k][json.index];
   },
 
-  id: function(v) {
-    const i = Math.floor(v.x) + this.size/2;
-    const j = Math.floor(v.y) + this.size/2;
-    const k = Math.floor(v.z) + this.size/2;
+  id: function (v) {
+    const i = Math.floor(v.x) + this.size / 2;
+    const j = Math.floor(v.y) + this.size / 2;
+    const k = Math.floor(v.z) + this.size / 2;
 
     let id = {};
 
     for (let q = 0, l = this.vertices[i][j][k].length; q < l; q++) {
       if (this.vertices[i][j][k][q].equals(v)) {
-        id = {i: i, j: j, k: k, index: q};
+        id = { i: i, j: j, k: k, index: q };
         break;
       }
     }
@@ -73,4 +73,4 @@ Object.assign( Graph.prototype, {
   },
 });
 
-export {Graph};
+export { Graph };

@@ -20,21 +20,17 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-
 /**
  * Description: maintain a history of past & future commands to allow
  * for undo & redo operations.
  * @constructor
  */
 function History() {
-  this.type = 'History';
+  this.type = "History";
   this.past = [];
   this.future = [];
 }
 
-History.prototype = Object.create( Object.assign, {
+History.prototype = Object.create(Object.assign, {});
 
-
-});
-
-export {History};
+export { History };

@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {NameVar} from './NameVar.js';
+import { NameVar } from "./NameVar.js";
 
 /**
  * Description: state variables allow for dataflow and
@@ -31,7 +31,7 @@ import {NameVar} from './NameVar.js';
  */
 function ComponentNameVar(component, catalog) {
   NameVar.call(this, catalog.name(component));
-  this.type = 'ComponentNameVar';
+  this.type = "ComponentNameVar";
   this.component = component;
   this.catalog = catalog;
 
@@ -41,20 +41,19 @@ function ComponentNameVar(component, catalog) {
   }
 }
 
-ComponentNameVar.prototpye =
-    Object.assign( Object.create( NameVar.prototype ), {
-      constructor: ComponentNameVar,
+ComponentNameVar.prototpye = Object.assign(Object.create(NameVar.prototype), {
+  constructor: ComponentNameVar,
 
-      isComponentNameVar: true,
+  isComponentNameVar: true,
 
-      updateName: function() {
-        if (!this.component) {
-          this.name = null;
-        } else {
-          const name = this.catalog.name(this.component);
-          this.name = name;
-        }
-      },
-    });
+  updateName: function () {
+    if (!this.component) {
+      this.name = null;
+    } else {
+      const name = this.catalog.name(this.component);
+      this.name = name;
+    }
+  },
+});
 
-export {ComponentNameVar};
+export { ComponentNameVar };

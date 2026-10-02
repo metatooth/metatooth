@@ -24,10 +24,10 @@
  * Description: manipulation semantics
  */
 function Manipulator() {
-  this.type = 'Manipulator';
+  this.type = "Manipulator";
 }
 
-Object.assign( Manipulator.prototype, {
+Object.assign(Manipulator.prototype, {
   constructor: Manipulator,
 
   isManipulator: true,
@@ -35,7 +35,7 @@ Object.assign( Manipulator.prototype, {
   /**
    * @param {Event} event the starting event
    */
-  grasp: function( event ) {
+  grasp: function (event) {
     // no op
   },
 
@@ -43,16 +43,16 @@ Object.assign( Manipulator.prototype, {
    * @param {Event} event the subsequent events
    * @return {boolean}
    */
-  manipulating: function( event ) {
+  manipulating: function (event) {
     return false;
   },
 
   /**
    * @param {Event} event the final event
    */
-  effect: function( event ) {
+  effect: function (event) {
     // no op
   },
 });
 
-export {Manipulator};
+export { Manipulator };

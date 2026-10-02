@@ -20,11 +20,11 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {Raycaster} from 'three';
-import {Vector2} from 'three';
-import {Vector3} from 'three';
+import { Raycaster } from "three";
+import { Vector2 } from "three";
+import { Vector3 } from "three";
 
-import {Manipulator} from './manipulator';
+import { Manipulator } from "./manipulator";
 
 /**
  * Description: A single click. Mousedown will raycast from mouse
@@ -33,20 +33,20 @@ import {Manipulator} from './manipulator';
  * @param {Viewer} viewer: the owning viewer, used for raycasting
  * @param {Tool} tool: for user interaction
  */
-function ClickManip( viewer, tool ) {
-  Manipulator.call( this );
+function ClickManip(viewer, tool) {
+  Manipulator.call(this);
 
-  this.type = 'ClickManip';
+  this.type = "ClickManip";
 
   this.viewer = viewer;
   this.tool = tool;
 
-  this.raycaster = new Raycaster;
+  this.raycaster = new Raycaster();
   this.found = false;
-  this.point = new Vector3;
+  this.point = new Vector3();
 }
 
-ClickManip.prototype = Object.assign( Object.create( Manipulator.prototype ), {
+ClickManip.prototype = Object.assign(Object.create(Manipulator.prototype), {
   constructor: ClickManip,
 
   isClickManip: true,
@@ -56,19 +56,19 @@ ClickManip.prototype = Object.assign( Object.create( Manipulator.prototype ), {
    * intersects with the target mesh.
    * @param {Event} event - event to check for interesection
    */
-  grasp: function( event ) {
-    if (event.type == 'mousedown') {
+  grasp: function (event) {
+    if (event.type == "mousedown") {
       this.viewer.controls.enabled = false;
       this.viewer.controls.saveState();
 
-      const mouse = new Vector2;
-      mouse.x = ( event.clientX / window.innerWidth ) * 2 - 1;
-      mouse.y = - ( event.clientY / window.innerHeight ) * 2 + 1;
+      const mouse = new Vector2();
+      mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+      mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-      this.raycaster.setFromCamera( mouse, this.viewer.camera );
-      const intersects = this.raycaster.intersectObject( this.viewer.mesh() );
+      this.raycaster.setFromCamera(mouse, this.viewer.camera);
+      const intersects = this.raycaster.intersectObject(this.viewer.mesh());
 
-      if ( intersects.length > 0 ) {
+      if (intersects.length > 0) {
         this.point = intersects[0].point;
         this.found = true;
       }
@@ -78,12 +78,10 @@ ClickManip.prototype = Object.assign( Object.create( Manipulator.prototype ), {
   /**
    * @param {Event} event
    */
-  effect: function( event ) {
+  effect: function (event) {
     this.viewer.controls.reset();
     this.viewer.controls.enabled = true;
   },
-
-
 });
 
-export {ClickManip};
+export { ClickManip };

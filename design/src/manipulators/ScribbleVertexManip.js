@@ -20,7 +20,7 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {VertexManip} from './VertexManip.js';
+import { VertexManip } from "./VertexManip.js";
 
 /**
  * Description: Mousedown. Drag... Mouseup.
@@ -29,42 +29,43 @@ import {VertexManip} from './VertexManip.js';
  * collect vertices
  * @param {Tool} tool: user interaction
  */
-function ScribbleVertexManip( viewer, gv, tool ) {
-  VertexManip.call( this, viewer, gv, tool );
+function ScribbleVertexManip(viewer, gv, tool) {
+  VertexManip.call(this, viewer, gv, tool);
 
-  this.type = 'ScribbleVertexManip';
+  this.type = "ScribbleVertexManip";
 
   this.first = true;
 }
 
-ScribbleVertexManip.prototype = Object.assign( Object.create(
-    VertexManip.prototype ), {
-  constructor: ScribbleVertexManip,
+ScribbleVertexManip.prototype = Object.assign(
+  Object.create(VertexManip.prototype),
+  {
+    constructor: ScribbleVertexManip,
 
-  isScribbleVertexManip: true,
+    isScribbleVertexManip: true,
 
-  /**
-   * @param {Event} event - is dragging
-   * @return {boolean}
-   */
-  manipulating: function( event ) {
-    if ( event.type == 'mousemove' ) {
-      if (!this.first) {
-        const intersects = this.raycast( event.clientX, event.clientY );
-        if ( intersects.length > 0 ) {
-          this.rubberband.addVertex( intersects[0].point );
+    /**
+     * @param {Event} event - is dragging
+     * @return {boolean}
+     */
+    manipulating: function (event) {
+      if (event.type == "mousemove") {
+        if (!this.first) {
+          const intersects = this.raycast(event.clientX, event.clientY);
+          if (intersects.length > 0) {
+            this.rubberband.addVertex(intersects[0].point);
+          }
+          const p = this.viewer.unproject(event.clientX, event.clientY);
+          this.rubberband.track(p);
+        } else {
+          this.first = false;
         }
-        const p = this.viewer.unproject( event.clientX, event.clientY );
-        this.rubberband.track( p );
-      } else {
-        this.first = false;
+      } else if (event.type === "mouseup") {
+        return false;
       }
-    } else if ( event.type === 'mouseup' ) {
-      return false;
-    }
-    return true;
+      return true;
+    },
   },
+);
 
-});
-
-export {ScribbleVertexManip};
+export { ScribbleVertexManip };

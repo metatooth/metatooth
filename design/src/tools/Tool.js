@@ -26,10 +26,10 @@
  * @constructor
  */
 function Tool() {
-  this.type = 'Tool';
+  this.type = "Tool";
 }
 
-Object.assign( Tool.prototype, {
+Object.assign(Tool.prototype, {
   constructor: Tool,
 
   isTool: true,
@@ -38,7 +38,7 @@ Object.assign( Tool.prototype, {
    * @param {Event} event - the starting event
    * @return {Manipulator}
    */
-  create: function(event) {
+  create: function (event) {
     return null;
   },
 
@@ -46,17 +46,16 @@ Object.assign( Tool.prototype, {
    * @param {Manipulator} manipulator - the manipulation to analyze
    * @return {Command}
    */
-  interpret: function(manipulator) {
+  interpret: function (manipulator) {
     return null;
   },
 
   /**
-    * @return {Object3D}
-    */
-  component: function() {
+   * @return {Object3D}
+   */
+  component: function () {
     return null;
   },
-
 });
 
-export {Tool};
+export { Tool };

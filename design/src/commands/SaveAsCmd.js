@@ -20,24 +20,24 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {Command} from './Command.js';
+import { Command } from "./Command.js";
 
 /**
  * Description: save as command
  * @constructor
  * @param {Editor} editor: the editor the command acts within
  */
-function SaveAsCmd( editor ) {
-  Command.call( this, editor, null );
-  this.type = 'SaveAsCmd';
+function SaveAsCmd(editor) {
+  Command.call(this, editor, null);
+  this.type = "SaveAsCmd";
 }
 
-SaveAsCmd.prototype = Object.assign( Object.create( Command.prototype ), {
+SaveAsCmd.prototype = Object.assign(Object.create(Command.prototype), {
   constructor: SaveAsCmd,
 
   isSaveAsCmd: true,
 
-  execute: function() {
+  execute: function () {
     const comp = this.editor.component;
     const namevar = this.editor.name;
     const oldname = namevar.name;
@@ -45,24 +45,22 @@ SaveAsCmd.prototype = Object.assign( Object.create( Command.prototype ), {
     const modifvar = this.editor.modified;
     const unidraw = this.editor.unidraw;
 
-    unidraw.catalog.create(comp, oldname)
-        .then((ok) => {
-          if (ok) {
-            modifvar.modified = false;
-            unidraw.clearHistory(comp);
-            const name = unidraw.catalog.name(comp);
-            namevar.name = name;
+    unidraw.catalog.create(comp, oldname).then((ok) => {
+      if (ok) {
+        modifvar.modified = false;
+        unidraw.clearHistory(comp);
+        const name = unidraw.catalog.name(comp);
+        namevar.name = name;
 
-            if (oldname.match(/^\/assets/)) {
-              const arr = name.split('/');
-              window.location.href = '?plan=' + arr[2];
-            }
-          } else {
-            console.warn('save as -- not ok!');
-          }
-        });
+        if (oldname.match(/^\/assets/)) {
+          const arr = name.split("/");
+          window.location.href = "?plan=" + arr[2];
+        }
+      } else {
+        console.warn("save as -- not ok!");
+      }
+    });
   },
-
 });
 
-export {SaveAsCmd};
+export { SaveAsCmd };

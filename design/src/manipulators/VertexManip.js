@@ -20,9 +20,9 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {Raycaster} from 'three';
+import { Raycaster } from "three";
 
-import {DragManip} from './DragManip.js';
+import { DragManip } from "./DragManip.js";
 
 /**
  * Description: A multi-click manipulation.
@@ -30,15 +30,15 @@ import {DragManip} from './DragManip.js';
  * @param {GrowingVertices} gv: track mouse movement and collect vertices
  * @param {Tool} tool: user interaction
  */
-function VertexManip( viewer, gv, tool ) {
-  DragManip.call( this, viewer, gv, tool );
+function VertexManip(viewer, gv, tool) {
+  DragManip.call(this, viewer, gv, tool);
 
-  this.type = 'VertexManip';
+  this.type = "VertexManip";
 
-  this.raycaster = new Raycaster;
+  this.raycaster = new Raycaster();
 }
 
-VertexManip.prototype = Object.assign( Object.create( DragManip.prototype ), {
+VertexManip.prototype = Object.assign(Object.create(DragManip.prototype), {
   constructor: VertexManip,
 
   isVertexManip: true,
@@ -50,44 +50,44 @@ VertexManip.prototype = Object.assign( Object.create( DragManip.prototype ), {
    * @param {Float32} y
    * @return {Vector3} the closest intersection or null
    */
-  raycast: function( x, y ) {
-    const p = this.viewer.ndc( event.clientX, event.clientY );
-    this.raycaster.setFromCamera( p, this.viewer.camera );
-    return this.raycaster.intersectObject( this.viewer.mesh() );
+  raycast: function (x, y) {
+    const p = this.viewer.ndc(event.clientX, event.clientY);
+    this.raycaster.setFromCamera(p, this.viewer.camera);
+    return this.raycaster.intersectObject(this.viewer.mesh());
   },
 
   /**
    * @param {Event} event - the mousedown event to start the drag
    */
-  grasp: function( event ) {
+  grasp: function (event) {
     DragManip.prototype.grasp.call(this, event);
 
-    const intersects = this.raycast( event.clientX, event.clientY );
-    if ( intersects.length > 0) {
-      this.rubberband.addVertex( intersects[0].point );
+    const intersects = this.raycast(event.clientX, event.clientY);
+    if (intersects.length > 0) {
+      this.rubberband.addVertex(intersects[0].point);
     }
-    const p = this.viewer.unproject( event.clientX, event.clientY );
-    this.rubberband.track( p );
+    const p = this.viewer.unproject(event.clientX, event.clientY);
+    this.rubberband.track(p);
   },
 
   /**
    * @param {Event} event - is dragging
    * @return {boolean}
    */
-  manipulating: function( event ) {
-    if ( event.type == 'mousemove' ) {
-      const p = this.viewer.unproject( event.clientX, event.clientY );
-      this.rubberband.track( p );
-    } else if ( event.type == 'mousedown' ) {
-      const intersects = this.raycast( event.clientX, event.clientY );
-      if ( intersects.length > 0 ) {
-        this.rubberband.addVertex( intersects[0].point );
+  manipulating: function (event) {
+    if (event.type == "mousemove") {
+      const p = this.viewer.unproject(event.clientX, event.clientY);
+      this.rubberband.track(p);
+    } else if (event.type == "mousedown") {
+      const intersects = this.raycast(event.clientX, event.clientY);
+      if (intersects.length > 0) {
+        this.rubberband.addVertex(intersects[0].point);
       }
-    } else if ( event.type === 'mouseup' ) {
+    } else if (event.type === "mouseup") {
       return false;
     }
     return true;
   },
 });
 
-export {VertexManip};
+export { VertexManip };

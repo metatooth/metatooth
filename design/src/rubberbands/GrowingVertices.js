@@ -22,11 +22,11 @@
  * OF THIS SOFTWARE.
  */
 
-import {MeshPhongMaterial} from 'three';
-import {SphereGeometry} from 'three';
-import {Mesh} from 'three';
+import { MeshPhongMaterial } from "three";
+import { SphereGeometry } from "three";
+import { Mesh } from "three";
 
-import {Rubberband} from './Rubberband.js';
+import { Rubberband } from "./Rubberband.js";
 
 /**
  * GrowingVertices are Rubberbands defined by a set of vertices
@@ -37,28 +37,27 @@ import {Rubberband} from './Rubberband.js';
 function GrowingVertices(vec) {
   Rubberband.call(this, vec);
 
-  this.type = 'GrowingVertices';
+  this.type = "GrowingVertices";
 
   this.vertices = [];
 
   this.geometry = new SphereGeometry(0.3, 8, 8);
-  this.material = new MeshPhongMaterial({color: 0xff33bb});
+  this.material = new MeshPhongMaterial({ color: 0xff33bb });
 
   if (vec) {
     this.track(vec);
   }
 }
 
-GrowingVertices.prototype = Object.assign( Object.create(
-    Rubberband.prototype ), {
+GrowingVertices.prototype = Object.assign(Object.create(Rubberband.prototype), {
   constructor: GrowingVertices,
 
   isGrowingVertices: true,
 
-  update: function() {
+  update: function () {
     if (this.vertices.length) {
       const mesh = new Mesh(this.geometry, this.material);
-      mesh.name = 'point-as-sphere';
+      mesh.name = "point-as-sphere";
 
       const v = this.vertices[this.vertices.length - 1];
 
@@ -74,19 +73,18 @@ GrowingVertices.prototype = Object.assign( Object.create(
    * Adds a vertex to the list.
    * @param {Vector3} v the vertex to add
    */
-  addVertex: function( v ) {
-    this.vertices.push( v );
+  addVertex: function (v) {
+    this.vertices.push(v);
     this.update();
   },
 
   /**
    * Removes the last vertex from the list
    */
-  removeVertex: function() {
+  removeVertex: function () {
     this.vertices.pop();
     this.children.pop();
   },
-
 });
 
-export {GrowingVertices};
+export { GrowingVertices };

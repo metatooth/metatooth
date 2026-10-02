@@ -20,53 +20,53 @@
  * WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
-import {Command} from './Command.js';
-import {SaveAsCmd} from './SaveAsCmd.js';
+import { Command } from "./Command.js";
+import { SaveAsCmd } from "./SaveAsCmd.js";
 
 /**
  * Description: save command
  * @constructor
  * @param {Editor} editor: the editor the command acts within
  */
-function SaveCmd( editor ) {
-  Command.call( this, editor, null );
-  this.type = 'SaveCmd';
+function SaveCmd(editor) {
+  Command.call(this, editor, null);
+  this.type = "SaveCmd";
 }
 
-SaveCmd.prototype = Object.assign( Object.create( Command.prototype ), {
+SaveCmd.prototype = Object.assign(Object.create(Command.prototype), {
   constructor: SaveCmd,
 
   isSaveCmd: true,
 
-  execute: function() {
+  execute: function () {
     const modified = this.editor.modified;
     const compName = this.editor.name;
-    const name = (compName) ? compName.name : undefined;
+    const name = compName ? compName.name : undefined;
     if (name === undefined || compName.name.match(/^\/assets\//)) {
       const saveas = new SaveAsCmd(this.editor);
       saveas.execute();
     } else if (modified && modified.modified) {
       const catalog = this.editor.$parent.catalog;
 
-      catalog.retrieve(name)
-          .then((comp) => catalog.save(comp, name))
-          .then((ok) => {
-            if (ok) {
-              if (modified) modified.modified = false;
-              const comp = catalog.compMap.get(name);
-              this.editor.unidraw.clearHistory(comp);
-            } else {
-              const saveas = new SaveAsCmd(this.editor);
-              saveas.execute();
-            }
-          })
-          .catch((error) => {
-            console.log('save-cmd catch @ execute');
-            console.log(error);
-          });
+      catalog
+        .retrieve(name)
+        .then((comp) => catalog.save(comp, name))
+        .then((ok) => {
+          if (ok) {
+            if (modified) modified.modified = false;
+            const comp = catalog.compMap.get(name);
+            this.editor.unidraw.clearHistory(comp);
+          } else {
+            const saveas = new SaveAsCmd(this.editor);
+            saveas.execute();
+          }
+        })
+        .catch((error) => {
+          console.log("save-cmd catch @ execute");
+          console.log(error);
+        });
     }
   },
-
 });
 
-export {SaveCmd};
+export { SaveCmd };
