@@ -1,0 +1,14 @@
+{
+  "buildpacks": [
+    { "url": "heroku/ruby" }
+  ],
+  "environments": {
+    "test": {
+      "addons": ["heroku-postgresql:in-dyno"],
+      "scripts": {
+        "test-setup": "gem install rubocop",
+        "test": "bundle exec rubocop . & bundle exec rspec"
+      }
+    }
+  }
+}
