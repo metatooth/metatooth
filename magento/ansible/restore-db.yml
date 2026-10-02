@@ -1,0 +1,67 @@
+- hosts: servers
+  become: yes
+
+  tasks:
+    - name: Ensure {{ build_dir }} dir exists
+      ansible.builtin.file:
+        path: "{{ build_dir }}"
+        state: directory
+
+    - name: Copy and restore database safely
+      block:
+        - name: Copy database dump
+          ansible.posix.synchronize:
+            src: "{{ db_dump_path }}"
+            dest: "{{ build_dir }}/magento-final.sql"
+            rsync_opts:
+              - "--chmod=Fu=rw,Fgo="
+
+        - name: Check whether {{ site_domain }} service unit exists
+          ansible.builtin.stat:
+            path: /etc/systemd/system/com.{{ site_slug }}.service
+          register: magento_service_unit
+
+        - name: Check whether {{ site_domain }} service is running
+          ansible.builtin.shell:
+            cmd: systemctl is-active --quiet com.{{ site_slug }}
+          register: magento_service_status
+          changed_when: false
+          failed_when: false
+          when: magento_service_unit.stat.exists
+
+        - name: Stop {{ site_domain }} service during restore
+          ansible.builtin.systemd:
+            name: com.{{ site_slug }}
+            state: stopped
+          when:
+            - magento_service_unit.stat.exists
+            - magento_service_status.rc | default(1) == 0
+
+        - name: Import database dump
+          ansible.builtin.shell:
+            cmd: |
+              set -o pipefail
+              grep -v "^CREATE DATABASE\|^USE " {{ (build_dir ~ '/magento-final.sql') | quote }} | \
+                sed "s/ DEFINER=\`[^\`]*\`@\`[^\`]*\`//" | \
+                mysql -h {{ db_host | quote }} -P {{ (db_port | default('3306')) | quote }} \
+                  -u {{ db_user | quote }} {{ db_name | quote }}
+            executable: /bin/bash
+          environment:
+            MYSQL_PWD: "{{ db_password }}"
+          register: magento_restore_db
+          changed_when: magento_restore_db.rc == 0
+          failed_when: magento_restore_db.rc != 0
+      always:
+        - name: Remove database dump from server
+          ansible.builtin.file:
+            path: "{{ build_dir }}/magento-final.sql"
+            state: absent
+
+        - name: Start {{ site_domain }} service after restore
+          ansible.builtin.systemd:
+            name: com.{{ site_slug }}
+            state: started
+          when:
+            - magento_service_unit is defined
+            - magento_service_unit.stat.exists
+            - magento_service_status.rc | default(1) == 0
