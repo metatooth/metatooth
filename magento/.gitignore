@@ -3,3 +3,4 @@ opt/
 *.sql
 *.tar.gz
 *.gz
+src/app/etc/config.php

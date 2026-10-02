@@ -1,4 +1,7 @@
 - hosts: servers
+  vars:
+    magento_app_owner: "{{ magento_container_app_uid | default('1000') }}"
+    magento_app_group: "{{ magento_container_app_gid | default('1000') }}"
 
   tasks:
     - name: Ensure {{ build_dir }} dir exists
@@ -7,26 +10,100 @@
         state: directory
 
     - name: Sync Magento source
-      synchronize:
+      become: yes
+      ansible.posix.synchronize:
         src: "{{ playbook_dir }}/../src/"
         dest: "{{ build_dir }}/public_html/"
+        delete: yes
         rsync_opts:
           - "--exclude=.gitignore"
+          - "--filter=P /app/etc/env.php"
+          - "--filter=P /app/etc/config.php"
+          - "--exclude=/var"
+          - "--exclude=/generated"
+          - "--exclude=/pub/media"
+          - "--exclude=/pub/static"
+          - "--exclude=/app/etc/env.php"
+          - "--exclude=/app/etc/config.php"
       tags: sync
 
     - name: Sync active theme
-      synchronize:
+      become: yes
+      ansible.posix.synchronize:
         src: "{{ playbook_dir }}/../themes/metatooth/default/"
         dest: "{{ build_dir }}/public_html/app/design/frontend/Metatooth/threetwenty/"
         rsync_opts:
           - "--exclude=.gitignore"
       tags: sync
 
-    - name: Copy database dump
-      synchronize:
-        src: "{{ db_dump_path }}"
-        dest: "{{ build_dir }}/magento-final.sql"
-      tags: sync
+    - name: Ensure release root is writable by container app user
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html"
+        state: directory
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
+
+    - name: Check for config.php in inventory
+      delegate_to: localhost
+      become: no
+      ansible.builtin.stat:
+        path: "{{ inventory_dir }}/config.php"
+      register: magento_inventory_config_php
+
+    - name: Check for config.php in the deployed release
+      become: yes
+      ansible.builtin.stat:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+      register: magento_existing_config_php
+
+    - name: Require inventory config.php or preserved deployed config.php before Composer
+      ansible.builtin.assert:
+        that:
+          - magento_inventory_config_php.stat.exists or magento_existing_config_php.stat.exists
+        fail_msg: >
+          app/etc/config.php must already exist in {{ build_dir }}/public_html or be
+          provided as {{ inventory_dir }}/config.php before deployment continues.
+
+    - name: Check for composer.lock in source tree
+      delegate_to: localhost
+      become: no
+      ansible.builtin.stat:
+        path: "{{ playbook_dir }}/../src/composer.lock"
+      register: magento_source_composer_lock
+
+    - name: Check for composer.lock in inventory
+      delegate_to: localhost
+      become: no
+      ansible.builtin.stat:
+        path: "{{ inventory_dir }}/composer.lock"
+      register: magento_inventory_composer_lock
+
+    - name: Copy composer.lock from inventory when source tree does not include it
+      become: yes
+      ansible.builtin.copy:
+        src: "{{ inventory_dir }}/composer.lock"
+        dest: "{{ build_dir }}/public_html/composer.lock"
+        owner: root
+        group: root
+        mode: '0644'
+      when:
+        - not magento_source_composer_lock.stat.exists
+        - magento_inventory_composer_lock.stat.exists
+
+    - name: Check for composer.lock in the deployed release
+      become: yes
+      ansible.builtin.stat:
+        path: "{{ build_dir }}/public_html/composer.lock"
+      register: magento_composer_lock
+
+    - name: Require composer.lock for deterministic Composer installs
+      ansible.builtin.assert:
+        that:
+          - magento_composer_lock.stat.exists
+        fail_msg: >
+          composer.lock must be present in {{ build_dir }}/public_html before running
+          composer install so deployments stay deterministic.
 
     - name: Ensure /root/.composer dir exists
       become: yes
@@ -42,17 +119,15 @@
         dest: /root/.composer/auth.json
         mode: '0600'
 
+    - name: Ensure app/etc dir exists
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/app/etc"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
 
-    - name: Import database dump
-      ansible.builtin.shell:
-        cmd: >
-          grep -v "^CREATE DATABASE\|^USE " {{ build_dir }}/magento-final.sql |
-          sed "s/ DEFINER=\`[^\`]*\`@\`[^\`]*\`//" |
-          mysql -h {{ db_host }} -P {{ db_port | default('3306') }}
-          -u {{ db_user }} {{ db_name }}
-      environment:
-        MYSQL_PWD: "{{ db_password }}"
-      tags: import
 
     - name: Install env.php
       become: yes
@@ -63,18 +138,30 @@
         group: root
         mode: '0644'
 
-    - name: Set writable directory permissions
+    - name: Install config.php from inventory when provided
       become: yes
-      ansible.builtin.shell:
-        cmd: >
-          chown -R {{ ansible_user }}:{{ ansible_user }} {{ build_dir }}/public_html/{{ item }} &&
-          chmod -R 775 {{ build_dir }}/public_html/{{ item }}
+      ansible.builtin.copy:
+        src: "{{ inventory_dir }}/config.php"
+        dest: "{{ build_dir }}/public_html/app/etc/config.php"
+        owner: root
+        group: root
+        mode: '0644'
+      when: magento_inventory_config_php.stat.exists
+
+    - name: Ensure required writable directories exist for container app user
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/{{ item }}"
+        state: directory
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
+        mode: '0775'
       loop:
         - var
-        - pub/static
         - pub/media
+        - pub/static
         - generated
-        - app/etc
+        - var/view_preprocessed
 
     - name: Install refresh script
       template:
@@ -129,63 +216,108 @@
       become: yes
       ansible.builtin.shell:
         cmd: |
-          docker exec php-{{ site_slug }}-1 mkdir -p /root/.composer
-          docker cp /root/.composer/auth.json php-{{ site_slug }}-1:/root/.composer/auth.json
+          docker exec php-{{ site_slug }}-1 mkdir -p /var/www/.composer
+          docker cp /root/.composer/auth.json php-{{ site_slug }}-1:/var/www/.composer/auth.json
+          docker exec -u root php-{{ site_slug }}-1 chown -R app:app /var/www/.composer
 
     - name: Install composer dependencies
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
-          composer install --no-dev --optimize-autoloader -d /var/www/html
+          docker exec -u root -e COMPOSER_DISABLE_PARALLEL_INSTALL=1 -e COMPOSER_PROCESS_TIMEOUT=1800 php-{{ site_slug }}-1
+          composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-ftp -d /var/www/html
+
+    - name: Check whether app/etc/config.php exists before Magento bootstrap
+      become: yes
+      ansible.builtin.stat:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+      register: magento_config_php_ready
+
+    - name: Require app/etc/config.php before Magento bootstrap
+      ansible.builtin.assert:
+        that:
+          - magento_config_php_ready.stat.exists
+        fail_msg: >
+          app/etc/config.php must already exist in the release or be provided from
+          inventory before running Magento CLI tasks.
 
     - name: Regenerate autoloader (no classmap — allows bootstrap without proxies)
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
+          docker exec -u root php-{{ site_slug }}-1
           composer dump-autoload -d /var/www/html
 
-    - name: Compile DI
+    - name: Compile DI (pass 1 — unblocks setup:upgrade's non-compiled DI resolution for brand-new modules)
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
+          docker exec -u root php-{{ site_slug }}-1
+          php /var/www/html/bin/magento setup:di:compile
+
+    - name: Run setup:upgrade (registers new modules, applies schema/data patches)
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec -u root php-{{ site_slug }}-1
+          php /var/www/html/bin/magento setup:upgrade --keep-generated
+
+    - name: Compile DI (pass 2 — final, covers everything setup:upgrade just enabled)
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec -u root php-{{ site_slug }}-1
           php /var/www/html/bin/magento setup:di:compile
 
     - name: Regenerate autoloader (optimized — now that proxies exist)
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
+          docker exec -u root php-{{ site_slug }}-1
           composer dump-autoload --optimize -d /var/www/html
+
+    - name: Check whether OpenSearch configuration already matches desired values
+      become: yes
+      ansible.builtin.shell:
+        cmd: >
+          docker exec -u root php-{{ site_slug }}-1 /bin/sh -lc
+          'test "$(php /var/www/html/bin/magento config:show catalog/search/engine 2>/dev/null)" = "opensearch"
+          && test "$(php /var/www/html/bin/magento config:show catalog/search/opensearch_server_hostname 2>/dev/null)" = "{{ site_slug }}_opensearch"
+          && test "$(php /var/www/html/bin/magento config:show catalog/search/opensearch_server_port 2>/dev/null)" = "9200"'
+      register: magento_opensearch_state
+      changed_when: false
+      failed_when: false
 
     - name: Configure OpenSearch as search engine
       become: yes
       ansible.builtin.shell:
-        cmd: >
-          docker exec php-{{ site_slug }}-1
-          php /var/www/html/bin/magento setup:config:set
-          --search-engine=opensearch
-          --opensearch-host={{ site_slug }}_opensearch
-          --opensearch-port=9200
-          --no-interaction
-
-    - name: Run setup:upgrade
-      become: yes
-      ansible.builtin.shell:
-        cmd: >
-          docker exec php-{{ site_slug }}-1
-          php /var/www/html/bin/magento setup:upgrade --keep-generated
+        cmd: |
+          set -e
+          docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento setup:config:set --search-engine=opensearch --opensearch-host={{ site_slug }}_opensearch --opensearch-port=9200
+          docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/engine opensearch
+          docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_hostname {{ site_slug }}_opensearch
+          docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set catalog/search/opensearch_server_port 9200
+        executable: /bin/bash
+      register: magento_opensearch_config
+      changed_when: magento_opensearch_config.rc == 0
+      failed_when: magento_opensearch_config.rc != 0
+      when: magento_opensearch_state.rc != 0
 
     - name: Deploy static content
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec php-{{ site_slug }}-1
+          docker exec -u root php-{{ site_slug }}-1
           php /var/www/html/bin/magento setup:static-content:deploy -f en_US
         chdir: "{{ build_dir }}"
       tags: static
+
+    - name: Restore app ownership on app/etc/config.php after deployment bootstrap
+      become: yes
+      ansible.builtin.file:
+        path: "{{ build_dir }}/public_html/app/etc/config.php"
+        owner: "{{ magento_app_owner }}"
+        group: "{{ magento_app_group }}"
 
     - name: Flush Magento cache
       become: yes
@@ -205,6 +337,7 @@
           docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set web/secure/base_static_url "https://{{ site_domain }}/static/"
           docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set web/unsecure/base_media_url "http://{{ site_domain }}/media/"
           docker exec php-{{ site_slug }}-1 php /var/www/html/bin/magento config:set web/secure/base_media_url "https://{{ site_domain }}/media/"
+        executable: /bin/bash
       register: magento_base_urls
       changed_when: magento_base_urls.rc == 0
       failed_when: magento_base_urls.rc != 0
