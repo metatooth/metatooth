@@ -17,14 +17,16 @@
         delete: yes
         rsync_opts:
           - "--exclude=.gitignore"
-          - "--filter=P /app/etc/env.php"
-          - "--filter=P /app/etc/config.php"
+          - "--filter=P_/app/etc/env.php"
+          - "--filter=P_/app/etc/config.php"
+          - "--filter=P_/composer.lock"
           - "--exclude=/var"
           - "--exclude=/generated"
           - "--exclude=/pub/media"
           - "--exclude=/pub/static"
           - "--exclude=/app/etc/env.php"
           - "--exclude=/app/etc/config.php"
+          - "--exclude=/composer.lock"
       tags: sync
 
     - name: Sync active theme
