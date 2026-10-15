@@ -9,6 +9,7 @@
 
 require 'aws-sdk-s3'
 require 'json'
+require 'open3'
 require 'optparse'
 require 'rest-client'
 require 'xmpp4r'
@@ -187,10 +188,13 @@ items.each do |_key, value|
 
   fetch_all(url, plan, revision, dirs, auth)
 
-  value = `#{action} #{dirs['plan']}`
-  puts value
-
   shellpath = File.join(dirs['outgoing'], 'shell.stl')
+  File.delete(shellpath) if File.exist?(shellpath)
+
+  output, status = Open3.capture2e(action, dirs['plan'])
+  puts output
+  abort "Action failed with status #{status.exitstatus}" unless status.success?
+
   key = make_key(shellpath)
 
   upload(shellpath, key)
