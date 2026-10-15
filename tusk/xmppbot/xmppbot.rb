@@ -43,15 +43,15 @@ OptionParser.new do |opts|
   opts.parse!(ARGV)
 end
 
-puts 'No pub-sub domain specified. See xmppbot -h' if to.nil?
+abort 'No pub-sub domain specified. See xmppbot -h' if to.nil?
 
-puts 'No incoming node specified. See xmppbot -h' if incoming.nil?
+abort 'No incoming node specified. See xmppbot -h' if incoming.nil?
 
-puts 'No script action specified. See xmppbot -h' if action.nil?
+abort 'No script action specified. See xmppbot -h' if action.nil?
 
-puts 'No working directory specified. See xmppbot -h' if workdir.nil?
+abort 'No working directory specified. See xmppbot -h' if workdir.nil?
 
-puts 'No outgoing node specified. See xmppbot -h' if outgoing.nil?
+abort 'No outgoing node specified. See xmppbot -h' if outgoing.nil?
 
 def fetch(url, path, options = nil)
   response = RestClient.get(url, options)
