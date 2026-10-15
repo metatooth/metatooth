@@ -73,7 +73,7 @@ def fetch_json(url, path, options = nil)
   response = RestClient.get(url, options)
   json = JSON.parse(response.body)
   File.open(path, 'w') do |f|
-    f << json
+    f << JSON.generate(json)
   end
   json
 end
