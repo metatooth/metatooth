@@ -9,6 +9,7 @@
 
 require 'aws-sdk-s3'
 require 'json'
+require 'open3'
 require 'optparse'
 require 'rest-client'
 require 'xmpp4r'
@@ -43,15 +44,15 @@ OptionParser.new do |opts|
   opts.parse!(ARGV)
 end
 
-puts 'No pub-sub domain specified. See xmppbot -h' if to.nil?
+abort 'No pub-sub domain specified. See xmppbot -h' if to.nil?
 
-puts 'No incoming node specified. See xmppbot -h' if incoming.nil?
+abort 'No incoming node specified. See xmppbot -h' if incoming.nil?
 
-puts 'No script action specified. See xmppbot -h' if action.nil?
+abort 'No script action specified. See xmppbot -h' if action.nil?
 
-puts 'No working directory specified. See xmppbot -h' if workdir.nil?
+abort 'No working directory specified. See xmppbot -h' if workdir.nil?
 
-puts 'No outgoing node specified. See xmppbot -h' if outgoing.nil?
+abort 'No outgoing node specified. See xmppbot -h' if outgoing.nil?
 
 def fetch(url, path, options = nil)
   response = RestClient.get(url, options)
@@ -73,7 +74,7 @@ def fetch_json(url, path, options = nil)
   response = RestClient.get(url, options)
   json = JSON.parse(response.body)
   File.open(path, 'w') do |f|
-    f << json
+    f << JSON.dump(json)
   end
   json
 end
@@ -187,10 +188,12 @@ items.each do |_key, value|
 
   fetch_all(url, plan, revision, dirs, auth)
 
-  value = `#{action} #{dirs['plan']}`
-  puts value
-
   shellpath = File.join(dirs['outgoing'], 'shell.stl')
+  File.delete(shellpath) if File.exist?(shellpath)
+  value, status = Open3.capture2e(action, dirs['plan'])
+  puts value
+  abort "Command failed: #{action}" unless status.success?
+
   key = make_key(shellpath)
 
   upload(shellpath, key)
