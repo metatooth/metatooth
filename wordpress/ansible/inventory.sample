@@ -1,6 +1,6 @@
 [all:vars]
 ansible_connection=ssh
-ansible_user=tusk
+ansible_user=<add_ansible_user>
 ansible_python_interpreter=/usr/bin/python3
 deploy_dir="/home/{{ ansible_user }}"
 build_dir="{{ deploy_dir }}/{{ site_slug }}"
