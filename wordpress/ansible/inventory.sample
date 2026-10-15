@@ -1,0 +1,24 @@
+[all:vars]
+ansible_connection=ssh
+ansible_user=tusk
+ansible_python_interpreter=/usr/bin/python3
+deploy_dir="/home/{{ ansible_user }}"
+build_dir="{{ deploy_dir }}/{{ site_slug }}"
+site_slug=<add_site_slug>
+site_domain=<add_domain>
+wordpress_port=<add_wordpress_port>
+backend_host=<add_backend_host>
+volume_name=<add_volume_name>
+
+[servers]
+<add_backend_host>
+
+[servers:vars]
+db_host=<add_db_host:port>
+db_user=<add_db_user>
+db_password=<add_db_password>
+db_name=<add_db_name>
+db_url=mysql2://{{ db_user }}:{{ db_password }}@{{ db_host }}/{{ db_name }}
+
+[balancers]
+<add_balancer_host>
