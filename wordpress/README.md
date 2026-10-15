@@ -1,5 +1,7 @@
 # [growherbert.com](https://growherbert.com)
+
 # [lynngrown.com](https://lynngrown.com)
+
 # [metatooth.com](https://metatooth.com)
 
 Deploys a WordPress-powered website
@@ -7,6 +9,7 @@ Deploys a WordPress-powered website
 ## Getting Started
 
 After changing to this directory in a terminal, run the following make command.
+
 ```bash
 ANSIBLE_INVENTORY=/path/to/inventory make deploy
 ```
