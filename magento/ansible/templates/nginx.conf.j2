@@ -61,15 +61,15 @@ server {
             add_header Cache-Control "public";
             add_header X-Frame-Options "SAMEORIGIN";
             expires +1y;
-            if (!-f $request_filename) { rewrite ^/static/(version\d*/)?(.*)$ /static/$2 last; }
+            if (!-f $request_filename) { return 404; }
         }
         location ~* \.(zip|gz|gzip|bz2|csv|xml)$ {
             add_header Cache-Control "no-store";
             add_header X-Frame-Options "SAMEORIGIN";
             expires off;
-            if (!-f $request_filename) { rewrite ^/static/(version\d*/)?(.*)$ /static/$2 last; }
+            if (!-f $request_filename) { return 404; }
         }
-        if (!-f $request_filename) { rewrite ^/static/(version\d*/)?(.*)$ /static/$2 last; }
+        if (!-f $request_filename) { return 404; }
         add_header X-Frame-Options "SAMEORIGIN";
     }
 
