@@ -1,0 +1,26 @@
+<?xml version="1.0"?>
+<csp_whitelist xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="urn:magento:module:Magento_Csp:etc/csp_whitelist.xsd">
+    <policies>
+        <!-- Font Awesome kit loaded from the theme's default_head_blocks.xml -->
+        <policy id="script-src">
+            <values>
+                <value id="fontawesome-kit" type="host">kit.fontawesome.com</value>
+            </values>
+        </policy>
+        <policy id="connect-src">
+            <values>
+                <value id="fontawesome-assets" type="host">ka-f.fontawesome.com</value>
+            </values>
+        </policy>
+        <policy id="style-src">
+            <values>
+                <value id="fontawesome-assets" type="host">ka-f.fontawesome.com</value>
+            </values>
+        </policy>
+        <policy id="font-src">
+            <values>
+                <value id="fontawesome-assets" type="host">ka-f.fontawesome.com</value>
+            </values>
+        </policy>
+    </policies>
+</csp_whitelist>
