@@ -303,6 +303,19 @@
       failed_when: magento_opensearch_config.rc != 0
       when: magento_opensearch_state.rc != 0
 
+    # setup:static-content:deploy -f does not overwrite an existing
+    # requirejs-config.js, so a module enabled/disabled since the last deploy
+    # leaves checkout requesting JS that no longer exists. Clear first.
+    - name: Clear generated theme static files
+      become: yes
+      ansible.builtin.file:
+        path: "{{ item }}"
+        state: absent
+      loop:
+        - "{{ build_dir }}/public_html/pub/static/frontend/Metatooth/threetwenty"
+        - "{{ build_dir }}/public_html/var/view_preprocessed"
+      tags: static
+
     - name: Deploy static content
       become: yes
       ansible.builtin.shell:
