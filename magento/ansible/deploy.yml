@@ -226,7 +226,7 @@
       become: yes
       ansible.builtin.shell:
         cmd: >
-          docker exec -u root -e COMPOSER_DISABLE_PARALLEL_INSTALL=1 -e COMPOSER_PROCESS_TIMEOUT=1800 php-{{ site_slug }}-1
+          docker exec -u root -e COMPOSER_HOME=/var/www/.composer -e COMPOSER_DISABLE_PARALLEL_INSTALL=1 -e COMPOSER_PROCESS_TIMEOUT=1800 php-{{ site_slug }}-1
           composer install --no-dev --optimize-autoloader --ignore-platform-req=ext-ftp -d /var/www/html
 
     - name: Check whether app/etc/config.php exists before Magento bootstrap
