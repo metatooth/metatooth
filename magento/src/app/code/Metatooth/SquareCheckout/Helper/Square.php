@@ -6,11 +6,12 @@ namespace Metatooth\SquareCheckout\Helper;
 use Magento\Framework\App\Helper\AbstractHelper;
 use Magento\Framework\App\Helper\Context;
 use Magento\Sales\Model\Order;
-use Square\SquareClient;
-use Square\Models\CheckoutOptions;
-use Square\Models\CreatePaymentLinkRequest;
-use Square\Models\Money;
-use Square\Models\QuickPay;
+use Square\Legacy\Models\CheckoutOptions;
+use Square\Legacy\Models\CreatePaymentLinkRequest;
+use Square\Legacy\Models\Money;
+use Square\Legacy\Models\OrderState;
+use Square\Legacy\Models\QuickPay;
+use Square\Legacy\SquareClient;
 
 class Square extends AbstractHelper
 {
@@ -64,17 +65,32 @@ class Square extends AbstractHelper
     }
 
     /**
-     * Return the payment IDs attached to a previously-created payment link.
+     * Whether the Square order behind a payment link has been paid.
      *
-     * @return string[]
+     * Payment links do not expose payment IDs; the order Square creates for
+     * the link is COMPLETED once a tender has been captured against it.
      */
-    public function getPaymentIds(string $linkId, int $storeId): array
+    public function isPaymentLinkPaid(string $linkId, int $storeId): bool
     {
-        $response = $this->buildClient($storeId)->getCheckoutApi()->retrievePaymentLink($linkId);
-        if (!$response->isSuccess()) {
-            return [];
+        $client = $this->buildClient($storeId);
+
+        $linkResponse = $client->getCheckoutApi()->retrievePaymentLink($linkId);
+        if (!$linkResponse->isSuccess()) {
+            return false;
         }
-        return $response->getResult()->getPaymentLink()->getPaymentIds() ?? [];
+
+        $squareOrderId = $linkResponse->getResult()->getPaymentLink()->getOrderId();
+        if (!$squareOrderId) {
+            return false;
+        }
+
+        $orderResponse = $client->getOrdersApi()->retrieveOrder($squareOrderId);
+        if (!$orderResponse->isSuccess()) {
+            return false;
+        }
+
+        $squareOrder = $orderResponse->getResult()->getOrder();
+        return $squareOrder !== null && $squareOrder->getState() === OrderState::COMPLETED;
     }
 
     private function buildClient(int $storeId): SquareClient

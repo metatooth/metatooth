@@ -43,11 +43,9 @@ class Success implements HttpGetActionInterface
 
         if ($order->getState() === Order::STATE_PENDING_PAYMENT) {
             $linkId = $order->getPayment()->getAdditionalInformation('square_payment_link_id');
-            $paymentIds = $linkId
-                ? $this->square->getPaymentIds($linkId, (int) $order->getStoreId())
-                : [];
+            $paid = $linkId && $this->square->isPaymentLinkPaid($linkId, (int) $order->getStoreId());
 
-            if (empty($paymentIds)) {
+            if (!$paid) {
                 // Square redirected here without a completed payment — treat as cancel
                 $this->messageManager->addNoticeMessage(__('Your payment was not completed.'));
                 return $this->cancelOrder($order, $result);

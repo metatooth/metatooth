@@ -10,7 +10,9 @@ use Magento\Framework\Controller\Result\RedirectFactory;
 use Magento\Framework\Message\ManagerInterface;
 use Magento\Framework\UrlInterface;
 use Magento\Sales\Api\OrderRepositoryInterface;
+use Magento\Sales\Model\Order;
 use Metatooth\SquareCheckout\Helper\Square;
+use Psr\Log\LoggerInterface;
 
 class Redirect implements HttpGetActionInterface
 {
@@ -22,6 +24,7 @@ class Redirect implements HttpGetActionInterface
         private readonly UrlInterface $urlBuilder,
         private readonly RedirectFactory $redirectFactory,
         private readonly ManagerInterface $messageManager,
+        private readonly LoggerInterface $logger,
     ) {}
 
     public function execute()
@@ -42,11 +45,14 @@ class Redirect implements HttpGetActionInterface
             ['id' => $linkId, 'url' => $squareUrl] = $this->square->createPaymentLink($order, $returnUrl);
 
             $order->getPayment()->setAdditionalInformation('square_payment_link_id', $linkId);
+            // payment_action=order leaves the order in new/processing; Success verifies only pending_payment
+            $order->setState(Order::STATE_PENDING_PAYMENT)->setStatus(Order::STATE_PENDING_PAYMENT);
             $this->orderRepository->save($order);
 
             return $result->setUrl($squareUrl);
 
-        } catch (\Exception $e) {
+        } catch (\Throwable $e) {
+            $this->logger->error('Metatooth_SquareCheckout: ' . $e->getMessage(), ['exception' => $e]);
             $this->messageManager->addErrorMessage(
                 __('Unable to connect to Square. Please try another payment method or contact us.')
             );
