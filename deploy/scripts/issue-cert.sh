@@ -10,6 +10,10 @@
 # for renewals and reloads nginx after each one.
 set -euo pipefail
 
+# acme.sh refuses to run when it sees it was started through sudo, which is how
+# Ansible's become reaches this script.
+unset SUDO_COMMAND SUDO_USER SUDO_UID SUDO_GID
+
 if [ "$#" -lt 4 ]; then
   echo "usage: $0 <email> <ca> <webroot> <domain> [alias...]" >&2
   exit 64
