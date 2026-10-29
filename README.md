@@ -10,7 +10,10 @@ portfolios, built for [laramirandagoodman.com](https://laramirandagoodman.com).
 ## deploy
 
 Ansible playbooks for host maintenance, shared across projects (package
-upgrades, reboots).
+upgrades, reboots), plus the shared acme.sh tasks and scripts the `wordpress`
+and `baldur` projects use to issue TLS certificates (`make certs` in each; see
+their READMEs). `deploy/scripts/check-certs.sh <domain>...` reports expiry of
+the live certificates.
 
 ## herbert
 

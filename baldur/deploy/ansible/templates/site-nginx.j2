@@ -1,10 +1,10 @@
 upstream baldur_backend {
-  server thermos.metatooth.com:3333;
+  server {{ backend_host }}:{{ baldur_port }};
 }
 
 server {
   listen 443 ssl;
-  server_name laramirandagoodman.com;
+  server_name {{ site_domain }};
 
   if ($scheme = http) {
     return 301 https://$host$request_uri;
@@ -22,16 +22,19 @@ server {
     proxy_set_header X-Forwarded-Proto $scheme;
   }
 
-  ssl_certificate /etc/zerossl/live/laramirandagoodman.com/cert.pem;
-  ssl_certificate_key /etc/zerossl/live/laramirandagoodman.com/key.pem;
+  ssl_certificate /root/.acme.sh/{{ site_domain }}_ecc/fullchain.cer;
+  ssl_certificate_key /root/.acme.sh/{{ site_domain }}_ecc/{{ site_domain }}.key;
 }
 
 server {
-  if ($host = laramirandagoodman.com) {
-    return 301 https://$host$request_uri;
+  listen 80;
+  server_name {{ site_domain }};
+
+  location /.well-known/acme-challenge/ {
+    root /var/www/acme;
   }
 
-  listen 80;
-  server_name laramirandagoodman.com;
-  return 404;
+  location / {
+    return 301 https://$host$request_uri;
+  }
 }

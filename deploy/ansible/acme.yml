@@ -1,0 +1,101 @@
+# Shared tasks for issuing and renewing one TLS certificate on a balancer with
+# acme.sh. Included by each project's certs.yml, which runs them against the
+# balancers group and supplies:
+#
+#   cert_domain   primary domain
+#   cert_aliases  extra names on the same certificate (list)
+#   acme_script   path to deploy/scripts/issue-cert.sh on the controller
+#   acme_email    from the inventory
+#   acme_ca       optional, defaults to zerossl
+#
+# Run before the first site deploy: nginx will not reload while a site config
+# references a certificate that does not exist yet. For the duration of
+# issuance a temporary port 80 server named for the certificate hosts answers
+# the challenge, shadowing any existing vhost (conf.d loads before
+# sites-enabled; nginx only warns about the duplicate name) and still
+# redirecting other requests to https. It is removed afterwards; renewals use
+# the site's own port 80 server.
+- name: Require site_domain and acme_email
+  assert:
+    that:
+      - site_domain is defined
+      - acme_email is defined
+    fail_msg: Set site_domain and acme_email in the inventory.
+
+- name: Ensure curl is installed
+  become: yes
+  apt:
+    name: curl
+    state: present
+    cache_valid_time: 86400
+
+- name: Ensure ACME webroot exists
+  become: yes
+  file:
+    path: "{{ acme_webroot }}"
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: Issue or renew {{ cert_domain }}
+  become: yes
+  block:
+    - name: Write acme-challenge.conf
+      copy:
+        dest: /etc/nginx/conf.d/acme-challenge.conf
+        owner: root
+        group: root
+        mode: '0644'
+        content: |
+          server {
+            listen 80;
+            server_name {{ ([cert_domain] + cert_aliases) | join(' ') }};
+
+            location /.well-known/acme-challenge/ {
+              root {{ acme_webroot }};
+            }
+
+            location / {
+              return 301 https://$host$request_uri;
+            }
+          }
+
+    - name: Validate nginx config
+      command: nginx -t
+      changed_when: false
+
+    - name: Reload nginx
+      service:
+        name: nginx
+        state: reloaded
+
+    - name: Run acme.sh for {{ cert_domain }}
+      script: >
+        {{ acme_script | quote }}
+        {{ acme_email | quote }} {{ acme_ca | quote }} {{ acme_webroot | quote }}
+        {{ cert_domain | quote }}
+        {% for alias in cert_aliases %}{{ alias | quote }} {% endfor %}
+      register: issue
+      changed_when: "'Cert success' in issue.stdout or 'Installing cert' in issue.stdout"
+  rescue:
+    - name: Fail
+      fail:
+        msg: >
+          Certificate issuance failed (nginx -t rejected the temporary ACME
+          server, or acme.sh could not validate {{ cert_domain }}). The
+          temporary server has been removed; fix the cause and re-run.
+  always:
+    - name: Remove acme-challenge.conf
+      file:
+        path: /etc/nginx/conf.d/acme-challenge.conf
+        state: absent
+
+    - name: Validate nginx config after cleanup
+      command: nginx -t
+      changed_when: false
+
+    - name: Reload nginx after cleanup
+      service:
+        name: nginx
+        state: reloaded

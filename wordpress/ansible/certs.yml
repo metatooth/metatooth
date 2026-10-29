@@ -1,0 +1,13 @@
+# Issue and renew the TLS certificate for the site on the balancers.
+# Uses site_domain and acme_email from the inventory; covers www.<site_domain>.
+- hosts: balancers
+
+  vars:
+    acme_ca: zerossl
+    acme_webroot: /var/www/acme
+    acme_script: "{{ playbook_dir }}/../../deploy/scripts/issue-cert.sh"
+    cert_domain: "{{ site_domain }}"
+    cert_aliases: ["www.{{ site_domain }}"]
+
+  tasks:
+    - ansible.builtin.include_tasks: ../../deploy/ansible/acme.yml

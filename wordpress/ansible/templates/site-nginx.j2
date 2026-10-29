@@ -25,15 +25,22 @@ server {
 }
 
 server {
-  if ($host = www.{{ site_domain }}) {
-    return 301 https://{{ site_domain }}$request_uri;
-  }
-
-  if ($host = {{ site_domain }}) {
-    return 301 https://$host$request_uri;
-  }
-
   listen 80;
   server_name www.{{ site_domain }} {{ site_domain }};
-  return 404;
+
+  location /.well-known/acme-challenge/ {
+    root /var/www/acme;
+  }
+
+  location / {
+    if ($host = www.{{ site_domain }}) {
+      return 301 https://{{ site_domain }}$request_uri;
+    }
+
+    if ($host = {{ site_domain }}) {
+      return 301 https://$host$request_uri;
+    }
+
+    return 404;
+  }
 }

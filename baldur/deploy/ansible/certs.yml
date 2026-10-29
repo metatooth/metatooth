@@ -1,0 +1,13 @@
+# Issue and renew the TLS certificate for the baldur site on the balancers.
+# Uses site_domain and acme_email from the inventory.
+- hosts: balancers
+
+  vars:
+    acme_ca: zerossl
+    acme_webroot: /var/www/acme
+    acme_script: "{{ playbook_dir }}/../../../deploy/scripts/issue-cert.sh"
+    cert_domain: "{{ site_domain }}"
+    cert_aliases: []
+
+  tasks:
+    - ansible.builtin.include_tasks: ../../../deploy/ansible/acme.yml
