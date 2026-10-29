@@ -57,6 +57,10 @@
 
 - hosts: balancers
 
+  vars:
+    # laramirandagoodman.com -> laramirandagoodman-com
+    site_conf: "{{ site_domain | replace('.', '-') }}"
+
   handlers:
     - name: Restart Nginx
       become: yes
@@ -66,16 +70,16 @@
 
   tasks:
 
-  - name: Install laramirandagoodman.com config
+  - name: Install {{ site_domain }} config
     become: yes
     template:
       src: ./templates/site-nginx.j2
-      dest: /etc/nginx/sites-available/laramirandagoodman-com
+      dest: /etc/nginx/sites-available/{{ site_conf }}
 
-  - name: Enable laramirandagoodman.com
+  - name: Enable {{ site_domain }}
     become: yes
     file:
-      src: /etc/nginx/sites-available/laramirandagoodman-com
-      dest: /etc/nginx/sites-enabled/laramirandagoodman-com
+      src: /etc/nginx/sites-available/{{ site_conf }}
+      dest: /etc/nginx/sites-enabled/{{ site_conf }}
       state: link
     notify: Restart Nginx
