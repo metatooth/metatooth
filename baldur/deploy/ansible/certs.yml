@@ -1,10 +1,8 @@
 # Issue and renew the TLS certificate for the baldur site on the balancers.
-# Uses acme_email from the inventory; site_domain defaults to the production
-# domain.
+# Uses site_domain and acme_email from the inventory.
 - hosts: balancers
 
   vars:
-    site_domain: laramirandagoodman.com
     acme_ca: zerossl
     acme_webroot: /var/www/acme
     acme_script: "{{ playbook_dir }}/../../../deploy/scripts/issue-cert.sh"

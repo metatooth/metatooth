@@ -24,8 +24,8 @@ S3_BUCKET_NAME
 
 ## TLS certificates
 
-Run before the first deploy (set `acme_email` in the inventory; `site_domain`
-optionally overrides the default `laramirandagoodman.com`):
+Run before the first deploy (set `site_domain` and `acme_email` in the
+inventory):
 
 ```bash
 cd deploy

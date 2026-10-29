@@ -12,10 +12,12 @@
 # references a certificate that does not exist yet. A catch-all port 80 server
 # answers the challenge for hosts that have no site config yet; afterwards the
 # site's own port 80 server does.
-- name: Require acme_email
+- name: Require site_domain and acme_email
   assert:
-    that: acme_email is defined
-    fail_msg: Set acme_email in the inventory.
+    that:
+      - site_domain is defined
+      - acme_email is defined
+    fail_msg: Set site_domain and acme_email in the inventory.
 
 - name: Ensure curl is installed
   become: yes
