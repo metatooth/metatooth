@@ -4,7 +4,7 @@ upstream baldur_backend {
 
 server {
   listen 443 ssl;
-  server_name laramirandagoodman.com;
+  server_name {{ site_domain }};
 
   if ($scheme = http) {
     return 301 https://$host$request_uri;
@@ -22,13 +22,13 @@ server {
     proxy_set_header X-Forwarded-Proto $scheme;
   }
 
-  ssl_certificate /root/.acme.sh/laramirandagoodman.com_ecc/fullchain.cer;
-  ssl_certificate_key /root/.acme.sh/laramirandagoodman.com_ecc/laramirandagoodman.com.key;
+  ssl_certificate /root/.acme.sh/{{ site_domain }}_ecc/fullchain.cer;
+  ssl_certificate_key /root/.acme.sh/{{ site_domain }}_ecc/{{ site_domain }}.key;
 }
 
 server {
   listen 80;
-  server_name laramirandagoodman.com;
+  server_name {{ site_domain }};
 
   location /.well-known/acme-challenge/ {
     root /var/www/acme;

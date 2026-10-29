@@ -64,8 +64,8 @@
 
   - name: Install laramirandagoodman.com config
     become: yes
-    synchronize:
-      src: "{{ src_dir }}/nginx.conf"
+    template:
+      src: ./templates/site-nginx.j2
       dest: /etc/nginx/sites-available/laramirandagoodman-com
 
   - name: Enable laramirandagoodman.com
