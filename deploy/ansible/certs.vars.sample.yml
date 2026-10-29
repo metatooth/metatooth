@@ -1,0 +1,10 @@
+# Pass with: ansible-playbook -e @certs.vars.yml ansible/certs.yml
+# Each cert covers `domain` plus any `aliases` (as SANs).
+certs:
+  - domain: growherbert.com
+    aliases: [www.growherbert.com]
+  - domain: lynngrown.com
+    aliases: [www.lynngrown.com]
+  - domain: metatooth.com
+    aliases: [www.metatooth.com]
+  - domain: laramirandagoodman.com

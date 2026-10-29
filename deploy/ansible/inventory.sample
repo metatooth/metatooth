@@ -1,0 +1,11 @@
+[all:vars]
+ansible_connection=ssh
+ansible_user=<add_ansible_user>
+ansible_python_interpreter=/usr/bin/python3
+
+# Used by certs.yml
+acme_email=<add_acme_email>
+# acme_ca=zerossl  # or letsencrypt
+
+[balancers]
+<add_balancer_host>

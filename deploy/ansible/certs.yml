@@ -1,0 +1,91 @@
+# Issue and renew TLS certificates on the balancers with acme.sh.
+#
+# Run before the first site deploy: nginx will not reload while a site config
+# references a certificate that does not exist yet. A catch-all port 80 server
+# answers the challenge for hosts that have no site config yet; afterwards
+# each site's own port 80 server does.
+#
+# Expects `certs` (and `acme_email`) from the inventory, see inventory.sample.
+- hosts: balancers
+  become: yes
+
+  vars:
+    acme_ca: zerossl
+    acme_webroot: /var/www/acme
+
+  tasks:
+    - name: Require acme_email and certs
+      assert:
+        that:
+          - acme_email is defined
+          - certs is defined and certs | length > 0
+        fail_msg: Set acme_email and certs in the inventory (see inventory.sample).
+
+    - name: Ensure curl is installed
+      apt:
+        name: curl
+        state: present
+        cache_valid_time: 86400
+
+    - name: Ensure ACME webroot exists
+      file:
+        path: "{{ acme_webroot }}"
+        state: directory
+        owner: root
+        group: root
+        mode: '0755'
+
+    - name: Install catch-all ACME challenge server
+      block:
+        - name: Write acme-challenge.conf
+          copy:
+            dest: /etc/nginx/conf.d/acme-challenge.conf
+            owner: root
+            group: root
+            mode: '0644'
+            content: |
+              server {
+                listen 80 default_server;
+                server_name _;
+
+                location /.well-known/acme-challenge/ {
+                  root {{ acme_webroot }};
+                }
+
+                location / {
+                  return 404;
+                }
+              }
+
+        - name: Validate nginx config
+          command: nginx -t
+          changed_when: false
+
+        - name: Reload nginx
+          service:
+            name: nginx
+            state: reloaded
+      rescue:
+        - name: Remove acme-challenge.conf
+          file:
+            path: /etc/nginx/conf.d/acme-challenge.conf
+            state: absent
+
+        - name: Fail
+          fail:
+            msg: >
+              nginx -t failed with the catch-all ACME server (another
+              default_server on port 80, or a site referencing a missing
+              certificate?). Removed it; fix the config and re-run.
+
+    - name: Issue or renew certificates
+      script: >
+        ../scripts/issue-cert.sh
+        {{ acme_email | quote }} {{ acme_ca | quote }} {{ acme_webroot | quote }}
+        {{ item.domain | quote }}
+        {% for alias in item.aliases | default([]) %}{{ alias | quote }} {% endfor %}
+      loop: "{{ certs }}"
+      loop_control:
+        label: "{{ item.domain }}"
+      register: issue
+      changed_when: "'Cert success' in issue.stdout or 'Installing cert' in issue.stdout"
