@@ -22,6 +22,13 @@ DATABASE_URL
 RACK_SECRET
 S3_BUCKET_NAME
 
+## Deployment inventory
+
+Besides the usual connection and database settings, the inventory must define
+`site_domain`, `backend_host` (the host running the container, used as the
+nginx upstream) and `baldur_port` (the host port mapped to the container's
+4567).
+
 ## TLS certificates
 
 Run before the first deploy (set `site_domain` and `acme_email` in the
