@@ -5,7 +5,7 @@ After=docker.service
 
 [Service]
 Type=oneshot
-ExecStart=/bin/bash -c 'if docker ps -q -f "name=^{{ container_name }}$" | grep -q .; then exit 0; elif docker container inspect {{ container_name }} >/dev/null 2>&1; then docker start {{ container_name }}; else docker run -d --restart unless-stopped -p {{ baldur_port }}:4567 --name {{ container_name }} --add-host={{ db_host }}:{{ db_host_ip }} --env-file {{ deploy_dir }}/.env baldur_app:latest; fi'
+ExecStart=/bin/bash -c 'if docker ps -q -f "name=^{{ baldur_container }}$" | grep -q .; then exit 0; elif docker container inspect {{ baldur_container }} >/dev/null 2>&1; then docker start {{ baldur_container }}; else docker run -d --restart unless-stopped -p {{ baldur_port }}:4567 --name {{ baldur_container }} --add-host={{ db_host }}:{{ db_host_ip }} --env-file {{ deploy_dir }}/.env baldur_app:latest; fi'
 RemainAfterExit=yes
 
 [Install]

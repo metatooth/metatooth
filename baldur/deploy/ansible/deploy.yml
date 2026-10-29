@@ -3,6 +3,8 @@
   vars:
     # laramirandagoodman.com -> com.laramirandagoodman
     service_name: "{{ site_domain.split('.') | reverse | join('.') }}"
+    # container_name from the inventory wins; otherwise same as the service
+    baldur_container: "{{ container_name | default(service_name) }}"
 
   tasks:
     - name: Sync docker image
@@ -25,7 +27,7 @@
 
     - name: Stop running container
       ansible.builtin.shell:
-        cmd: docker container remove --force {{ container_name }}
+        cmd: docker container remove --force {{ baldur_container }}
 
     - name: Run docker image as container
       ansible.builtin.shell:
@@ -33,7 +35,7 @@
           docker run -d
           --restart unless-stopped
           -p {{ baldur_port }}:4567
-          --name {{ container_name }}
+          --name {{ baldur_container }}
           --add-host={{ db_host }}:{{ db_host_ip }}
           --env-file {{ deploy_dir }}/.env
           baldur_app:latest

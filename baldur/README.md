@@ -27,7 +27,8 @@ S3_BUCKET_NAME
 Besides the usual connection and database settings, the inventory must define
 `site_domain`, `backend_host` (the host running the container, used as the
 nginx upstream) and `baldur_port` (the host port mapped to the container's
-4567).
+4567). `container_name` is optional and defaults to the reversed domain
+(`com.laramirandagoodman`).
 
 ## TLS certificates
 
