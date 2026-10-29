@@ -39,3 +39,8 @@ deploy:
 deploy-baldur:
 	$(MAKE) build
 	$(MAKE) deploy
+
+# Issue/renew the TLS certificate on the balancers (run before first deploy).
+.PHONY: certs
+certs:
+	ansible-playbook -i ${ANSIBLE_INVENTORY} ansible/certs.yml

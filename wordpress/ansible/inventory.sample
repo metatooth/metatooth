@@ -6,6 +6,7 @@ deploy_dir="/home/{{ ansible_user }}"
 build_dir="{{ deploy_dir }}/{{ site_slug }}"
 site_slug=<add_site_slug>
 site_domain=<add_domain>
+acme_email=<add_acme_email>
 wordpress_port=<add_wordpress_port>
 backend_host=<add_backend_host>
 volume_name=<add_volume_name>

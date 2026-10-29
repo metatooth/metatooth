@@ -21,3 +21,16 @@ AWS_SECRET_ACCESS_KEY
 DATABASE_URL
 RACK_SECRET
 S3_BUCKET_NAME
+
+## TLS certificates
+
+Run before the first deploy (set `acme_email` in the inventory; `site_domain`
+optionally overrides the default `laramirandagoodman.com`):
+
+```bash
+cd deploy
+ANSIBLE_INVENTORY=/path/to/inventory make certs
+```
+
+Certificates are issued on the balancers with acme.sh, which renews them from
+cron. Check expiry with `../deploy/scripts/check-certs.sh <domain>`.

@@ -10,11 +10,10 @@ portfolios, built for [laramirandagoodman.com](https://laramirandagoodman.com).
 ## deploy
 
 Ansible playbooks for host maintenance, shared across projects (package
-upgrades, reboots) and TLS certificates for the balancers. Copy
-`deploy/ansible/certs.vars.sample.yml` to `certs.vars.yml`, then run
-`ANSIBLE_INVENTORY=/path/to/inventory make certs` from `deploy/` to issue and
-renew certificates with acme.sh (run it before the first WordPress or baldur
-deploy), and `make certs-check` to report expiry of the live certificates.
+upgrades, reboots), plus the shared acme.sh tasks and scripts the `wordpress`
+and `baldur` projects use to issue TLS certificates (`make certs` in each; see
+their READMEs). `deploy/scripts/check-certs.sh <domain>...` reports expiry of
+the live certificates.
 
 ## herbert
 
