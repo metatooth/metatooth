@@ -53,6 +53,17 @@ class Redirect implements HttpGetActionInterface
 
         } catch (\Throwable $e) {
             $this->logger->error('Metatooth_SquareCheckout: ' . $e->getMessage(), ['exception' => $e]);
+            try {
+                $order = $this->orderRepository->get($orderId);
+                if ($order->canCancel()) {
+                    $order->cancel()
+                        ->addCommentToStatusHistory('Cancelled: could not create Square payment link.');
+                    $this->orderRepository->save($order);
+                }
+                $this->checkoutSession->restoreQuote();
+            } catch (\Throwable $inner) {
+                $this->logger->error('Metatooth_SquareCheckout: cleanup failed: ' . $inner->getMessage());
+            }
             $this->messageManager->addErrorMessage(
                 __('Unable to connect to Square. Please try another payment method or contact us.')
             );
