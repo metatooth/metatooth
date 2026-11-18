@@ -8,7 +8,9 @@
 # the specified JID.
 
 require 'aws-sdk-s3'
+require 'fileutils'
 require 'json'
+require 'open3'
 require 'optparse'
 require 'rest-client'
 require 'xmpp4r'
@@ -182,15 +184,31 @@ items.each do |_key, value|
     end
   end
 
+  unless plan.match?(/\A[\w-]+\z/)
+    warn "Skipping invalid plan identifier: #{plan.inspect}"
+    next
+  end
+
   puts "Processing /plans/#{plan}/revisions/#{revision} ..."
   dirs = make_directories(workdir, plan, incoming, outgoing)
 
   fetch_all(url, plan, revision, dirs, auth)
 
-  value = `#{action} #{dirs['plan']}`
-  puts value
-
   shellpath = File.join(dirs['outgoing'], 'shell.stl')
+  FileUtils.rm_f(shellpath)
+
+  output, status = Open3.capture2e(action, dirs['plan'])
+  puts output
+  unless status.success?
+    warn "#{action} failed (exit #{status.exitstatus}) for plan #{plan}"
+    next
+  end
+
+  unless File.file?(shellpath)
+    warn "#{action} did not produce #{shellpath}"
+    next
+  end
+
   key = make_key(shellpath)
 
   upload(shellpath, key)
