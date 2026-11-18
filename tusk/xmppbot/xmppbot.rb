@@ -13,6 +13,7 @@ require 'json'
 require 'open3'
 require 'optparse'
 require 'rest-client'
+require 'set'
 require 'xmpp4r'
 require 'xmpp4r/pubsub/helper/servicehelper'
 
@@ -163,34 +164,35 @@ def upload(path, key)
   end
 end
 
-client = Jabber::Client.new(ENV['JABBER_ID'])
-client.connect
-client.auth(ENV['JABBER_PASSWORD'])
+ID_PATTERN = /\A[\w-]+\z/
 
-helper = Jabber::PubSub::ServiceHelper.new(client, to)
-helper.subscribe_to(incoming)
-
-items = helper.get_items_from(incoming, 3)
-
-items.each do |_key, value|
-  plan = ''
-  revision = ''
-  value.each_element do |elem|
-    case elem.name
-    when 'plan'
-      plan = elem.text
-    when 'revision'
-      revision = elem.text
-    end
+# Reads the plan and revision identifiers from a published item.
+# Returns nil unless both are present and well formed.
+def parse_item(item)
+  fields = { 'plan' => '', 'revision' => '' }
+  item.each_element do |elem|
+    fields[elem.name] = elem.text.to_s.strip if fields.key?(elem.name)
   end
 
-  unless plan.match?(/\A[\w-]+\z/)
-    warn "Skipping invalid plan identifier: #{plan.inspect}"
-    next
+  return nil unless fields.values.all? { |v| v.match?(ID_PATTERN) }
+
+  [fields['plan'], fields['revision']]
+end
+
+# Processes one item. Returns true on success, false otherwise.
+def process_item(id, item, ctx)
+  plan, revision = parse_item(item)
+  if plan.nil?
+    warn "Skipping item #{id}: invalid or missing plan/revision"
+    return false
   end
+
+  action = ctx[:action]
+  url = ctx[:url]
+  auth = ctx[:auth]
 
   puts "Processing /plans/#{plan}/revisions/#{revision} ..."
-  dirs = make_directories(workdir, plan, incoming, outgoing)
+  dirs = make_directories(ctx[:workdir], plan, ctx[:incoming], ctx[:outgoing])
 
   fetch_all(url, plan, revision, dirs, auth)
 
@@ -201,21 +203,70 @@ items.each do |_key, value|
   puts output
   unless status.success?
     warn "#{action} failed (exit #{status.exitstatus}) for plan #{plan}"
-    next
+    return false
   end
 
   unless File.file?(shellpath)
     warn "#{action} did not produce #{shellpath}"
-    next
+    return false
   end
 
   key = make_key(shellpath)
-
   upload(shellpath, key)
 
   response = post(url, auth, key)
   json = JSON.parse(response.body)
 
-  response = helper.publish_item_to(outgoing, make_item(plan, json['locator']))
-  puts response
+  puts ctx[:helper].publish_item_to(ctx[:outgoing],
+                                    make_item(plan, json['locator']))
+  true
+rescue StandardError => e
+  warn "Error processing item #{id}: #{e.class}: #{e.message}"
+  false
 end
+
+client = Jabber::Client.new(ENV['JABBER_ID'])
+client.connect
+client.auth(ENV['JABBER_PASSWORD'])
+
+helper = Jabber::PubSub::ServiceHelper.new(client, to)
+
+ctx = {
+  action: action, url: url, auth: auth, workdir: workdir,
+  incoming: incoming, outgoing: outgoing, helper: helper
+}
+
+FileUtils.mkdir_p(workdir)
+processed_path = File.join(workdir, '.processed')
+processed = Set.new(File.exist?(processed_path) ? File.readlines(processed_path, chomp: true) : [])
+lock = Mutex.new
+
+handle = lambda do |id, item|
+  lock.synchronize do
+    next if id.nil? || processed.include?(id)
+
+    if process_item(id, item, ctx)
+      processed << id
+      File.open(processed_path, 'a') { |f| f.puts(id) }
+    end
+  end
+end
+
+# Install the callback before subscribing so no publication is missed.
+helper.add_event_callback do |event|
+  items = event.first_element('items')
+  next if items.nil?
+
+  items.each_element('item') { |item| handle.call(item.attributes['id'], item) }
+end
+
+helper.subscribe_to(incoming)
+
+# Recover the backlog of items published while the bot was not running.
+helper.get_items_from(incoming).each { |id, item| handle.call(id, item) }
+
+done = Queue.new
+%w[INT TERM].each { |sig| Signal.trap(sig) { done << sig } }
+puts "Waiting for items on #{incoming} ..."
+done.pop
+client.close
