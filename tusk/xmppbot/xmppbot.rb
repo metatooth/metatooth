@@ -228,6 +228,8 @@ end
 client = Jabber::Client.new(ENV['JABBER_ID'])
 client.connect
 client.auth(ENV['JABBER_PASSWORD'])
+# Announce availability so the server routes pubsub notifications to us.
+client.send(Jabber::Presence.new.set_type(:available))
 
 helper = Jabber::PubSub::ServiceHelper.new(client, to)
 
@@ -257,7 +259,10 @@ helper.add_event_callback do |event|
   items = event.first_element('items')
   next if items.nil?
 
-  items.each_element('item') { |item| handle.call(item.attributes['id'], item) }
+  items.each_element('item') do |item|
+    # Notifications wrap the payload in <item>; backlog fetches yield it bare.
+    handle.call(item.attributes['id'], item.first_element('entry') || item)
+  end
 end
 
 helper.subscribe_to(incoming)
