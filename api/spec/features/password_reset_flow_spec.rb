@@ -37,6 +37,6 @@ RSpec.describe 'Password Reset Flow', type: :request do
     expect(last_response.status).to eq 204
 
     user = user_repo.by_email(john.email)
-    expect(user.authenticate('new_password')).equal? true
+    expect(user.authenticate('new_password')).to eq true
   end
 end
