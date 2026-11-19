@@ -55,6 +55,15 @@ postgres=# \q
 $ echo "DATABASE_URL=postgres://metaspace:metaspace@localhost/metaspace_development" > .env
 ```
 
+### e-mail settings (optional)
+
+| Variable         | Default                      | Purpose                                      |
+|------------------|------------------------------|----------------------------------------------|
+| `PUBLIC_API_URL` | `https://api.metatooth.com`  | Origin used for links in confirmation, password-reset and product e-mails |
+| `MAIL_FROM`      | `noreply@metatooth.com`      | Sender address                               |
+
+For local development set `PUBLIC_API_URL=http://localhost:9393` in `.env`.
+
 ### serve with hot reload at localhost:9393
 
 ```
