@@ -24,6 +24,25 @@ $ bundle install
 
 ### initialize database & environment variables
 
+#### Option 1: Docker
+
+```bash
+$ docker run -d --name metatooth-pg \
+    -e POSTGRES_USER=metatooth -e POSTGRES_PASSWORD=metatooth \
+    -e POSTGRES_DB=metatooth_development \
+    -p 5432:5432 postgres:15
+$ echo "DATABASE_URL=postgres://metatooth:metatooth@localhost/metatooth_development" > .env
+```
+
+Check that it is ready with `pg_isready -h localhost`. The database starts
+empty; load the schema before starting the server:
+
+```bash
+$ docker exec -i metatooth-pg psql -U metatooth -d metatooth_development < db/setup.sql
+```
+
+#### Option 2: local PostgreSQL
+
 ```bash
 $ sudo -u postgres psql
 postgres=# create database metaspace_development;

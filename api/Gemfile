@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-ruby '3.0.2'
+ruby '3.3.8'
 
 source 'https://rubygems.org'
 
@@ -8,6 +8,7 @@ gem 'bcrypt'
 gem 'dry-validation'
 gem 'foreman'
 gem 'json'
+gem 'net-smtp'
 gem 'pg'
 gem 'pony'
 gem 'puma'

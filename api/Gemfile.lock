@@ -78,7 +78,11 @@ GEM
     minitest (5.16.3)
     mustermann (2.0.2)
       ruby2_keywords (~> 0.0.1)
-    nio4r (2.5.8)
+    net-protocol (0.2.2)
+      timeout
+    net-smtp (0.5.1)
+      net-protocol
+    nio4r (2.7.5)
     parallel (1.22.1)
     parser (3.1.2.1)
       ast (~> 2.4.1)
@@ -94,7 +98,7 @@ GEM
     puma (5.6.5)
       nio4r (~> 2.0)
     racc (1.6.0)
-    rack (2.2.4)
+    rack (2.2.25)
     rack-accept (0.4.5)
       rack (>= 0.4)
     rack-cors (1.1.1)
@@ -109,7 +113,7 @@ GEM
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     regexp_parser (2.5.0)
-    rerun (0.13.1)
+    rerun (0.14.0)
       listen (~> 3.0)
     rexml (3.2.5)
     rom (5.2.6)
@@ -189,6 +193,7 @@ GEM
       tilt (~> 2.0)
     slop (3.6.0)
     tilt (2.0.11)
+    timeout (0.6.0)
     transproc (1.1.1)
     tzinfo (2.0.5)
       concurrent-ruby (~> 1.0)
@@ -204,6 +209,7 @@ DEPENDENCIES
   dry-validation-matchers (~> 1.2)
   foreman
   json
+  net-smtp
   pg
   pony
   pry
@@ -226,7 +232,7 @@ DEPENDENCIES
   sinatra
 
 RUBY VERSION
-   ruby 3.0.2p107
+   ruby 3.3.8p144
 
 BUNDLED WITH
-   2.1.4
+   2.6.2

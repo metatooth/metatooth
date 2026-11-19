@@ -2,7 +2,6 @@
 
 ENV['RACK_ENV'] = 'test'
 
-require 'database_cleaner'
 require 'dry-validation-matchers'
 require 'pry-remote'
 require 'rack/test'
@@ -18,6 +17,18 @@ end
 
 Dir["#{File.dirname(__FILE__)}/support/factories/*.rb"].sort.each do |file|
   require file
+end
+
+# Truncates every application table through the ROM gateway's Sequel
+# connection (the app has no ActiveRecord connection).
+module DbCleaner
+  def self.clean
+    db = MAIN_CONTAINER.gateways[:default].connection
+    tables = db.tables.map { |t| db.literal(t) }
+    return if tables.empty?
+
+    db.run("TRUNCATE #{tables.join(', ')} RESTART IDENTITY CASCADE")
+  end
 end
 
 # RSpec Helpers
@@ -54,13 +65,11 @@ RSpec.configure do |config|
     header 'Accept', 'application/vnd.metaspace.v1+json'
   end
 
-  config.before(:suite) do
-    DatabaseCleaner.clean_with(:truncation)
-  end
+  config.before(:suite) { DbCleaner.clean }
 
   config.around(:each) do |example|
-    DatabaseCleaner.cleaning do
-      example.run
-    end
+    example.run
+  ensure
+    DbCleaner.clean
   end
 end
