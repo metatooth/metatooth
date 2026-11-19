@@ -32,6 +32,43 @@ RSpec.describe 'Addresses', type: :request do
         "Metaspace-Token api_key=#{key_str}, access_token=#{token_str}" }
       end
 
+      context "for another user's addresses" do
+        let(:other) { Factory[:user] }
+        let(:theirs) { Factory[:address, user_id: other.id] }
+
+        before { theirs }
+
+        it 'forbids listing' do
+          get "/users/#{other.id}/addresses", nil, headers
+          expect(last_response.status).to eq 403
+        end
+
+        it 'forbids reading' do
+          get "/users/#{other.id}/addresses/#{theirs.id}", nil, headers
+          expect(last_response.status).to eq 403
+        end
+
+        it 'forbids creating' do
+          post "/users/#{other.id}/addresses",
+               { data: { name: 'x', address1: '1 A St', city: 'B',
+                         state: 'MA' } }, headers
+          expect(last_response.status).to eq 403
+        end
+
+        it 'forbids updating' do
+          put "/users/#{other.id}/addresses/#{theirs.id}",
+              { data: { city: 'Elsewhere' } }, headers
+          expect(last_response.status).to eq 403
+          expect(address_repo.by_id(theirs.id)[:city]).to eq theirs.city
+        end
+
+        it 'forbids deleting' do
+          delete "/users/#{other.id}/addresses/#{theirs.id}", nil, headers
+          expect(last_response.status).to eq 403
+          expect(address_repo.by_id(theirs.id)[:deleted]).to be false
+        end
+      end
+
       describe 'GET /users/:uid/addresses' do
         before { get "/users/#{user.id}/addresses", nil, headers }
 

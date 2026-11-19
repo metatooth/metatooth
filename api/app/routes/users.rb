@@ -16,6 +16,7 @@ class App
 
   get '/users' do
     authenticate_user
+    forbidden! unless current_user_manager?
 
     status 200
     { data: users.to_a.map { |u| public_user(u) } }.to_json
@@ -47,6 +48,7 @@ class App
 
   get '/users/:id' do
     authenticate_user
+    authorize_account!
 
     if user
       status 200
@@ -58,6 +60,7 @@ class App
 
   put '/users/:id' do
     authenticate_user
+    authorize_account!
 
     if user.nil?
       resource_not_found
@@ -81,6 +84,7 @@ class App
 
   delete '/users/:id' do
     authenticate_user
+    authorize_account!
 
     if user.nil?
       resource_not_found
@@ -99,6 +103,11 @@ class App
   def public_user(record)
     attrs = record.respond_to?(:attributes) ? record.attributes : record.to_h
     attrs.to_h.transform_keys(&:to_sym).slice(*PUBLIC_USER_FIELDS)
+  end
+
+  # Self-service for the account owner; cross-account needs a manager.
+  def authorize_account!
+    forbidden! unless current_user_id?(params[:id]) || current_user_manager?
   end
 
   def user

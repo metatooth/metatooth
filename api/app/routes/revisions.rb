@@ -97,8 +97,12 @@ class App
     @revision_repo ||= RevisionRepo.new(MAIN_CONTAINER)
   end
 
+  # The revision must belong to the plan named in the path.
   def revision
-    @revision ||= revision_repo.by_locator(params[:id])
+    @revision ||= begin
+      plan = plan_repo.by_locator(params[:pid])
+      revision_repo.by_plan_and_locator(plan.id, params[:id])
+    end
   rescue StandardError
     nil
   end

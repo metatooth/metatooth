@@ -22,6 +22,7 @@ class App
     to = params[:to] ? Time.parse(params[:to]) : now + (1 * 24 * 60 * 60)
 
     all_orders = orders.to_a
+    all_orders.select! { |o| o[:user_id] == current_user[:id] } unless current_admin?
     all_orders.select! { |v| v[:created_at] > from && v[:created_at] < to }
 
     status 200
@@ -31,7 +32,7 @@ class App
   post '/orders' do
     authenticate_user
 
-    order_hash = { user_id: current_user.id }
+    order_hash = { user_id: current_user[:id] }
     order_params.each do |k, v|
       order_hash[k.to_sym] = v
     end
@@ -95,8 +96,12 @@ class App
 
   private
 
+  # Only the owner (or an Admin) can see an order; others get a 404.
   def order
-    @order ||= order_repo.by_id(params[:id])
+    @order ||= begin
+      found = order_repo.by_id(params[:id])
+      found if current_admin? || found[:user_id] == current_user[:id]
+    end
   rescue StandardError
     nil
   end

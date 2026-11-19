@@ -32,6 +32,23 @@ module Authentication
     @api_key ||= authenticator.api_key
   end
 
+  # Roles live in the users.type column (the User model is always plain User).
+  def current_user_manager?
+    %w[UserManager Admin].include?(current_user&.[](:type))
+  end
+
+  def current_admin?
+    current_user&.[](:type) == 'Admin'
+  end
+
+  def current_user_id?(id)
+    !current_user.nil? && current_user[:id] == id.to_i
+  end
+
+  def forbidden!
+    halt 403
+  end
+
   def current_user
     @current_user ||= UserRepo.new(MAIN_CONTAINER).by_id(access_token[:user_id])
   rescue StandardError

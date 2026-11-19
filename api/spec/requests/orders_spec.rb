@@ -41,6 +41,39 @@ RSpec.describe 'Orders', type: :request do
         "Metaspace-Token api_key=#{key_str}, access_token=#{token_str}" }
       end
 
+      context "with another customer's order" do
+        let(:other) { Factory[:user] }
+        let(:other_address) { Factory[:address, user_id: other.id] }
+        let(:foreign) do
+          Factory[:order, user_id: other.id, bill_id: other_address.id,
+                          ship_id: other_address.id]
+        end
+
+        before { foreign }
+
+        it 'does not list it' do
+          get '/orders', nil, headers
+          ids = json_body['data'].map { |o| o['id'] }
+          expect(ids).to match_array([a.id, b.id, c.id])
+        end
+
+        it 'returns 404 when reading it' do
+          get "/orders/#{foreign.id}", nil, headers
+          expect(last_response.status).to eq 404
+        end
+
+        it 'returns 404 when updating it' do
+          put "/orders/#{foreign.id}", { data: {} }, headers
+          expect(last_response.status).to eq 404
+        end
+
+        it 'returns 404 and keeps it when deleting it' do
+          delete "/orders/#{foreign.id}", nil, headers
+          expect(last_response.status).to eq 404
+          expect(order_repo.by_id(foreign.id)[:deleted]).to be false
+        end
+      end
+
       describe 'GET /orders' do
         before { get '/orders', nil, headers }
 

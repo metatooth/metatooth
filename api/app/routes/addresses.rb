@@ -4,6 +4,7 @@
 class App
   get '/users/:uid/addresses' do
     authenticate_user
+    authorize_address_owner!
 
     if selected_user.nil?
       resource_not_found
@@ -15,6 +16,7 @@ class App
 
   get '/users/:uid/addresses/:id' do
     authenticate_user
+    authorize_address_owner!
 
     if selected_user.nil?
       resource_not_found
@@ -32,6 +34,7 @@ class App
 
   post '/users/:uid/addresses' do
     authenticate_user
+    authorize_address_owner!
 
     if selected_user.nil?
       resource_not_found
@@ -54,6 +57,7 @@ class App
 
   put '/users/:uid/addresses/:id' do
     authenticate_user
+    authorize_address_owner!
 
     if selected_user.nil? ||
        !selected_user.addresses.find { |a| a.id == params[:id].to_i }
@@ -81,6 +85,7 @@ class App
 
   delete '/users/:uid/addresses/:id' do
     authenticate_user
+    authorize_address_owner!
 
     if selected_user.nil? ||
        !selected_user.addresses.find { |a| a.id == params[:id].to_i }
@@ -93,6 +98,11 @@ class App
   end
 
   private
+
+  # Addresses belong to :uid; only that user (or an Admin) may touch them.
+  def authorize_address_owner!
+    forbidden! unless current_user_id?(params[:uid]) || current_admin?
+  end
 
   def selected_user
     user_repo = UserRepo.new(MAIN_CONTAINER)

@@ -23,6 +23,36 @@ RSpec.describe 'Revisions', type: :request do
       { 'HTTP_AUTHORIZATION' => "Metaspace-Token api_key=#{key_str}" }
     end
 
+    context 'with a revision belonging to a different plan' do
+      let(:other_plan) { Factory[:plan] }
+      let(:foreign) { Factory[:revision, plan_id: other_plan.id] }
+
+      before { foreign }
+
+      it 'returns 404 when read through the wrong plan' do
+        get "/plans/#{plan.locator}/revisions/#{foreign.locator}", nil, headers
+        expect(last_response.status).to eq 404
+      end
+
+      it 'returns 404 when updated through the wrong plan' do
+        put "/plans/#{plan.locator}/revisions/#{foreign.locator}",
+            { data: { location: 'evil.example.org' } }, headers
+        expect(last_response.status).to eq 404
+        expect(revision_repo.by_id(foreign.id)[:location]).to eq 'example.org'
+      end
+
+      it 'returns 404 and keeps it when deleted through the wrong plan' do
+        delete "/plans/#{plan.locator}/revisions/#{foreign.locator}", nil, headers
+        expect(last_response.status).to eq 404
+        expect(revision_repo.by_id(foreign.id)[:deleted]).to be false
+      end
+
+      it 'returns 404 for a nonexistent parent plan' do
+        get "/plans/nope/revisions/#{foreign.locator}", nil, headers
+        expect(last_response.status).to eq 404
+      end
+    end
+
     describe 'GET /plans/:pid/revisions' do
       before { get "/plans/#{plan.locator}/revisions", nil, headers }
 

@@ -12,6 +12,10 @@ class RevisionRepo < ROM::Repository[:revisions]
     revisions.where(locator: locator).one!
   end
 
+  def by_plan_and_locator(plan_id, locator)
+    revisions.where(plan_id: plan_id, locator: locator).one!
+  end
+
   def delete(id)
     update(id, deleted: true, deleted_at: DateTime.now)
   end

@@ -3,13 +3,12 @@
 require_relative '../spec_helper'
 
 SECRET_USER_FIELDS = %w[password_digest confirmation_token reset_password_token
-                        reset_password_redirect_url
-                        confirmation_redirect_url].freeze
+             reset_password_redirect_url confirmation_redirect_url].freeze
 
 RSpec.describe 'Users', type: :request do
   let(:user_repo) { UserRepo.new(MAIN_CONTAINER) }
 
-  let(:a) { Factory[:user] }
+  let(:a) { Factory[:user, type: 'UserManager'] }
   let(:b) { Factory[:user] }
   let(:c) { Factory[:user] }
   let(:users) { [a, b, c] }
@@ -22,6 +21,51 @@ RSpec.describe 'Users', type: :request do
   context 'with valid API Key' do
     let(:key) { Factory[:api_key] }
     let(:key_str) { "#{key.id}:#{key.api_key}" }
+
+    context 'with a plain (non-manager) access token' do
+      let(:access_token) do
+        Factory[:access_token, api_key_id: key.id, user_id: b.id]
+      end
+      let(:token) do
+        AccessTokenRepo.new(MAIN_CONTAINER).generate(access_token.id)
+      end
+      let(:headers) do
+        { 'HTTP_AUTHORIZATION' =>
+        "Metaspace-Token api_key=#{key_str}, access_token=#{b.id}:#{token}" }
+      end
+
+      it 'forbids listing all users' do
+        get '/users', nil, headers
+        expect(last_response.status).to eq 403
+      end
+
+      it 'allows reading own account' do
+        get "/users/#{b.id}", nil, headers
+        expect(last_response.status).to eq 200
+      end
+
+      it 'allows updating own account' do
+        put "/users/#{b.id}", { data: { name: 'Me' } }, headers
+        expect(last_response.status).to eq 200
+      end
+
+      it 'forbids reading another account' do
+        get "/users/#{c.id}", nil, headers
+        expect(last_response.status).to eq 403
+      end
+
+      it "forbids changing another account's email" do
+        put "/users/#{c.id}", { data: { email: 'x@example.com' } }, headers
+        expect(last_response.status).to eq 403
+        expect(user_repo.by_id(c.id)[:email]).to eq c.email
+      end
+
+      it 'forbids deleting another account' do
+        delete "/users/#{c.id}", nil, headers
+        expect(last_response.status).to eq 403
+        expect(user_repo.by_id(c.id)[:deleted]).to be false
+      end
+    end
 
     context 'with valid access token' do
       let(:access_token) do
