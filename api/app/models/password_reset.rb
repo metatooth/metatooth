@@ -65,10 +65,10 @@ class PasswordReset
   end
 
   def retrieve_user
-    user = if email
-             user_with_email
-           else
+    user = if updating || reset_token
              user_with_token
+           else
+             user_with_email
            end
 
     raise StandardError unless user
