@@ -4,6 +4,8 @@ require 'bcrypt'
 
 # Access Token allows User access to API
 class AccessTokens < ROM::Relation[:sql]
+  include SoftDeletable
+
   schema(infer: true) do
     associations do
       belongs_to :user

@@ -5,7 +5,7 @@ class OrderRepo < ROM::Repository[:orders]
   commands :create, update: :by_pk
 
   def by_id(id)
-    orders.by_pk(id).one!
+    orders.active.by_pk(id).one!
   end
 
   def delete(id)
@@ -13,10 +13,10 @@ class OrderRepo < ROM::Repository[:orders]
   end
 
   def for_user(uid)
-    orders.combine(:users).where(id: uid)
+    orders.active.combine(:users).where(id: uid)
   end
 
   def query(conditions)
-    orders.where(conditions).to_a
+    orders.active.where(conditions).to_a
   end
 end

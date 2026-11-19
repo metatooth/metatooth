@@ -18,7 +18,7 @@ class App
     plan = plan_repo.plan_with_revisions(params[:pid]).one!
 
     status 200
-    { data: plan.revisions.to_a }.to_json
+    { data: plan.revisions.map(&:to_h) }.to_json
   end
 
   post '/plans/:pid/revisions' do
@@ -26,7 +26,7 @@ class App
 
     revision_hash = {}
     revision_hash[:plan_id] = plan.id
-    revision_hash[:number] = plan.revisions.length
+    revision_hash[:number] = revision_repo.next_number(plan.id)
     revision_params.each do |k, v|
       revision_hash[k.to_sym] = v
     end

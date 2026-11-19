@@ -9,7 +9,7 @@ class AccessTokenRepo < ROM::Repository[:access_tokens]
   end
 
   def by_id(id)
-    access_tokens.by_pk(id).one!
+    access_tokens.active.by_pk(id).one!
   end
 
   def delete(id)

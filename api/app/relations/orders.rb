@@ -2,6 +2,8 @@
 
 # A struct for an order
 class Orders < ROM::Relation[:sql]
+  include SoftDeletable
+
   schema(:orders, infer: true) do
     attribute :shipped_impression_kit_at, Types::DateTime
 

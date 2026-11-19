@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Revisions < ROM::Relation[:sql]
+  include SoftDeletable
+
   schema(:revisions, infer: true) do
     attribute :locator, (Types::String.default { SecureRandom.hex(2) })
     attribute :created_at, (Types::DateTime.default { DateTime.now })

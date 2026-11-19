@@ -94,7 +94,7 @@ class App
   end
 
   def products
-    @products ||= MAIN_CONTAINER.relations[:products].call
+    @products ||= MAIN_CONTAINER.relations[:products].active
   end
 
   def product_params

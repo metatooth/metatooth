@@ -117,6 +117,6 @@ class App
   end
 
   def orders
-    @orders ||= MAIN_CONTAINER.relations[:orders].call
+    @orders ||= MAIN_CONTAINER.relations[:orders].active
   end
 end

@@ -5,7 +5,7 @@ class AddressRepo < ROM::Repository[:addresses]
   commands :create, update: :by_pk
 
   def by_id(id)
-    addresses.by_pk(id).one!
+    addresses.active.by_pk(id).one!
   end
 
   def delete(id)

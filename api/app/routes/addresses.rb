@@ -10,7 +10,7 @@ class App
       resource_not_found
     else
       status 200
-      { data: selected_user.addresses.to_a }.to_json
+      { data: selected_user.addresses.map(&:to_h) }.to_json
     end
   end
 

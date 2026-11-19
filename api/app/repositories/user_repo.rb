@@ -5,15 +5,15 @@ class UserRepo < ROM::Repository[:users]
   commands :create, update: :by_pk
 
   def by_id(id)
-    users.map_to(User).by_pk(id).one!
+    users.active.map_to(User).by_pk(id).one!
   end
 
   def by_email(email)
-    users.map_to(User).where(email: email).one!
+    users.active.map_to(User).where(email: email).one!
   end
 
   def by_token(token)
-    users.map_to(User).where(reset_password_token: token).one!
+    users.active.map_to(User).where(reset_password_token: token).one!
   end
 
   def complete_password_reset(id, password)
@@ -28,8 +28,14 @@ class UserRepo < ROM::Repository[:users]
     update(id, confirmation_token: nil, confirmed_at: DateTime.now)
   end
 
+  # Soft-deletes the user and revokes their access tokens atomically.
   def delete(id)
-    update(id, deleted: true, deleted_at: DateTime.now)
+    now = DateTime.now
+    transaction do
+      access_tokens.where(user_id: id, deleted: false)
+                   .command(:update).call(deleted: true, deleted_at: now)
+      update(id, deleted: true, deleted_at: now)
+    end
   end
 
   def init_password_reset(id, redirect_url)
@@ -40,10 +46,10 @@ class UserRepo < ROM::Repository[:users]
   end
 
   def user_with_addresses(id)
-    users.where(id: id).combine(:addresses).one!
+    users.active.where(id: id).combine(:addresses).one!
   end
 
   def query(conditions)
-    users.where(conditions).to_a
+    users.active.where(conditions).to_a
   end
 end

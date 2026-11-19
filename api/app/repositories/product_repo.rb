@@ -5,7 +5,7 @@ class ProductRepo < ROM::Repository[:products]
   commands :create, update: :by_pk
 
   def by_id(id)
-    products.by_pk(id).one!
+    products.active.by_pk(id).one!
   end
 
   def delete(id)
@@ -13,6 +13,6 @@ class ProductRepo < ROM::Repository[:products]
   end
 
   def query(conditions)
-    products.where(conditions).to_a
+    products.active.where(conditions).to_a
   end
 end

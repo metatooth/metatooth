@@ -5,11 +5,11 @@ class PlanRepo < ROM::Repository[:plans]
   commands :create, update: :by_pk
 
   def by_id(id)
-    plans.by_pk(id).one!
+    plans.active.by_pk(id).one!
   end
 
   def by_locator(locator)
-    plans.where(locator: locator).one!
+    plans.active.where(locator: locator).one!
   end
 
   def delete(id)
@@ -17,6 +17,6 @@ class PlanRepo < ROM::Repository[:plans]
   end
 
   def plan_with_revisions(locator)
-    plans.where(locator: locator).combine(:revisions)
+    plans.active.where(locator: locator).combine(:revisions)
   end
 end

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Plans < ROM::Relation[:sql]
+  include SoftDeletable
+
   schema(:plans, infer: true) do
     attribute :locator, (Types::String.default { SecureRandom.hex(2) })
     attribute :created_at, (Types::DateTime.default { DateTime.now })
@@ -8,7 +10,7 @@ class Plans < ROM::Relation[:sql]
     attribute :deleted, (Types::Bool.default { false })
 
     associations do
-      has_many :revisions
+      has_many :revisions, view: :active
     end
   end
 end

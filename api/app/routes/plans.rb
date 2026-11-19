@@ -108,7 +108,7 @@ class App
   end
 
   def plans
-    @plans ||= MAIN_CONTAINER.relations[:plans].call
+    @plans ||= MAIN_CONTAINER.relations[:plans].active
   end
 
   def plan_params

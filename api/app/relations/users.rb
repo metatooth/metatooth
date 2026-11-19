@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Users < ROM::Relation[:sql]
+  include SoftDeletable
+
   schema(:users) do
     attribute :id, Types::Serial
     attribute :locator, (Types::String.default { SecureRandom.hex(2) })
@@ -26,7 +28,7 @@ class Users < ROM::Relation[:sql]
 
     associations do
       has_many :access_tokens
-      has_many :addresses
+      has_many :addresses, view: :active
       has_many :orders
     end
   end

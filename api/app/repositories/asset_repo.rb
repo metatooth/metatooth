@@ -5,15 +5,15 @@ class AssetRepo < ROM::Repository[:assets]
   commands :create, update: :by_pk
 
   def by_created_at(from, to)
-    assets.where { (created_at > from) & (created_at < to) }.call
+    assets.active.where { (created_at > from) & (created_at < to) }.call
   end
 
   def by_id(id)
-    assets.by_pk(id).one!
+    assets.active.by_pk(id).one!
   end
 
   def by_locator(locator)
-    assets.where(locator: locator).one!
+    assets.active.where(locator: locator).one!
   end
 
   def delete(id)

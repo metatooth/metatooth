@@ -128,6 +128,6 @@ class App
   end
 
   def users
-    @users ||= MAIN_CONTAINER.relations[:users].call
+    @users ||= MAIN_CONTAINER.relations[:users].active
   end
 end
