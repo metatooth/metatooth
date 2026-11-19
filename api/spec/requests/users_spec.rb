@@ -2,6 +2,10 @@
 
 require_relative '../spec_helper'
 
+SECRET_USER_FIELDS = %w[password_digest confirmation_token reset_password_token
+                        reset_password_redirect_url
+                        confirmation_redirect_url].freeze
+
 RSpec.describe 'Users', type: :request do
   let(:user_repo) { UserRepo.new(MAIN_CONTAINER) }
 
@@ -47,6 +51,12 @@ RSpec.describe 'Users', type: :request do
         it 'receives all 3 users' do
           expect(json_body['data'].size).to eq 3
         end
+
+        it 'does not expose authentication secrets' do
+          json_body['data'].each do |u|
+            expect(u.keys & SECRET_USER_FIELDS).to be_empty
+          end
+        end
       end
 
       describe 'GET /users/:id' do
@@ -63,6 +73,10 @@ RSpec.describe 'Users', type: :request do
 
           it 'receives user' do
             expect(json_body['data']['email']).to eq b.email
+          end
+
+          it 'does not expose authentication secrets' do
+            expect(json_body['data'].keys & SECRET_USER_FIELDS).to be_empty
           end
         end
 
@@ -199,6 +213,10 @@ RSpec.describe 'Users', type: :request do
 
           it 'receives the newly created resource' do
             expect(json_body['data']['email']).to eq 'someone@example.com'
+          end
+
+          it 'does not expose authentication secrets' do
+            expect(json_body['data'].keys & SECRET_USER_FIELDS).to be_empty
           end
 
           users = MAIN_CONTAINER.relations[:users]

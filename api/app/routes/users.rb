@@ -18,7 +18,7 @@ class App
     authenticate_user
 
     status 200
-    { data: users.to_a }.to_json
+    { data: users.to_a.map { |u| public_user(u) } }.to_json
   end
 
   post '/users' do
@@ -39,7 +39,7 @@ class App
       response.headers['Location'] =
         "#{request.scheme}://#{request.host}/users/#{new_user[:id]}"
       status :created
-      { data: new_user.to_h }.to_json
+      { data: public_user(new_user) }.to_json
     else
       unprocessable_entity!(errors)
     end
@@ -50,7 +50,7 @@ class App
 
     if user
       status 200
-      { data: user.attributes }.to_json
+      { data: public_user(user) }.to_json
     else
       resource_not_found
     end
@@ -72,7 +72,7 @@ class App
       if errors.empty?
         updated_user = user_repo.update(user[:id], user_hash)
         status :ok
-        { data: updated_user.to_h }.to_json
+        { data: public_user(updated_user) }.to_json
       else
         unprocessable_entity!(errors)
       end
@@ -91,6 +91,15 @@ class App
   end
 
   private
+
+  PUBLIC_USER_FIELDS = %i[id locator type email name last_logged_in_at
+                          confirmed_at created_at updated_at].freeze
+
+  # Projects a user (model, ROM struct, or hash) onto non-secret fields.
+  def public_user(record)
+    attrs = record.respond_to?(:attributes) ? record.attributes : record.to_h
+    attrs.to_h.transform_keys(&:to_sym).slice(*PUBLIC_USER_FIELDS)
+  end
 
   def user
     @user ||= UserRepo.new(MAIN_CONTAINER).by_id(params[:id])
