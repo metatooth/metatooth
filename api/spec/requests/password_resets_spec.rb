@@ -101,7 +101,7 @@ RSpec.describe 'PasswordResets', type: :request do
           expect(last_response.status).to eq 204
         end
         it 'updates the password' do
-          expect(john.authenticate('new_password')).to eq false
+          expect(user_repo.by_id(john[:id]).authenticate('new_password')).to eq true
         end
       end
       context 'with invalid parameters' do
