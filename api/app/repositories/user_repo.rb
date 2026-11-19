@@ -18,7 +18,7 @@ class UserRepo < ROM::Repository[:users]
 
   def complete_password_reset(id, password)
     update(id,
-           password: password,
+           password_digest: BCrypt::Password.create(password),
            reset_password_token: nil,
            reset_password_sent_at: nil,
            reset_password_redirect_url: nil)
