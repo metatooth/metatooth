@@ -36,16 +36,18 @@ class App
     if selected_user.nil?
       resource_not_found
     else
-      address.user = selected_user
+      address_hash = (address_params || {}).transform_keys(&:to_sym).merge(user_id: selected_user.id)
+      errors = AddressContract.new.call(address_hash).errors(full: true).to_h
 
-      if address.save
-        path = "/users/#{selected_user.id}/addresses/#{address.id}"
+      if errors.empty?
+        new_address = address_repo.create(address_hash)
+        path = "/users/#{selected_user.id}/addresses/#{new_address.id}"
         response.headers['Location'] =
           "#{request.scheme}://#{request.host}#{path}"
         status :created
-        { data: address }.to_json
+        { data: new_address.to_h }.to_json
       else
-        unprocessable_entity!(address)
+        unprocessable_entity!(errors)
       end
     end
   end
