@@ -103,7 +103,7 @@ RSpec.describe 'Orders', type: :request do
 
           it 'updates the record in the database' do
             updated_order = order_repo.by_id(b.id)
-            expect(Time.new(1974, 6, 21, 0, 0, 0)).to eq(
+            expect(Time.new(1974, 6, 21, 0, 0, 0, '-04:00')).to eq(
               updated_order[:shipped_impression_kit_at]
             )
           end
