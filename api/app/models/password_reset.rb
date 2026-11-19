@@ -2,6 +2,9 @@
 
 # Helper object for password reset
 class PasswordReset
+  # How long a reset link stays usable after it is issued.
+  TOKEN_LIFETIME = 2 * 60 * 60
+
   attr_accessor :email, :reset_password_redirect_url, :password,
                 :reset_token, :updating
 
@@ -82,10 +85,20 @@ class PasswordReset
     nil
   end
 
+  # A blank token must never be looked up (`WHERE token IS NULL` would match
+  # every user without a pending reset) and an old token is treated as unknown.
   def user_with_token
-    user_repo.by_token(reset_token)
+    return nil if blank?(reset_token)
+
+    found = user_repo.by_token(reset_token)
+    found if token_fresh?(found)
   rescue StandardError
     nil
+  end
+
+  def token_fresh?(found)
+    sent_at = found[:reset_password_sent_at]
+    !sent_at.nil? && (Time.now - sent_at.to_time) <= TOKEN_LIFETIME
   end
 
   def user_repo

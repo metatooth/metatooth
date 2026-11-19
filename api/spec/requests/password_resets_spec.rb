@@ -23,6 +23,10 @@ RSpec.describe 'PasswordResets', type: :request do
         expect(last_response.status).to eq 204
       end
 
+      it 'sets no Location header' do
+        expect(last_response.headers['Location']).to be_nil
+      end
+
       # Here we check that all the fields have properly been updated
       it 'adds the reset password attributes to "john"' do
         puts "john #{john.inspect}"
@@ -43,6 +47,12 @@ RSpec.describe 'PasswordResets', type: :request do
       before { post '/password_resets', params }
       it 'returns HTTP status 422' do
         expect(last_response.status).to eq 422
+      end
+
+      it 'lists the validation messages' do
+        expect(json_body['error']['invalid_params']).to eq(
+          ['reset_password_redirect_url must be present']
+        )
       end
     end
 
@@ -86,6 +96,16 @@ RSpec.describe 'PasswordResets', type: :request do
         expect(last_response.status).to eq 404
       end
     end
+    context 'with an expired token' do
+      let(:user) do
+        Factory[:user, :reset_password,
+                reset_password_sent_at: DateTime.now - 3]
+      end
+      it 'returns HTTP status 404 and does not redirect' do
+        get "/password_resets/#{user.reset_password_token}"
+        expect(last_response.status).to eq 404
+      end
+    end
   end
 
   describe 'PUT /password_resets/:token' do
@@ -109,6 +129,38 @@ RSpec.describe 'PasswordResets', type: :request do
         it 'returns HTTP status 422' do
           expect(last_response.status).to eq 422
         end
+        it 'lists the validation messages' do
+          expect(json_body['error']['invalid_params']).to eq(
+            ['password must be present']
+          )
+        end
+      end
+    end
+    context 'with an expired token' do
+      let(:user) do
+        Factory[:user, :reset_password,
+                reset_password_sent_at: DateTime.now - 3]
+      end
+      before do
+        put "/password_resets/#{user.reset_password_token}",
+            data: { password: 'new_password' }
+      end
+      it 'returns HTTP status 404' do
+        expect(last_response.status).to eq 404
+      end
+      it 'leaves the password unchanged' do
+        expect(user_repo.by_id(user.id).authenticate('new_password')).to eq false
+        expect(user_repo.by_id(user.id).authenticate('password')).to eq true
+      end
+    end
+    context 'with a token but no recorded send time' do
+      let(:user) do
+        Factory[:user, :reset_password, reset_password_sent_at: nil]
+      end
+      it 'returns HTTP status 404' do
+        put "/password_resets/#{user.reset_password_token}",
+            data: { password: 'new_password' }
+        expect(last_response.status).to eq 404
       end
     end
     context 'with nonexistent user' do
@@ -121,4 +173,23 @@ RSpec.describe 'PasswordResets', type: :request do
     end
   end
   # 'PUT /password_resets/:token'
+
+  describe PasswordReset do
+    before { user }
+
+    it 'never looks a user up with a nil or empty token' do
+      [nil, ''].each do |token|
+        reset = PasswordReset.new(password: 'x')
+        reset.reset_token = token
+        expect { reset.update }.to raise_error(StandardError)
+      end
+    end
+
+    it 'accepts a token issued within the lifetime' do
+      fresh = Factory[:user, :reset_password,
+                      reset_password_sent_at: DateTime.now - Rational(1, 24)]
+      reset = PasswordReset.new(reset_token: fresh.reset_password_token)
+      expect(reset.user[:id]).to eq fresh.id
+    end
+  end
 end
