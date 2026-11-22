@@ -315,15 +315,20 @@
         state: absent
       loop:
         - "{{ build_dir }}/public_html/pub/static/frontend/Metatooth/threetwenty"
+        - "{{ build_dir }}/public_html/pub/static/adminhtml/Magento/backend"
         - "{{ build_dir }}/public_html/var/view_preprocessed"
       tags: static
 
+    # -t limits deployment to the named theme, so the admin theme must be
+    # deployed explicitly or the admin pages render without CSS/JS.
     - name: Deploy static content
       become: yes
       ansible.builtin.shell:
-        cmd: >
-          docker exec -u root php-{{ site_slug }}-1
-          php /var/www/html/bin/magento setup:static-content:deploy -f -t Metatooth/threetwenty en_US
+        cmd: |
+          set -e
+          docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento setup:static-content:deploy -f --area frontend -t Metatooth/threetwenty en_US
+          docker exec -u root php-{{ site_slug }}-1 php /var/www/html/bin/magento setup:static-content:deploy -f --area adminhtml -t Magento/backend en_US
+        executable: /bin/bash
         chdir: "{{ build_dir }}"
       tags: static
 
