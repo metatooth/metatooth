@@ -10,6 +10,8 @@
                 <model>Metatooth\SquareCheckout\Model\Payment</model>
                 <payment_action>order</payment_action>
                 <allowspecific>0</allowspecific>
+                <access_token backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
+                <sandbox_access_token backend_model="Magento\Config\Model\Config\Backend\Encrypted"/>
             </squarecheckout>
         </payment>
     </default>

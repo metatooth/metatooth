@@ -36,10 +36,11 @@ class Square extends AbstractHelper
         $money->setAmount((int) round($order->getGrandTotal() * 100));
         $money->setCurrency($order->getOrderCurrencyCode());
 
-        $quickPay = new QuickPay();
-        $quickPay->setName('Order #' . $order->getIncrementId());
-        $quickPay->setPriceMoney($money);
-        $quickPay->setLocationId($this->config->getLocationId($storeId));
+        $quickPay = new QuickPay(
+            'Order #' . $order->getIncrementId(),
+            $money,
+            $this->config->getLocationId($storeId)
+        );
 
         $checkoutOptions = new CheckoutOptions();
         $checkoutOptions->setRedirectUrl($redirectUrl);
