@@ -9,7 +9,6 @@ use Magento\Sales\Model\Order;
 use Square\Legacy\Models\CheckoutOptions;
 use Square\Legacy\Models\CreatePaymentLinkRequest;
 use Square\Legacy\Models\Money;
-use Square\Legacy\Models\OrderState;
 use Square\Legacy\Models\QuickPay;
 use Square\Legacy\SquareClient;
 
@@ -68,8 +67,10 @@ class Square extends AbstractHelper
     /**
      * Whether the Square order behind a payment link has been paid.
      *
-     * Payment links do not expose payment IDs; the order Square creates for
-     * the link is COMPLETED once a tender has been captured against it.
+     * Payment links do not expose payment IDs, so they are read from the
+     * tenders on the order Square creates for the link. That order can stay
+     * OPEN after payment while its fulfillment is pending, so the payments
+     * themselves must be COMPLETED and cover the order total.
      */
     public function isPaymentLinkPaid(string $linkId, int $storeId): bool
     {
@@ -91,7 +92,27 @@ class Square extends AbstractHelper
         }
 
         $squareOrder = $orderResponse->getResult()->getOrder();
-        return $squareOrder !== null && $squareOrder->getState() === OrderState::COMPLETED;
+        $total = (int) $squareOrder?->getTotalMoney()?->getAmount();
+        if ($total <= 0) {
+            return false;
+        }
+
+        $paid = 0;
+        foreach ($squareOrder->getTenders() ?? [] as $tender) {
+            if (!$tender->getPaymentId()) {
+                continue;
+            }
+            $paymentResponse = $client->getPaymentsApi()->getPayment($tender->getPaymentId());
+            if (!$paymentResponse->isSuccess()) {
+                continue;
+            }
+            $payment = $paymentResponse->getResult()->getPayment();
+            if ($payment->getStatus() === 'COMPLETED') {
+                $paid += (int) $payment->getAmountMoney()?->getAmount();
+            }
+        }
+
+        return $paid >= $total;
     }
 
     private function buildClient(int $storeId): SquareClient
